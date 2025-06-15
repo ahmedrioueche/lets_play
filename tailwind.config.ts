@@ -1,0 +1,106 @@
+import type { Config } from "tailwindcss";
+
+const config: Config = {
+  content: [
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        light: {
+          background: "#f8fafc", // Clean light background
+          foreground: "#0f172a", // Dark text for readability
+          primary: "#06b6d4", // Energetic cyan for sports/games
+          secondary: "#f59e0b", // Vibrant amber for highlights
+          accent: "#10b981", // Success green for positive actions
+          muted: "#64748b", // Muted text
+          border: "#e2e8f0", // Light borders
+          card: "#ffffff", // Card backgrounds
+          text: {
+            primary: "#0f172a",
+            secondary: "#64748b",
+            muted: "#94a3b8",
+          },
+        },
+        dark: {
+          background: "#0f172a", // Deep dark background
+          foreground: "#f1f5f9", // Light text
+          primary: "#22d3ee", // Bright cyan for contrast
+          secondary: "#fbbf24", // Warm amber
+          accent: "#34d399", // Bright green
+          muted: "#64748b", // Muted elements
+          border: "#334155", // Dark borders
+          card: "#1e293b", // Card backgrounds
+          text: {
+            primary: "#f1f5f9",
+            secondary: "#cbd5e1",
+            muted: "#94a3b8",
+          },
+        },
+        // Game/Sport specific colors
+        sports: {
+          soccer: "#22c55e",
+          basketball: "#f97316",
+          tennis: "#eab308",
+          volleyball: "#3b82f6",
+          badminton: "#a855f7",
+          swimming: "#06b6d4",
+          running: "#ef4444",
+          cycling: "#84cc16",
+        },
+      },
+      fontFamily: {
+        dancing: ["Dancing Script", "serif"],
+        stix: ["STIX Two Text", "serif"],
+        inter: ["Inter", "sans-serif"],
+      },
+      backgroundImage: {
+        "game-gradient":
+          "linear-gradient(135deg, #06b6d4 0%, #3b82f6 50%, #8b5cf6 100%)",
+        "sport-gradient": "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+      },
+    },
+    keyframes: {
+      "fade-in": {
+        "0%": { opacity: "0", transform: "translateY(-10px)" },
+        "100%": { opacity: "1", transform: "translateY(0)" },
+      },
+      "inplace-fade": {
+        "0%": { opacity: "0" },
+        "100%": { opacity: "1" },
+      },
+      "slide-up": {
+        "0%": { opacity: "0", transform: "translateY(20px)" },
+        "100%": { opacity: "1", transform: "translateY(0)" },
+      },
+      "bounce-in": {
+        "0%": { opacity: "0", transform: "scale(0.3)" },
+        "50%": { opacity: "1", transform: "scale(1.05)" },
+        "70%": { transform: "scale(0.9)" },
+        "100%": { opacity: "1", transform: "scale(1)" },
+      },
+      spin: {
+        to: { transform: "rotate(360deg)" },
+      },
+      pulse: {
+        "0%, 100%": { opacity: "1" },
+        "50%": { opacity: "0.5" },
+      },
+    },
+    animation: {
+      "bounce-slow": "bounce 1s ease-in-out infinite",
+      "bounce-in": "bounce-in 0.6s ease-out",
+      spin: "spin 1s linear infinite",
+      "fade-in": "fade-in 0.5s ease-out",
+      "inplace-fade": "inplace-fade 300ms ease-out",
+      "slide-up": "slide-up 0.4s ease-out",
+      pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+    },
+  },
+  plugins: [require("tailwind-scrollbar-hide")],
+  darkMode: "class",
+};
+
+export default config;

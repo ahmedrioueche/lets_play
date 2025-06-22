@@ -13,6 +13,7 @@ interface Stats {
 interface CachedData {
   stats: Stats | null;
   nearbyGames: Game[];
+  recentGames: Game[];
   userLocation: { lat: number; lng: number } | null;
   timestamp: number;
 }
@@ -20,9 +21,11 @@ interface CachedData {
 interface UseHomeReturn {
   stats: Stats | null;
   nearbyGames: Game[];
+  recentGames: Game[];
   userLocation: { lat: number; lng: number } | null;
   isLoadingStats: boolean;
   isLoadingGames: boolean;
+  isLoadingRecent: boolean;
   isLoadingLocation: boolean;
   error: string | null;
   refreshData: () => void;
@@ -33,20 +36,14 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 const getCachedData = (): CachedData | null => {
   if (typeof window === 'undefined') return null;
-
   try {
     const cached = localStorage.getItem(CACHE_KEY);
     if (!cached) return null;
-
     const data: CachedData = JSON.parse(cached);
     const now = Date.now();
-
-    // Check if cache is still valid
     if (now - data.timestamp < CACHE_DURATION) {
       return data;
     }
-
-    // Remove expired cache
     localStorage.removeItem(CACHE_KEY);
     return null;
   } catch (error) {
@@ -57,7 +54,6 @@ const getCachedData = (): CachedData | null => {
 
 const setCachedData = (data: Omit<CachedData, 'timestamp'>) => {
   if (typeof window === 'undefined') return;
-
   try {
     const cacheData: CachedData = {
       ...data,
@@ -73,15 +69,17 @@ export const useHome = (): UseHomeReturn => {
   const { user } = useAuth();
   const [stats, setStats] = useState<Stats | null>(null);
   const [nearbyGames, setNearbyGames] = useState<Game[]>([]);
+  const [recentGames, setRecentGames] = useState<Game[]>([]);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [isLoadingStats, setIsLoadingStats] = useState(false);
   const [isLoadingGames, setIsLoadingGames] = useState(false);
+  const [isLoadingRecent, setIsLoadingRecent] = useState(false);
   const [isLoadingLocation, setIsLoadingLocation] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchStats = async (useCache = true) => {
+  // --- Fetchers ---
+  const fetchStats = async () => {
     if (!user?.id) {
-      // Set default stats for new users or when user is not available
       const defaultStats = {
         userGames: 0,
         nearbyGames: 0,
@@ -92,29 +90,25 @@ export const useHome = (): UseHomeReturn => {
       setStats(defaultStats);
       return;
     }
-
     setIsLoadingStats(true);
     setError(null);
-
     try {
       const response = await fetch(`/api/stats?userId=${user.id}`);
       if (!response.ok) {
         throw new Error('Failed to fetch stats');
       }
-
       const data = await response.json();
       setStats(data);
-
       // Update cache
       const cached = getCachedData();
       setCachedData({
         stats: data,
         nearbyGames: cached?.nearbyGames || [],
+        recentGames: cached?.recentGames || [],
         userLocation: cached?.userLocation || null,
       });
     } catch (err) {
       console.error('Error fetching stats:', err);
-      // Set default stats on error
       setStats({
         userGames: 0,
         nearbyGames: 0,
@@ -127,43 +121,61 @@ export const useHome = (): UseHomeReturn => {
     }
   };
 
-  const fetchNearbyGames = async (useCache = true) => {
-    if (!userLocation) {
-      return;
-    }
-
+  const fetchNearbyGames = async (location: { lat: number; lng: number } | null) => {
+    if (!location) return;
     setIsLoadingGames(true);
-
     try {
       const response = await fetch(
-        `/api/games/nearby?lat=${userLocation.lat}&lng=${userLocation.lng}&limit=6`
+        `/api/games/nearby?lat=${location.lat}&lng=${location.lng}&limit=6`
       );
       if (!response.ok) {
         throw new Error('Failed to fetch nearby games');
       }
-
       const data = await response.json();
       setNearbyGames(data);
-
       // Update cache
       const cached = getCachedData();
       setCachedData({
         stats: cached?.stats || null,
         nearbyGames: data,
-        userLocation: cached?.userLocation || userLocation,
+        recentGames: cached?.recentGames || [],
+        userLocation: cached?.userLocation || location,
       });
     } catch (err) {
       console.error('Error fetching nearby games:', err);
-      // Set empty array on error - this is fine for new users
       setNearbyGames([]);
     } finally {
       setIsLoadingGames(false);
     }
   };
 
+  const fetchRecentGames = async () => {
+    setIsLoadingRecent(true);
+    try {
+      const response = await fetch(`/api/games/recent?limit=3`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch recent games');
+      }
+      const data = await response.json();
+      setRecentGames(data);
+      // Update cache
+      const cached = getCachedData();
+      setCachedData({
+        stats: cached?.stats || null,
+        nearbyGames: cached?.nearbyGames || [],
+        recentGames: data,
+        userLocation: cached?.userLocation || null,
+      });
+    } catch (err) {
+      console.error('Error fetching recent games:', err);
+      setRecentGames([]);
+    } finally {
+      setIsLoadingRecent(false);
+    }
+  };
+
   const getLocation = () => {
     setIsLoadingLocation(true);
-
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -173,41 +185,39 @@ export const useHome = (): UseHomeReturn => {
           };
           setUserLocation(location);
           setIsLoadingLocation(false);
-
           // Update cache
           const cached = getCachedData();
           setCachedData({
             stats: cached?.stats || null,
             nearbyGames: cached?.nearbyGames || [],
+            recentGames: cached?.recentGames || [],
             userLocation: location,
           });
         },
         () => {
-          // Default to New York City if location access is denied
           const defaultLocation = { lat: 40.7128, lng: -74.006 };
           setUserLocation(defaultLocation);
           setIsLoadingLocation(false);
-
           // Update cache
           const cached = getCachedData();
           setCachedData({
             stats: cached?.stats || null,
             nearbyGames: cached?.nearbyGames || [],
+            recentGames: cached?.recentGames || [],
             userLocation: defaultLocation,
           });
         }
       );
     } else {
-      // Default to New York City if geolocation is not supported
       const defaultLocation = { lat: 40.7128, lng: -74.006 };
       setUserLocation(defaultLocation);
       setIsLoadingLocation(false);
-
       // Update cache
       const cached = getCachedData();
       setCachedData({
         stats: cached?.stats || null,
         nearbyGames: cached?.nearbyGames || [],
+        recentGames: cached?.recentGames || [],
         userLocation: defaultLocation,
       });
     }
@@ -215,45 +225,47 @@ export const useHome = (): UseHomeReturn => {
 
   const refreshData = () => {
     setError(null);
-    // Clear cache to force fresh data
     if (typeof window !== 'undefined') {
       localStorage.removeItem(CACHE_KEY);
     }
-
-    fetchStats(false);
-    fetchNearbyGames(false);
+    fetchStats();
+    fetchNearbyGames(userLocation);
+    fetchRecentGames();
   };
 
-  // Initialize data on mount
+  // --- Initial load: cache-first strategy ---
   useEffect(() => {
-    // Try to load from cache first
     const cached = getCachedData();
-
     if (cached) {
-      // Use cached data
       setStats(cached.stats);
       setNearbyGames(cached.nearbyGames);
+      setRecentGames(cached.recentGames);
       setUserLocation(cached.userLocation);
       setIsLoadingLocation(false);
       setIsLoadingStats(false);
       setIsLoadingGames(false);
+      setIsLoadingRecent(false);
+      // Do NOT fetch fresh data if cache is valid
     } else {
-      // No cache available, fetch fresh data
+      // No valid cache, fetch everything
       getLocation();
       fetchStats();
+      fetchRecentGames();
     }
   }, []);
 
-  // Fetch nearby games when location is available (only if not from cache)
+  // Fetch nearby games when location is available (only if no cache)
   useEffect(() => {
-    if (userLocation && !getCachedData()) {
-      fetchNearbyGames();
+    const cached = getCachedData();
+    if (userLocation && !cached) {
+      fetchNearbyGames(userLocation);
     }
   }, [userLocation]);
 
-  // Fetch stats when user is available (only if not from cache)
+  // Fetch stats when user is available (only if no cache)
   useEffect(() => {
-    if (user && !getCachedData()) {
+    const cached = getCachedData();
+    if (user && !cached) {
       fetchStats();
     }
   }, [user?.id]);
@@ -261,9 +273,11 @@ export const useHome = (): UseHomeReturn => {
   return {
     stats,
     nearbyGames,
+    recentGames,
     userLocation,
     isLoadingStats,
     isLoadingGames,
+    isLoadingRecent,
     isLoadingLocation,
     error,
     refreshData,

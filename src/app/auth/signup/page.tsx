@@ -68,7 +68,7 @@ const SignupPage: React.FC = () => {
       const result = await signup(formData.name, formData.email, formData.password);
 
       if (result.success) {
-        router.push('/');
+        router.push('/auth/email-verification');
       } else {
         setErrors({ general: result.error || text.auth.auth_failed });
       }
@@ -108,12 +108,6 @@ const SignupPage: React.FC = () => {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className='p-6 space-y-4'>
-          {errors.general && (
-            <div className='p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg'>
-              <p className='text-red-600 dark:text-red-400 text-sm'>{errors.general}</p>
-            </div>
-          )}
-
           <InputField
             name='name'
             value={formData.name}
@@ -174,6 +168,12 @@ const SignupPage: React.FC = () => {
           <Button type='submit' variant='primary' className='w-full' disabled={isLoading}>
             {isLoading ? 'Loading...' : text.general.sign_up}
           </Button>
+
+          {errors.general && (
+            <div className='text-center p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg'>
+              <p className='text-red-600 dark:text-red-400 text-sm'>{errors.general}</p>
+            </div>
+          )}
 
           <div className='relative'>
             <div className='absolute inset-0 flex items-center'>

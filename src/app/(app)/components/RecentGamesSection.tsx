@@ -34,8 +34,8 @@ const RecentGamesSection: React.FC<RecentGamesSectionProps> = ({
 
   return (
     <div className='space-y-4'>
-      <div className='flex items-center justify-between'>
-        <h3 className='text-lg font-semibold text-light-text-primary dark:text-dark-text-primary'>
+      <div className='flex items-center justify-between mb-4 mt-1'>
+        <h3 className='text-lg font-semibold text-light-text-primary dark:text-dark-text-primary '>
           {text.home.recent_games}
         </h3>
         <Button
@@ -76,7 +76,7 @@ const RecentGamesSection: React.FC<RecentGamesSectionProps> = ({
         </div>
       ) : (
         <div className='space-y-3'>
-          {games.slice(0, 4).map((game) => (
+          {games.slice(0, 3).map((game) => (
             <GameCard key={game.id} game={game} onClick={onGameSelect} />
           ))}
         </div>

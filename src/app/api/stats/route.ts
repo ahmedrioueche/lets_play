@@ -11,7 +11,6 @@ export async function GET(req: NextRequest) {
     // Return default stats if database is not available
     return NextResponse.json({
       userGames: 0,
-      nearbyGames: 0,
       activeGames: 0,
       friendsOnline: 5,
       totalUsers: 0,
@@ -26,28 +25,38 @@ export async function GET(req: NextRequest) {
     if (!userId) {
       return NextResponse.json({
         userGames: 0,
-        nearbyGames: 0,
         activeGames: 0,
         friendsOnline: 5,
         totalUsers: 0,
       });
     }
 
-    // Get user's games (created by user)
-    const userGames = await GameModel.find({ 'organizer.id': userId }).countDocuments();
+    // Get all games where user is organizer or participant
+    const allUserGames = await GameModel.find({
+      $or: [
+        { 'organizer.id': userId },
+        { participants: { $exists: true, $ne: [], $in: [userId] } },
+      ],
+    });
 
-    // Get nearby games (within 50km radius - simplified for now)
-    const nearbyGames = await GameModel.find({ status: 'open' }).countDocuments();
+    // userGames: total count
+    const userGames = allUserGames.length;
 
-    // Get total active games
-    const activeGames = await GameModel.find({ status: 'open' }).countDocuments();
+    // activeGames: games in the future (date/time >= now)
+    const now = new Date();
+    const activeGames = allUserGames.filter((game) => {
+      // Combine date and time fields
+      const dateStr = game.date || '';
+      const timeStr = game.time || '00:00';
+      const gameDate = new Date(`${dateStr}T${timeStr}`);
+      return gameDate >= now;
+    }).length;
 
     // Get total users (friends online is mock data for now)
     const totalUsers = await UserModel.countDocuments();
 
     return NextResponse.json({
       userGames,
-      nearbyGames,
       activeGames,
       friendsOnline: Math.floor(Math.random() * 15) + 5, // Mock data
       totalUsers,
@@ -57,7 +66,6 @@ export async function GET(req: NextRequest) {
     // Return default stats on error instead of throwing
     return NextResponse.json({
       userGames: 0,
-      nearbyGames: 0,
       activeGames: 0,
       friendsOnline: 5,
       totalUsers: 0,

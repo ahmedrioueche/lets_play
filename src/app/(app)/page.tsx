@@ -12,16 +12,18 @@ import {
   RecentGamesSection,
   StatsSection,
   WelcomeSection,
-} from './components/home';
+} from './components';
 
 const HomePage: React.FC = () => {
   const router = useRouter();
   const {
     stats,
     nearbyGames,
+    recentGames,
     userLocation,
     isLoadingStats,
     isLoadingGames,
+    isLoadingRecent,
     isLoadingLocation,
     error,
     refreshData,
@@ -42,7 +44,11 @@ const HomePage: React.FC = () => {
       <WelcomeSection />
 
       {/* Quick Stats - Show loading only for stats */}
-      <StatsSection stats={stats} isLoading={isLoadingStats} />
+      <StatsSection
+        stats={stats}
+        nearbyGamesCount={nearbyGames.length}
+        isLoading={isLoadingStats}
+      />
 
       {/* Map and Games Section */}
       <div className='grid grid-cols-1 xl:grid-cols-3 gap-6'>
@@ -58,12 +64,12 @@ const HomePage: React.FC = () => {
           />
         </div>
 
-        {/* Recent Games - Show loading only for games */}
+        {/* Recent Games - Show loading only for recent games */}
         <div>
           <RecentGamesSection
-            games={nearbyGames}
+            games={recentGames}
             onGameSelect={handleGameSelect}
-            isLoading={isLoadingGames}
+            isLoading={isLoadingRecent}
           />
         </div>
       </div>

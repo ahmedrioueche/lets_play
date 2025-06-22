@@ -4,7 +4,6 @@ import React from 'react';
 
 interface Stats {
   userGames: number;
-  nearbyGames: number;
   activeGames: number;
   friendsOnline: number;
   totalUsers: number;
@@ -12,10 +11,15 @@ interface Stats {
 
 interface StatsSectionProps {
   stats: Stats | null;
+  nearbyGamesCount: number;
   isLoading?: boolean;
 }
 
-const StatsSection: React.FC<StatsSectionProps> = ({ stats, isLoading = false }) => {
+const StatsSection: React.FC<StatsSectionProps> = ({
+  stats,
+  nearbyGamesCount,
+  isLoading = false,
+}) => {
   const text = useTranslator();
 
   const StatCard = ({
@@ -36,7 +40,7 @@ const StatsSection: React.FC<StatsSectionProps> = ({ stats, isLoading = false })
         <div>
           <p className='text-sm text-light-text-secondary dark:text-dark-text-secondary'>{title}</p>
           {isLoading ? (
-            <div className='h-8 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mt-1' />
+            <div className='h-8 w-20 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 dark:from-gray-700 dark:via-gray-800 dark:to-gray-700 animate-pulse bg-[length:200%_100%] bg-left bg-no-repeat' />
           ) : (
             <p className='text-2xl font-bold text-light-text-primary dark:text-dark-text-primary'>
               {value}
@@ -61,7 +65,7 @@ const StatsSection: React.FC<StatsSectionProps> = ({ stats, isLoading = false })
       />
       <StatCard
         title={text.home.nearby_games}
-        value={stats?.nearbyGames || 0}
+        value={nearbyGamesCount}
         icon={MapPin}
         bgColor='bg-green-50 dark:bg-green-900/20'
         iconColor='text-green-500'

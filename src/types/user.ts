@@ -7,6 +7,10 @@ export interface User {
   phone: string;
   avatar?: string;
   bio?: string;
+  age?: string | number;
+  favoriteSports?: string[];
+  isVerified?: boolean;
+  hasCompletedOnboarding?: boolean;
   location?: {
     lat: number;
     lng: number;
@@ -15,20 +19,3 @@ export interface User {
   createdAt: string;
   updatedAt: string;
 }
-
-// Example current user for development
-export const currentUser: User = {
-  id: '1',
-  name: 'John Doe',
-  email: 'john@example.com',
-  phone: '+1234567890',
-  avatar: '/images/avatars/default.jpg',
-  bio: 'Love playing sports and meeting new people!',
-  location: {
-    lat: 40.7128,
-    lng: -74.006,
-  },
-  registeredGames: [],
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-};

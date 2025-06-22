@@ -1,6 +1,5 @@
 'use client';
 
-import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import Button from '@/components/ui/Button';
 import { gamesApi } from '@/lib/api/client';
 import { Game } from '@/types/game';
@@ -156,47 +155,45 @@ export default function CreateGamePage() {
   );
 
   return (
-    <ProtectedRoute>
-      <div className='min-h-screen'>
-        <div className='container mx-auto p-0'>
-          <div className='flex flex-col lg:flex-row gap-8'>
-            {/* Left Column - Form */}
-            <div className='lg:w-1/2 '>
-              <div className='sticky top-8'>
-                <div className='bg-light-card dark:bg-dark-card rounded-2xl shadow-xl p-6'>
-                  <GameFormSection
-                    formData={{ ...formData, title: autoTitle }}
-                    errors={errors}
-                    handleInputChange={handleInputChange}
-                    handleSelectChange={handleSelectChange}
-                  />
+    <div className='min-h-screen'>
+      <div className='container mx-auto p-0'>
+        <div className='flex flex-col lg:flex-row gap-8'>
+          {/* Left Column - Form */}
+          <div className='lg:w-1/2 '>
+            <div className='sticky top-8'>
+              <div className='bg-light-card dark:bg-dark-card rounded-2xl shadow-xl p-6'>
+                <GameFormSection
+                  formData={{ ...formData, title: autoTitle }}
+                  errors={errors}
+                  handleInputChange={handleInputChange}
+                  handleSelectChange={handleSelectChange}
+                />
 
-                  <div className='mt-8'>
-                    <Button
-                      type='submit'
-                      variant='primary'
-                      className='w-full py-3 text-lg font-medium'
-                      onClick={handleSubmit}
-                    >
-                      Create Game
-                    </Button>
-                  </div>
+                <div className='mt-8'>
+                  <Button
+                    type='submit'
+                    variant='primary'
+                    className='w-full py-3 text-lg font-medium'
+                    onClick={handleSubmit}
+                  >
+                    Create Game
+                  </Button>
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Right Column - Map */}
-            <div className='lg:w-1/2 h-[calc(100vh)]'>
-              <MapSection
-                formData={formData}
-                errors={errors}
-                mapCenter={mapCenter}
-                handleMapClick={handleMapClick}
-              />
-            </div>
+          {/* Right Column - Map */}
+          <div className='lg:w-1/2 h-[calc(100vh)]'>
+            <MapSection
+              formData={formData}
+              errors={errors}
+              mapCenter={mapCenter}
+              handleMapClick={handleMapClick}
+            />
           </div>
         </div>
       </div>
-    </ProtectedRoute>
+    </div>
   );
 }

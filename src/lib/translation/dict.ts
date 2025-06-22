@@ -113,6 +113,10 @@ export const dict = {
         created_games: "You haven't created any games yet.",
         signedup_games: "You haven't signed up for any games yet.",
       },
+      loading: {
+        loadingWithDots: 'Loading...',
+        message: "Let's us cook",
+      },
     },
   },
 } as const;

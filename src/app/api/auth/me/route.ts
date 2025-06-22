@@ -1,4 +1,4 @@
-import connectToDatabase from '@/config/db';
+import UserModel from '@/models/User';
 import jwt from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';
 import { NextRequest, NextResponse } from 'next/server';
@@ -16,22 +16,15 @@ export async function GET(request: NextRequest) {
     // Verify JWT token
     const decoded = jwt.verify(token, JWT_SECRET) as { userId: string; email: string };
 
-    const db = await connectToDatabase();
-
-    // Find user by ID
-    const user = await db.models.User.findOne({ _id: new ObjectId(decoded.userId) });
+    // Find user by ID using Mongoose model
+    const user = await UserModel.findOne({ _id: new ObjectId(decoded.userId) });
 
     if (!user) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
 
     // Return user data without password
-    return NextResponse.json({
-      id: user._id.toString(),
-      name: user.name,
-      email: user.email,
-      isPremium: user.isPremium || false,
-    });
+    return NextResponse.json(user);
   } catch (error) {
     console.error('Auth check error:', error);
     return NextResponse.json({ message: 'Invalid token' }, { status: 401 });

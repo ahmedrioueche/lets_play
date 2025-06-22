@@ -1,6 +1,7 @@
 import GamesMap from '@/components/games/GamesMap';
+import { useAuth } from '@/context/AuthContext';
 import { Game } from '@/types/game';
-import { currentUser, User } from '@/types/user';
+import { User } from '@/types/user';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Calendar, ChevronRight, Clock, MapPin, User as UserIcon, Users, X } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
@@ -46,6 +47,7 @@ const GameDetailsModal: React.FC<GameDetailsModalProps> = ({
   const [currentView, setCurrentView] = useState<ModalView>('details');
   const [notes, setNotes] = useState('');
   const modalRef = useRef<HTMLDivElement>(null);
+  const { user } = useAuth();
 
   // Handle click outside
   useEffect(() => {
@@ -68,9 +70,9 @@ const GameDetailsModal: React.FC<GameDetailsModalProps> = ({
     try {
       setIsLoading(true);
       await onRegister(game.id, {
-        ...currentUser,
-        notes, // Add any additional notes to the registration
-      } as User); // Cast to AppUser to ensure notes property is recognized
+        ...user,
+        notes,
+      } as User);
       setCurrentView('details');
     } catch (error) {
       console.error('Failed to register:', error);
@@ -82,7 +84,7 @@ const GameDetailsModal: React.FC<GameDetailsModalProps> = ({
   const handleCancelRegistration = async () => {
     try {
       setIsLoading(true);
-      await onCancelRegistration(game.id, currentUser.id);
+      await onCancelRegistration(game.id, user?.id || '');
     } catch (error) {
       console.error('Failed to cancel registration:', error);
     } finally {
@@ -293,31 +295,25 @@ const GameDetailsModal: React.FC<GameDetailsModalProps> = ({
           <div className='space-y-3'>
             <div className='flex items-center gap-3'>
               <div className='w-10 h-10 rounded-full overflow-hidden bg-light-hover dark:bg-dark-hover'>
-                {currentUser.avatar ? (
-                  <img
-                    src={currentUser.avatar}
-                    alt={currentUser.name}
-                    className='w-full h-full object-cover'
-                  />
+                {user?.avatar ? (
+                  <img src={user.avatar} alt={user.name} className='w-full h-full object-cover' />
                 ) : (
                   <DefaultUserIcon />
                 )}
               </div>
               <div>
                 <p className='font-medium text-light-text-primary dark:text-dark-text-primary'>
-                  {currentUser.name}
+                  {user?.name}
                 </p>
                 <p className='text-sm text-light-text-secondary dark:text-dark-text-secondary'>
-                  {currentUser.email}
+                  {user?.email}
                 </p>
               </div>
             </div>
             <div className='grid grid-cols-2 gap-3 text-sm'>
               <div>
                 <p className='text-light-text-secondary dark:text-dark-text-secondary'>Phone</p>
-                <p className='text-light-text-primary dark:text-dark-text-primary'>
-                  {currentUser.phone}
-                </p>
+                <p className='text-light-text-primary dark:text-dark-text-primary'>{user?.phone}</p>
               </div>
             </div>
           </div>

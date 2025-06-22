@@ -1,23 +1,118 @@
 export const dict = {
-  "en": {
-    "app": {
-      "name": "Let's Play"
+  en: {
+    app: {
+      name: "Let's Play",
+      slogan: 'Connect. Play. Repeat.',
     },
-    "general": {
-      "notifications": "notifications",
-      "profile": "profile"
+    general: {
+      notifications: 'notifications',
+      profile: 'profile',
+      settings: 'Settings',
+      sign_in: 'Sign In',
+      sign_up: 'Sign Up',
+      logout: 'Logout',
+      login: 'Login',
+      email: 'Email',
+      password: 'Password',
+      name: 'Name',
+      confirm_password: 'Confirm Password',
     },
-    "actions": {
-      "toggle_theme": "Toggle Theme"
+    auth: {
+      welcome_back: 'Welcome Back',
+      create_account: 'Create Account',
+      sign_in_to_continue: 'Sign in to your account to continue',
+      join_us: 'Join us and start playing sports with friends',
+      email_required: 'Email is required',
+      email_invalid: 'Email is invalid',
+      password_required: 'Password is required',
+      password_min_length: 'Password must be at least 6 characters',
+      name_required: 'Name is required',
+      passwords_dont_match: 'Passwords do not match',
+      user_exists: 'User with this email already exists',
+      invalid_credentials: 'Invalid email or password',
+      auth_failed: 'Authentication failed',
+      something_went_wrong: 'Something went wrong. Please try again.',
+      google_auth_failed: 'Google authentication failed',
+      dont_have_account: "Don't have an account?",
+      already_have_account: 'Already have an account?',
+      continue_with_google: 'Continue with Google',
+      or_continue_with: 'Or continue with',
     },
-    "menu": {
-      "sidebar": {
-        "explore": "Explore",
-        "create": "Create",
-        "my_games": "My Games",
-        "friends": "Friends",
-        "messages": "Messages"
-      }
-    }
-  }
+    home: {
+      welcome_back: 'Welcome back! 👋',
+      ready_to_play: 'Ready to play some sports today?',
+      explore_games: 'Explore Games',
+      create_game: 'Create Game',
+      your_games: 'Your Games',
+      nearby_games: 'Nearby Games',
+      active_games: 'Active Games',
+      friends_online: 'Friends Online',
+      games_near_you: 'Games Near You',
+      recent_games: 'Recent Games',
+      view_all: 'View All',
+      refresh: 'Refresh',
+      no_games_nearby: 'No games nearby',
+      be_first_to_create: 'Be the first to create a game in your area!',
+      find_games_near_you: 'Find games near you',
+      organize_your_own_game: 'Organize your own game',
+      find_friends: 'Find Friends',
+      connect_with_players: 'Connect with players',
+      error_loading_data: 'Error Loading Data',
+      try_again: 'Try Again',
+      getting_location: 'Getting your location...',
+      loading_games: 'Loading games...',
+    },
+    game: {
+      skill_levels: {
+        beginner: 'Beginner',
+        intermediate: 'Intermediate',
+        advanced: 'Advanced',
+      },
+    },
+    create: {
+      select_location: 'Select Location',
+      go_to_my_location: 'Go to My Location',
+      click_map_instruction: 'Click on the map to pin your game location',
+      location_required: 'Please select a location on the map to continue.',
+      coordinates: 'Coordinates',
+      location_error: 'Could not get your location. Please allow location access.',
+      geolocation_not_supported: 'Geolocation is not supported by your browser.',
+    },
+    actions: {
+      toggle_theme: 'Toggle Theme',
+    },
+    menu: {
+      sidebar: {
+        home: 'Home',
+        explore: 'Explore',
+        create: 'Create',
+        my_games: 'My Games',
+        my_games_created: 'Games I Created',
+        my_games_signed_up: 'Games I Signed Up For',
+        friends: 'Friends',
+        messages: 'Messages',
+      },
+    },
+    messages: {
+      success: {
+        game_registration: 'Game registration was successful. Have fun!',
+      },
+      error: {
+        game_registration: 'Game registration failed. Please try again later.',
+      },
+      warning: {
+        game_registration:
+          "When you register for this game, you're making a commitment to attend. Repeated no-shows may affect your standing in the community and future game participation.",
+        cancel_signup:
+          'Are you sure you want to cancel your signup for this game? Canceling may affect your credibility.',
+        cancel_game:
+          'Are you sure you want to cancel this game? This action cannot be undone. Canceling may affect your credibility.',
+        credibility: 'Warning: Canceling affects your credibility!',
+      },
+      empty: {
+        created_games: "You haven't created any games yet.",
+        signedup_games: "You haven't signed up for any games yet.",
+      },
+    },
+  },
 } as const;

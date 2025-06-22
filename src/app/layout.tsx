@@ -1,44 +1,20 @@
-"use client";
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
+import { Providers } from './providers';
 
-import Navbar from "@/components/Navbar";
-import "./globals.css";
-import { SidebarProvider } from "@/context/SidebarContext";
-import SideBar from "@/components/Sidebar";
-import { ThemeProvider } from "./providers";
-import { SettingsProvider } from "@/context/SettingsContext";
+const inter = Inter({ subsets: ['latin'] });
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export const metadata: Metadata = {
+  title: "Let's Play",
+  description: 'Find and join sports games near you',
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <head>
-        <title>Let's Play</title>
-        <link rel="icon" href="/images/logo.svg" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-      </head>
-      <body className="flex flex-col h-screen bg-light-background font-stix text-light-text-primary dark:text-dark-text-primary scrollbar-light dark:scrollbar-dark">
-      
-        <SidebarProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <SettingsProvider>
-              <Navbar />
-              <div className="flex flex-1 overflow-hidden">
-                <SideBar />
-                <main className="flex-1 overflow-y-auto p-6 bg-light-background dark:bg-dark-background ">
-                  {children}
-                </main>
-              </div>
-            </SettingsProvider>
-          </ThemeProvider>
-        </SidebarProvider>
+    <html lang='en'>
+      <body className={inter.className}>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

@@ -1,9 +1,23 @@
-"use client";
+'use client';
 
-import {
-  ThemeProvider as NextThemesProvider,
-  type ThemeProviderProps,
-} from "next-themes";
-export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
-  return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
+import { AuthProvider } from '@/context/AuthContext';
+import { SettingsProvider } from '@/context/SettingsContext';
+import { SidebarProvider } from '@/context/SidebarContext';
+import { ThemeProvider as NextThemesProvider } from 'next-themes';
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <NextThemesProvider
+      attribute='class'
+      defaultTheme='system'
+      enableSystem
+      disableTransitionOnChange
+    >
+      <AuthProvider>
+        <SettingsProvider>
+          <SidebarProvider>{children}</SidebarProvider>
+        </SettingsProvider>
+      </AuthProvider>
+    </NextThemesProvider>
+  );
 }

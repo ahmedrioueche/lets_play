@@ -2,33 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @font-face {
-  font-family: "STIX Two Text";
-  src: url("/fonts/STIXTwoText-VariableFont_wght.ttf") format("truetype");
+  font-family: 'STIX Two Text';
+  src: url('/fonts/STIXTwoText-VariableFont_wght.ttf') format('truetype');
   font-weight: 100 900;
 }
 
 @font-face {
-  font-family: "Dancing Script";
-  src: url("/fonts/DancingScript-VariableFont_wght.ttf") format("truetype");
+  font-family: 'Dancing Script';
+  src: url('/fonts/DancingScript-VariableFont_wght.ttf') format('truetype');
   font-weight: 100 900;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
   overflow-x: hidden;
   font-family: Arial, Helvetica, sans-serif;
 }
@@ -70,7 +56,7 @@ body {
   margin: 0;
 }
 
-.no-spinner[type="number"] {
+.no-spinner[type='number'] {
   -moz-appearance: textfield;
 }
 
@@ -86,11 +72,11 @@ body {
 }
 
 .scrollbar-light::-webkit-scrollbar-track {
-  background-color: #f8fafc
+  background-color: #f8fafc;
 }
 
 .scrollbar-light::-webkit-scrollbar-corner {
-  background-color: #f8fafc
+  background-color: #f8fafc;
 }
 
 /* Dark Theme Scrollbar */
@@ -104,21 +90,20 @@ body {
 }
 
 .scrollbar-dark::-webkit-scrollbar-track {
-  background-color: #0f172a                               
+  background-color: #0f172a;
 }
 
 .scrollbar-dark::-webkit-scrollbar-corner {
-  background-color: #0f172a                             
+  background-color: #0f172a;
 }
 
-
 /* Remove the spinner from number inputs */
-input[type="number"]::-webkit-outer-spin-button,
-input[type="number"]::-webkit-inner-spin-button {
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-input[type="number"] {
+input[type='number'] {
   -moz-appearance: textfield;
 }

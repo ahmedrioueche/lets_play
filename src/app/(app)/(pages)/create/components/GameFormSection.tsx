@@ -22,10 +22,6 @@ export const GameFormSection = ({
   handleSelectChange,
 }: GameFormSectionProps) => (
   <div className='space-y-6 '>
-    <h2 className='text-2xl font-bold text-light-text-primary dark:text-dark-text-primary'>
-      Game Details
-    </h2>
-
     <div className='grid grid-cols-1 gap-5'>
       <InputField
         label='Game Title'
@@ -100,14 +96,30 @@ export const GameFormSection = ({
         />
       </div>
 
-      <InputField
-        label='Location Name'
-        name='location'
-        value={formData.location}
-        onChange={handleInputChange}
-        placeholder='e.g., Central Park Soccer Field'
-        error={errors.location}
-      />
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
+        <InputField
+          label='Minimum Age'
+          name='ageMin'
+          type='number'
+          value={formData.ageMin?.toString() || ''}
+          onChange={handleInputChange}
+          error={errors.ageRange}
+          min='13'
+          max='100'
+        />
+
+        <InputField
+          label='Maximum Age'
+          name='ageMax'
+          type='number'
+          value={formData.ageMax?.toString() || ''}
+          onChange={handleInputChange}
+          error={errors.ageRange}
+          min='13'
+          max='100'
+        />
+      </div>
+      {errors.ageRange && <p className='text-red-500 text-sm -mt-3'>{errors.ageRange}</p>}
 
       <div>
         <label className='block text-sm font-medium text-light-text-secondary dark:text-dark-text-secondary mb-2'>

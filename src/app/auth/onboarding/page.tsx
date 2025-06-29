@@ -1,5 +1,6 @@
 'use client';
 import LoadingPage from '@/components/ui/LoadingPage';
+import { useAuth } from '@/context/AuthContext';
 import { AnimatePresence, motion } from 'framer-motion';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -11,7 +12,7 @@ import ReviewStep from './components/ReviewStep';
 
 interface OnboardingData {
   age: string;
-  location: { lat: number; lng: number } | null;
+  location: { lat: number; lng: number; address?: string } | null;
   favoriteSports: string[];
 }
 
@@ -27,6 +28,7 @@ const OnboardingPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const router = useRouter();
+  const { user } = useAuth();
 
   useEffect(() => {
     // Check authentication on mount
@@ -59,12 +61,33 @@ const OnboardingPage: React.FC = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/onboarding', {
-        method: 'POST',
+      // Update core user fields
+      const resUser = await fetch(`/api/users/${user?._id}`, {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(onboardingData),
+        body: JSON.stringify({
+          age: onboardingData.age,
+          location: onboardingData.location
+            ? {
+                cords: { lat: onboardingData.location.lat, lng: onboardingData.location.lng },
+                address:
+                  onboardingData.location.address ||
+                  `Lat: ${onboardingData.location.lat}, Lng: ${onboardingData.location.lng}`,
+              }
+            : null,
+          hasCompletedOnboarding: true,
+        }),
       });
-      if (!res.ok) throw new Error('Failed to save onboarding data');
+      if (!resUser.ok) throw new Error('Failed to save user onboarding data');
+      // Update UserProfile fields
+      const resProfile = await fetch(`/api/users/${user?._id}/user-profile`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          favoriteSports: onboardingData.favoriteSports,
+        }),
+      });
+      if (!resProfile.ok) throw new Error('Failed to save user profile onboarding data');
       setIsLoading(false);
       setSuccess(true);
     } catch (err) {

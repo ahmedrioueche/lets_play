@@ -1,6 +1,7 @@
 'use client';
 
 import { useSidebar } from '@/context/SidebarContext';
+import { useBadges } from '@/hooks/useBadges';
 import useScreen from '@/hooks/useScreen';
 import useTranslator from '@/hooks/useTranslator';
 import { Calendar, Home, MapPin, Menu, MessageCircle, Plus, Users } from 'lucide-react';
@@ -72,6 +73,7 @@ const SideBar: React.FC<NavigationBarProps> = ({}) => {
   const overlayRef = useRef<HTMLDivElement>(null);
   const { isMobile } = useScreen();
   const text = useTranslator();
+  const { badges } = useBadges();
 
   useEffect(() => {
     if (pathname) {
@@ -119,7 +121,7 @@ const SideBar: React.FC<NavigationBarProps> = ({}) => {
       link: 'explore',
       title: text.menu.sidebar.explore,
       icon: <MapPin />,
-      badge: 12,
+      badge: badges.explore > 0 ? badges.explore : undefined,
       color: 'text-sports-soccer',
       gradient: 'from-light-primary to-blue-500 dark:from-dark-primary dark:to-blue-400',
     },
@@ -128,7 +130,7 @@ const SideBar: React.FC<NavigationBarProps> = ({}) => {
       link: 'games',
       title: text.menu.sidebar.my_games,
       icon: <Calendar />,
-      badge: 3,
+      badge: badges.games > 0 ? badges.games : undefined,
       color: 'text-sports-basketball',
       gradient: 'from-sports-basketball to-orange-400',
     },
@@ -145,7 +147,7 @@ const SideBar: React.FC<NavigationBarProps> = ({}) => {
       link: 'friends',
       title: text.menu.sidebar.friends,
       icon: <Users />,
-      badge: 5,
+      badge: badges.friends > 0 ? badges.friends : undefined,
       color: 'text-sports-volleyball',
       gradient: 'from-sports-volleyball to-blue-400',
     },
@@ -154,7 +156,7 @@ const SideBar: React.FC<NavigationBarProps> = ({}) => {
       link: 'chat',
       title: text.menu.sidebar.messages,
       icon: <MessageCircle />,
-      badge: 2,
+      badge: badges.chat > 0 ? badges.chat : undefined,
       color: 'text-sports-badminton',
       gradient: 'from-sports-badminton to-purple-400',
     },
@@ -187,7 +189,7 @@ const SideBar: React.FC<NavigationBarProps> = ({}) => {
         `}
       >
         {isMobile && (
-          <div className='flex items-center gap-3 flex-1'>
+          <div className='flex items-center gap-3 flex-1 px-2'>
             <button onClick={toggle} className='md:hidden mr-2'>
               <Menu className='h-6 w-6' />
             </button>
@@ -200,7 +202,7 @@ const SideBar: React.FC<NavigationBarProps> = ({}) => {
                 className='h-10 w-auto'
               />
               <span className='font-bold md:text-2xl text-lg sm:inline-block ml-1 mt-1 font-dancing '>
-                Let's Play
+                {text.app.name}
               </span>
             </div>
           </div>

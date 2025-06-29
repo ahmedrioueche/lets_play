@@ -55,21 +55,21 @@ const RecentGamesSection: React.FC<RecentGamesSectionProps> = ({
           ))}
         </div>
       ) : games.length === 0 ? (
-        <div className='bg-light-card dark:bg-dark-card p-6 rounded-xl border border-light-border dark:border-dark-border text-center'>
-          <div className='w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-3'>
-            <MapPin className='w-6 h-6 text-gray-400' />
+        <div className='lg:min-h-[330px] bg-light-card dark:bg-dark-card p-6 rounded-xl border border-light-border dark:border-dark-border flex flex-col items-center justify-center'>
+          <div className='w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4'>
+            <MapPin className='w-12 h-12 text-gray-400' />
           </div>
-          <h4 className='font-medium text-light-text-primary dark:text-dark-text-primary mb-1'>
+          <h4 className='font-medium text-light-text-primary dark:text-dark-text-primary mb-2 text-center'>
             {text.home.no_games_nearby}
           </h4>
-          <p className='text-sm text-light-text-secondary dark:text-dark-text-secondary mb-4'>
+          <p className='text-sm text-light-text-secondary dark:text-dark-text-secondary mb-6 text-center max-w-sm'>
             {text.home.be_first_to_create}
           </p>
           <Button
             variant='primary'
             size='sm'
             onClick={() => router.push('/create')}
-            className='w-full'
+            className='w-full max-w-xs'
           >
             {text.home.create_game}
           </Button>

@@ -27,6 +27,7 @@ const CustomSelect = <T extends string>({
   const selectRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const scrollPositionRef = useRef<number>(0);
+  const isScrollingRef = useRef(false);
 
   // Close the dropdown when clicking outside
   useEffect(() => {
@@ -40,7 +41,7 @@ const CustomSelect = <T extends string>({
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [selectRef]);
+  }, []);
 
   // Handle keyboard navigation
   useEffect(() => {
@@ -71,17 +72,37 @@ const CustomSelect = <T extends string>({
     };
   }, [isOpen, disabled]);
 
+  // Handle scroll events
+  useEffect(() => {
+    const handleScroll = (e: Event) => {
+      if (!isOpen || isScrollingRef.current) return;
+
+      // Check if the scroll event is coming from the dropdown list
+      const isScrollingList = listRef.current?.contains(e.target as Node);
+
+      if (!isScrollingList) {
+        setIsOpen(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, true);
+    return () => {
+      window.removeEventListener('scroll', handleScroll, true);
+    };
+  }, [isOpen]);
+
   const handleListScroll = () => {
     if (listRef.current) {
       scrollPositionRef.current = listRef.current.scrollTop;
+      isScrollingRef.current = true;
+
+      // Reset the flag after scroll ends
+      clearTimeout(isScrollingRef.current as any);
+      isScrollingRef.current = setTimeout(() => {
+        isScrollingRef.current = false;
+      }, 100) as any;
     }
   };
-
-  useEffect(() => {
-    if (isOpen && listRef.current) {
-      listRef.current.scrollTop = scrollPositionRef.current;
-    }
-  }, [isOpen]);
 
   // Base classes
   const baseClasses =
@@ -133,7 +154,10 @@ const CustomSelect = <T extends string>({
               position: 'fixed',
               width: selectRef.current?.clientWidth,
               top: selectRef.current
-                ? selectRef.current.getBoundingClientRect().bottom + window.scrollY
+                ? Math.min(
+                    selectRef.current.getBoundingClientRect().bottom + window.scrollY,
+                    window.innerHeight + window.scrollY - 10
+                  )
                 : 'auto',
               left: selectRef.current
                 ? selectRef.current.getBoundingClientRect().left + window.scrollX

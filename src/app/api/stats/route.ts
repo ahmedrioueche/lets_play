@@ -33,11 +33,10 @@ export async function GET(req: NextRequest) {
 
     // Get all games where user is organizer or participant
     const allUserGames = await GameModel.find({
-      $or: [
-        { 'organizer.id': userId },
-        { participants: { $exists: true, $ne: [], $in: [userId] } },
-      ],
-    });
+      $or: [{ organizer: userId }, { participants: userId }],
+    })
+      .populate('organizer', 'name email avatar _id')
+      .populate('participants', 'name email avatar _id');
 
     // userGames: total count
     const userGames = allUserGames.length;
@@ -58,7 +57,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       userGames,
       activeGames,
-      friendsOnline: Math.floor(Math.random() * 15) + 5, // Mock data
+      friendsOnline: 0,
       totalUsers,
     });
   } catch (error: any) {
@@ -67,7 +66,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       userGames: 0,
       activeGames: 0,
-      friendsOnline: 5,
+      friendsOnline: 0,
       totalUsers: 0,
     });
   }

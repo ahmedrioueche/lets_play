@@ -1,5 +1,11 @@
 import dbConnect from '@/config/db';
 import UserModel from '@/models/User';
+import UserAchievementsModel from '@/models/UserAchievements';
+import UserAnalyticsModel from '@/models/UserAnalytics';
+import UserGameHistoryModel from '@/models/UserGameHistory';
+import UserProfileModel from '@/models/UserProfile';
+import UserSocialModel from '@/models/UserSocial';
+import UserStatsModel from '@/models/UserStats';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { NextRequest, NextResponse } from 'next/server';
@@ -38,40 +44,43 @@ export async function POST(request: NextRequest) {
     const saltRounds = 12;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    // Create user
-    const newUser = {
-      id: email, // Use email as ID for now, can be changed to UUID later
+    // Create core user
+    const newUser = await UserModel.create({
       name,
       email,
-      phone: '', // Required field, user can update later
+      phone: '',
       password: hashedPassword,
-      avatar: '',
-      bio: '',
-      isPremium: false,
-      location: {
-        lat: null,
-        lng: null,
-      },
-      registeredGames: [],
-    };
+      isOnline: true,
+    });
 
-    const user = await UserModel.create(newUser);
+    // Create empty stats, social, history, achievements, analytics
+    const stats = await UserStatsModel.create({});
+    const social = await UserSocialModel.create({});
+    const history = await UserGameHistoryModel.create({ userId: newUser._id, registeredGames: [] });
+    const achievements = await UserAchievementsModel.create({
+      userId: newUser._id,
+      achievements: [],
+    });
+    const analytics = await UserAnalyticsModel.create({ userId: newUser._id, activityLog: [] });
+
+    // Create user profile
+    await UserProfileModel.create({
+      userId: newUser._id,
+      favoriteSports: [],
+      stats: stats._id,
+      social: social._id,
+      history: history._id,
+      achievements: achievements._id,
+      analytics: analytics._id,
+    });
 
     // Create JWT token
-    const token = jwt.sign({ userId: user._id?.toString() || '', email }, JWT_SECRET, {
+    const token = jwt.sign({ userId: newUser._id?.toString() || '', email }, JWT_SECRET, {
       expiresIn: '7d',
     });
 
-    // Create response
-    const response = NextResponse.json(
-      {
-        id: user._id?.toString() || '',
-        name: user.name,
-        email: user.email,
-        isPremium: user.isPremium,
-      },
-      { status: 201 }
-    );
+    // Create response with proper ID structure
+    const response = NextResponse.json(newUser);
 
     // Set HTTP-only cookie
     response.cookies.set('auth-token', token, {

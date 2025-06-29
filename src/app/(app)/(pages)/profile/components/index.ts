@@ -1,0 +1,9 @@
+export { default as AchievementCard } from './AchievementCard';
+export { default as AchievementsSection } from './AchievementsSection';
+export { default as DetailedStats } from './DetailedStats';
+export { default as PerformanceChart } from './PerformanceChart';
+export { default as ProfileHero } from './ProfileHero';
+export { default as QuickStats } from './QuickStats';
+export { default as RecentGames } from './RecentGames';
+export { default as TabContent } from './TabContent';
+export { default as TabNavigation } from './TabNavigation';

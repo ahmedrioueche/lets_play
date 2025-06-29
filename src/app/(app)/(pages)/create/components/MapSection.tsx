@@ -2,6 +2,7 @@
 
 import GamesMap from '@/components/games/GamesMap';
 import Button from '@/components/ui/Button';
+import { useAuth } from '@/context/AuthContext';
 import useTranslator from '@/hooks/useTranslator';
 import { Game, GameStatus, SkillLevel, SportType } from '@/types/game';
 import React, { useCallback, useMemo } from 'react';
@@ -17,6 +18,7 @@ interface MapSectionProps {
 export const MapSection = React.memo(
   ({ formData, errors, mapCenter, handleMapClick }: MapSectionProps) => {
     const text = useTranslator();
+    const { user } = useAuth();
 
     const gamesForMap = useMemo(() => {
       // Ensure the generated game object strictly adheres to the Game interface
@@ -33,7 +35,7 @@ export const MapSection = React.memo(
         skillLevel: formData.skillLevel as SkillLevel,
         location: formData.location,
         status: 'open' as GameStatus,
-        organizer: { id: 'mock', name: 'Mock Organizer', avatar: '' }, // Ensure organizer matches Partial<User>
+        organizer: user!,
         price: formData.price,
       };
 
@@ -83,28 +85,45 @@ export const MapSection = React.memo(
     }, [handleMapClick, text.create.location_error, text.create.geolocation_not_supported]);
 
     return (
-      <div className='flex flex-col h-full rounded-2xl overflow-hidden border border-light-border/30 dark:border-dark-border/30 bg-white dark:bg-dark-card shadow-xl'>
-        <div className='p-4 sm:p-6 flex flex-col gap-2'>
-          <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3'>
-            <h2 className='text-xl sm:text-2xl font-bold text-light-text-primary dark:text-dark-text-primary'>
-              {text.create.select_location || 'Select Location'}
-            </h2>
-            <Button
-              type='button'
-              variant='primary'
-              size='sm'
-              className='w-full sm:w-auto'
-              onClick={goToUserLocation}
-            >
-              {text.create.go_to_my_location || 'Go to My Location'}
-            </Button>
-          </div>
-          <p className='text-sm text-light-text-secondary dark:text-dark-text-secondary mb-2 sm:mb-4'>
-            {text.create.click_map_instruction || 'Click on the map to pin your game location'}
+      <div className='space-y-4'>
+        {/* Location Button */}
+        <div className='flex justify-between items-center'>
+          <p className='text-sm text-light-text-secondary dark:text-dark-text-secondary'>
+            Select Location
           </p>
+          <Button
+            type='button'
+            variant='default'
+            size='sm'
+            className='flex items-center gap-2'
+            onClick={goToUserLocation}
+          >
+            <svg
+              className='w-4 h-4'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
+              xmlns='http://www.w3.org/2000/svg'
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={2}
+                d='M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z'
+              />
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={2}
+                d='M15 11a3 3 0 11-6 0 3 3 0 016 0z'
+              />
+            </svg>
+            My Location
+          </Button>
         </div>
 
-        <div className='flex-1 w-full px-4 sm:px-6'>
+        {/* Map Container */}
+        <div className='relative w-full h-[400px] rounded-xl overflow-hidden border border-light-border dark:border-dark-border'>
           <GamesMap
             games={gamesForMap}
             selectedGame={null}
@@ -115,16 +134,24 @@ export const MapSection = React.memo(
           />
         </div>
 
-        <div className='p-4 sm:p-6'>
+        {/* Coordinates and Error Display */}
+        <div className='space-y-2'>
           {errors.coordinates && (
-            <p className='text-red-500 text-sm font-semibold'>
+            <p className='text-red-500 text-sm font-medium'>
               {text.create.location_required || 'Please select a location on the map to continue.'}
             </p>
           )}
-          <p className='text-sm text-light-text-secondary dark:text-dark-text-secondary mt-2'>
-            {text.create.coordinates || 'Coordinates'}: {formData.coordinates.lat.toFixed(4)},{' '}
-            {formData.coordinates.lng.toFixed(4)}
-          </p>
+
+          {(formData.coordinates.lat !== 0 || formData.coordinates.lng !== 0) && (
+            <div className='bg-light-accent dark:bg-dark-accent rounded-lg p-3'>
+              <p className='text-xs font-medium text-light-text-secondary dark:text-dark-text-secondary mb-1'>
+                Coordinates
+              </p>
+              <p className='text-sm text-light-text-primary dark:text-dark-text-primary font-mono'>
+                {formData.coordinates.lat.toFixed(6)}, {formData.coordinates.lng.toFixed(6)}
+              </p>
+            </div>
+          )}
         </div>
       </div>
     );

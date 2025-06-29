@@ -17,6 +17,8 @@ const GameSchema: Schema = new Schema(
     time: { type: String, required: true }, // Store as string for simplicity with HTML time input
     currentPlayers: { type: Number, required: true, default: 0 },
     maxPlayers: { type: Number, required: true },
+    ageMin: { type: Number, required: false, min: 13, max: 100 },
+    ageMax: { type: Number, required: false, min: 13, max: 100 },
     status: {
       type: String,
       enum: Object.values(['open', 'full', 'cancelled', 'completed']),
@@ -32,16 +34,12 @@ const GameSchema: Schema = new Schema(
       enum: Object.values(['beginner', 'intermediate', 'advanced']),
       required: true,
     },
-    organizer: {
-      id: { type: String, required: true },
-      name: { type: String, required: true },
-      avatar: { type: String },
-    },
+    organizer: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     price: { type: Number, default: 0 },
     image: { type: String },
-    participants: [{ type: Schema.Types.ObjectId, ref: 'User' }], // Assuming a User model later
+    participants: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   },
-  { timestamps: true } // Adds createdAt and updatedAt fields automatically
+  { timestamps: true }
 );
 
 const GameModel = (mongoose.models.Game ||

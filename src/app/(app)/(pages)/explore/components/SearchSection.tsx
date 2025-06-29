@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { Search, SlidersHorizontal, ChevronDown, ChevronUp } from 'lucide-react';
-import SearchBar from './SearchBar';
 import ViewToggle from '@/components/games/ViewToggle';
-import { ViewMode } from '@/types/explore';
+import SearchBar from '@/components/ui/SearchBar';
+import { ViewMode } from '@/types/game';
+import { ChevronDown, ChevronUp, MapPin, Search, SlidersHorizontal } from 'lucide-react';
+import React, { useState } from 'react';
 
 interface SearchSectionProps {
   searchQuery: string;
@@ -24,27 +24,23 @@ const SearchSection: React.FC<SearchSectionProps> = ({
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="w-full">
+    <div className='w-full'>
       {/* Mobile Header */}
-      <div className="md:hidden flex flex-col gap-4">
-        <div className="flex items-center justify-between">
+      <div className='md:hidden flex flex-col gap-4'>
+        <div className='flex items-center justify-between'>
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-dark-card text-light-text-primary dark:text-dark-text-primary rounded-xl hover:bg-light-hover dark:hover:bg-dark-hover transition-colors"
+            className='flex items-center gap-2 px-4 py-2 bg-white dark:bg-dark-card text-light-text-primary dark:text-dark-text-primary rounded-xl hover:bg-light-hover dark:hover:bg-dark-hover transition-colors'
           >
-            <Search className="w-5 h-5" />
+            <Search className='w-5 h-5' />
             <span>Search</span>
-            {isExpanded ? (
-              <ChevronUp className="w-5 h-5" />
-            ) : (
-              <ChevronDown className="w-5 h-5" />
-            )}
+            {isExpanded ? <ChevronUp className='w-5 h-5' /> : <ChevronDown className='w-5 h-5' />}
           </button>
           <button
             onClick={onFilterClick}
-            className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-dark-card text-light-text-primary dark:text-dark-text-primary rounded-xl hover:bg-light-hover dark:hover:bg-dark-hover transition-colors"
+            className='flex items-center gap-2 px-4 py-2 bg-white dark:bg-dark-card text-light-text-primary dark:text-dark-text-primary rounded-xl hover:bg-light-hover dark:hover:bg-dark-hover transition-colors'
           >
-            <SlidersHorizontal className="w-5 h-5" />
+            <SlidersHorizontal className='w-5 h-5' />
             <span>Filters</span>
           </button>
         </div>
@@ -54,7 +50,8 @@ const SearchSection: React.FC<SearchSectionProps> = ({
           <SearchBar
             value={searchQuery}
             onChange={onSearchChange}
-            onLocationClick={onLocationClick}
+            onActionClick={onLocationClick}
+            actionIcon={<MapPin />}
           />
         </div>
 
@@ -65,21 +62,22 @@ const SearchSection: React.FC<SearchSectionProps> = ({
       </div>
 
       {/* Desktop Layout */}
-      <div className="hidden md:flex flex-row gap-4">
-        <div className="flex-1">
+      <div className='hidden md:flex flex-row gap-4'>
+        <div className='flex-1'>
           <SearchBar
             value={searchQuery}
             onChange={onSearchChange}
-            onLocationClick={onLocationClick}
+            onActionClick={onLocationClick}
+            actionIcon={<MapPin />}
           />
         </div>
-        <div className="flex items-center gap-4">
+        <div className='flex items-center gap-4'>
           <ViewToggle currentView={currentView} onViewChange={onViewChange} />
           <button
             onClick={onFilterClick}
-            className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-dark-card text-light-text-primary dark:text-dark-text-primary rounded-xl hover:bg-light-hover dark:hover:bg-dark-hover transition-colors"
+            className='flex items-center gap-2 px-4 py-2 bg-white dark:bg-dark-card text-light-text-primary dark:text-dark-text-primary rounded-xl hover:bg-light-hover dark:hover:bg-dark-hover transition-colors'
           >
-            <SlidersHorizontal className="w-5 h-5" />
+            <SlidersHorizontal className='w-5 h-5' />
             <span>Filters</span>
           </button>
         </div>
@@ -88,4 +86,4 @@ const SearchSection: React.FC<SearchSectionProps> = ({
   );
 };
 
-export default SearchSection; 
+export default SearchSection;

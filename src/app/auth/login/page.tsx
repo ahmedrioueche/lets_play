@@ -58,10 +58,10 @@ const LoginPage: React.FC = () => {
         router.push('/');
       } else {
         setErrors({ general: result.error || text.auth.auth_failed });
+        setIsLoading(false);
       }
     } catch (error) {
       setErrors({ general: text.auth.something_went_wrong });
-    } finally {
       setIsLoading(false);
     }
   };

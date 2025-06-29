@@ -4,6 +4,10 @@ import { User } from '@/types/user';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 interface AuthContextType {
+  /**
+   * Core user data (authentication/identification only).
+   * For profile, stats, etc., use useUserProfile(user?.id)
+   */
   user: User | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
@@ -33,6 +37,7 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasMounted, setHasMounted] = useState(false);
 
   const checkAuth = async () => {
     try {
@@ -111,9 +116,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  // Ensure we're on the client side before checking auth
   useEffect(() => {
-    checkAuth();
+    setHasMounted(true);
   }, []);
+
+  // Only check auth after component has mounted on the client
+  useEffect(() => {
+    if (hasMounted) {
+      checkAuth();
+    }
+  }, [hasMounted]);
 
   const value: AuthContextType = {
     user,

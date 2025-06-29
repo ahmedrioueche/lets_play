@@ -77,9 +77,14 @@ export async function GET(request: NextRequest) {
           lng: null,
         },
         registeredGames: [],
+        isOnline: true,
       };
 
       user = await UserModel.create(newUser);
+    } else {
+      // Update existing user's online status
+      user.isOnline = true;
+      await user.save();
     }
 
     // Create JWT token

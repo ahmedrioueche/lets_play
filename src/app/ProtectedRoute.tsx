@@ -1,6 +1,7 @@
 'use client';
 
 import LoadingPage from '@/components/ui/LoadingPage';
+import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
@@ -38,6 +39,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     };
     checkAuth();
   }, [router]);
+
+  // Track online status when user is authenticated
+  useOnlineStatus();
 
   if (loading) {
     return <LoadingPage />;

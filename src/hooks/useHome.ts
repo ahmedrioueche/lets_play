@@ -32,7 +32,7 @@ interface UseHomeReturn {
 }
 
 const CACHE_KEY = 'home_data_cache';
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const CACHE_DURATION = 1 * 60 * 1000; // 1 minute
 
 const getCachedData = (): CachedData | null => {
   if (typeof window === 'undefined') return null;
@@ -79,12 +79,12 @@ export const useHome = (): UseHomeReturn => {
 
   // --- Fetchers ---
   const fetchStats = async () => {
-    if (!user?.id) {
+    if (!user?._id) {
       const defaultStats = {
         userGames: 0,
         nearbyGames: 0,
         activeGames: 0,
-        friendsOnline: 5, // Mock data
+        friendsOnline: 0,
         totalUsers: 0,
       };
       setStats(defaultStats);
@@ -93,7 +93,7 @@ export const useHome = (): UseHomeReturn => {
     setIsLoadingStats(true);
     setError(null);
     try {
-      const response = await fetch(`/api/stats?userId=${user.id}`);
+      const response = await fetch(`/api/stats?userId=${user._id}`);
       if (!response.ok) {
         throw new Error('Failed to fetch stats');
       }
@@ -113,7 +113,7 @@ export const useHome = (): UseHomeReturn => {
         userGames: 0,
         nearbyGames: 0,
         activeGames: 0,
-        friendsOnline: 5,
+        friendsOnline: 0,
         totalUsers: 0,
       });
     } finally {
@@ -268,7 +268,7 @@ export const useHome = (): UseHomeReturn => {
     if (user && !cached) {
       fetchStats();
     }
-  }, [user?.id]);
+  }, [user?._id]);
 
   return {
     stats,

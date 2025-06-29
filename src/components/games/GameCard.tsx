@@ -74,6 +74,33 @@ const GameCard: React.FC<GameCardProps> = ({ game, onClick, userLocation }) => {
             {game.skillLevel.charAt(0).toUpperCase() + game.skillLevel.slice(1)}
           </span>
         </div>
+
+        {/* Age Range */}
+        {(game.ageMin || game.ageMax) && (
+          <div className='flex items-center gap-2 text-sm text-light-text-secondary dark:text-dark-text-secondary'>
+            <svg
+              className='w-4 h-4'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
+              xmlns='http://www.w3.org/2000/svg'
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={2}
+                d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'
+              />
+            </svg>
+            <span>
+              {game.ageMin && game.ageMax
+                ? `${game.ageMin}-${game.ageMax} years`
+                : game.ageMin
+                  ? `${game.ageMin}+ years`
+                  : `Up to ${game.ageMax} years`}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );

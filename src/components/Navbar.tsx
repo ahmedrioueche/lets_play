@@ -3,31 +3,131 @@
 import { useAuth } from '@/context/AuthContext';
 import { useSidebar } from '@/context/SidebarContext';
 import useTranslator from '@/hooks/useTranslator';
-import { Bell, Menu, Settings, User, X } from 'lucide-react';
+import { capitalize } from '@/utils/helper';
+import {
+  Bell,
+  HelpCircle,
+  LogOut,
+  Menu,
+  MessageSquare,
+  Monitor,
+  Moon,
+  Palette,
+  Settings,
+  Sun,
+  X,
+} from 'lucide-react';
 import { useTheme } from 'next-themes';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import NotificationsDropdown from './NotificationsDropdown';
 import ProfileDropdown from './ProfileDropdown';
 import Dropdown from './ui/BaseDropdown';
+import UserAvatar from './ui/UserAvatar';
 
 const Navbar = () => {
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [mobileNotificationsOpen, setMobileNotificationsOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const { toggle, isOpen } = useSidebar();
   const text = useTranslator();
   const { user, logout } = useAuth();
-  const [showAuthModal, setShowAuthModal] = useState(false);
+  const router = useRouter();
+  const { theme, setTheme } = useTheme();
 
-  useEffect(() => setMounted(true), []);
+  //useEffect(() => {
+  //  usersApi.deleteCurrentUser(user?._id!);
+  //}, [user?._id]);
+
+  const handleSettingsClick = () => {
+    router.push('/settings');
+  };
 
   const handleLogout = async () => {
     await logout();
-    setProfileOpen(false);
+    router.push('/auth/login');
+    setMobileMenuOpen(false);
   };
+
+  const mobileMenuItems = [
+    {
+      id: 'profile',
+      icon: <UserAvatar avatar={user?.avatar} className='h-7 w-7' />,
+      label: capitalize(user?.name || 'profile'),
+      onClick: () => {
+        router.push(`/profile/${user?._id}`);
+        setMobileMenuOpen(false);
+      },
+      showNotification: false,
+    },
+    {
+      id: 'notifications',
+      icon: <Bell className='h-5 w-5' />,
+      label: text.general.notifications,
+      onClick: () => {
+        setMobileMenuOpen(false);
+        setTimeout(() => setMobileNotificationsOpen(true), 300);
+      },
+      showNotification: true,
+    },
+    {
+      id: 'settings',
+      icon: <Settings className='h-7 w-7' />,
+      label: text.general.settings,
+      onClick: () => {
+        handleSettingsClick();
+        setMobileMenuOpen(false);
+      },
+      showNotification: false,
+    },
+    {
+      id: 'help',
+      icon: <HelpCircle className='h-5 w-5' />,
+      label: 'Help',
+      onClick: () => setMobileMenuOpen(false),
+      showNotification: false,
+    },
+    {
+      id: 'feedback',
+      icon: <MessageSquare className='h-5 w-5' />,
+      label: 'Feedback',
+      onClick: () => setMobileMenuOpen(false),
+      showNotification: false,
+    },
+  ];
+
+  const themeOptions = [
+    {
+      id: 'system',
+      icon: <Monitor className='h-4 w-4' />,
+      label: 'System theme',
+      value: 'system',
+    },
+    {
+      id: 'light',
+      icon: <Sun className='h-4 w-4' />,
+      label: 'Light theme',
+      value: 'light',
+    },
+    {
+      id: 'dark',
+      icon: <Moon className='h-4 w-4' />,
+      label: 'Dark theme',
+      value: 'dark',
+    },
+  ];
+
+  const bottomMenuItems = [
+    {
+      id: 'logout',
+      icon: <LogOut className='h-5 w-5' />,
+      label: 'Logout',
+      onClick: handleLogout,
+      className: 'text-red-500',
+    },
+  ];
 
   return (
     <>
@@ -45,7 +145,10 @@ const Navbar = () => {
                 <Menu className='h-6 w-6 text-light-text-secondary dark:text-dark-text-secondary' />
               )}
             </button>
-            <div className='cursor-pointer flex items-center gap-2 min-w-0'>
+            <div
+              onClick={() => router.push('/')}
+              className='cursor-pointer flex items-center gap-2 min-w-0'
+            >
               <Image
                 src='/images/logo.svg'
                 alt='Logo'
@@ -63,18 +166,24 @@ const Navbar = () => {
           <div className='flex items-center justify-end gap-2 flex-shrink-0'>
             {/* Desktop Icons */}
             <div className='hidden md:flex items-center gap-2'>
-              <button
-                onClick={() => setNotificationsOpen(!notificationsOpen)}
-                className='p-2 rounded-full hover:bg-light-card dark:hover:bg-dark-card relative'
-                aria-label='Notifications'
-              >
-                <Bell className='h-5 w-5' />
-                <span className='absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500'></span>
-              </button>
-
+              {/* Notification Dropdown */}
+              <div className='relative'>
+                <button
+                  className='p-2 rounded-full hover:bg-light-card dark:hover:bg-dark-card relative'
+                  aria-label='Notifications'
+                  onClick={() => setIsNotificationsOpen((prev) => !prev)}
+                >
+                  <Bell className='h-6 w-6' />
+                </button>
+                <NotificationsDropdown
+                  isOpen={isNotificationsOpen}
+                  onClose={() => setIsNotificationsOpen(false)}
+                />
+              </div>
               <button
                 className='p-2 rounded-full hover:bg-light-card dark:hover:bg-dark-card'
                 aria-label='Settings'
+                onClick={handleSettingsClick}
               >
                 <Settings className='h-5 w-5' />
               </button>
@@ -84,13 +193,7 @@ const Navbar = () => {
                 className='ml-2'
                 aria-label='Profile'
               >
-                {user ? (
-                  <div className='h-8 w-8 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500'></div>
-                ) : (
-                  <div className='h-8 w-8 bg-light-primary dark:bg-dark-primary rounded-full flex items-center justify-center'>
-                    <User className='w-4 h-4 text-white' />
-                  </div>
-                )}
+                {user ? <UserAvatar avatar={user.avatar} /> : <UserAvatar />}
               </button>
             </div>
 
@@ -107,48 +210,83 @@ const Navbar = () => {
           </div>
 
           {/* Mobile Dropdown Menu */}
-          <Dropdown isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)}>
+          <Dropdown isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} width='w-56'>
             <div className='flex flex-col py-2'>
-              <button
-                className='p-3 hover:bg-light-card dark:hover:bg-dark-card flex items-center gap-3 text-left'
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  setNotificationsOpen(true);
-                }}
-              >
-                <Bell className='h-5 w-5' />
-                <span> {text.general.notifications}</span>
-                <span className='ml-auto h-2 w-2 rounded-full bg-red-500'></span>
-              </button>
+              {/* Main Menu Items */}
+              {mobileMenuItems.map((item) => (
+                <button
+                  key={item.id}
+                  className='p-3 hover:bg-light-background dark:hover:bg-dark-background flex items-center gap-3 text-left'
+                  onClick={item.onClick}
+                >
+                  {item.icon}
+                  <span>{item.label}</span>
+                  {item.showNotification && (
+                    <span className='ml-auto h-2 w-2 rounded-full bg-red-500'></span>
+                  )}
+                </button>
+              ))}
 
-              <button
-                className='p-3 hover:bg-light-card dark:hover:bg-dark-card flex items-center gap-3 text-left'
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                }}
-              >
-                <Settings className='h-5 w-5' />
-                <span> {text.general.settings}</span>
-              </button>
+              {/* Separator */}
+              <div className='border-t border-light-border dark:border-dark-border my-1'></div>
 
-              <button
-                className='p-3 hover:bg-light-card dark:hover:bg-dark-card flex items-center gap-3 text-left'
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  setProfileOpen(true);
-                }}
-              >
-                <div className='h-6 w-6 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500'></div>
-                <span>{text.general.profile}</span>
-              </button>
+              {/* Theme Toggle */}
+              <div className='p-3 flex items-center justify-between'>
+                <div className='flex items-center gap-3'>
+                  <Palette className='h-5 w-5' />
+                  <span>Theme</span>
+                </div>
+                <div className='flex gap-1 bg-light-card dark:bg-dark-card p-1 rounded-lg'>
+                  {themeOptions.map((option) => (
+                    <button
+                      key={option.id}
+                      onClick={() => setTheme(option.value)}
+                      className={`p-1.5 rounded-md ${
+                        theme === option.value
+                          ? 'bg-white dark:bg-dark-background shadow-sm'
+                          : 'hover:bg-light-background dark:hover:bg-dark-background'
+                      }`}
+                      aria-label={option.label}
+                    >
+                      <div
+                        className={`${
+                          theme === option.value
+                            ? 'text-light-primary dark:text-dark-primary'
+                            : 'text-light-text-secondary dark:text-dark-text-secondary'
+                        }`}
+                      >
+                        {option.icon}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Bottom Menu Items */}
+              {bottomMenuItems.map((item) => (
+                <button
+                  key={item.id}
+                  className={`p-3 hover:bg-light-card dark:hover:bg-dark-card flex items-center gap-3 text-left ${item.className || ''}`}
+                  onClick={item.onClick}
+                >
+                  {item.icon}
+                  <span>{item.label}</span>
+                </button>
+              ))}
             </div>
           </Dropdown>
 
-          {/* Notification Dropdown */}
-          <NotificationsDropdown
-            isOpen={notificationsOpen}
-            onClose={() => setNotificationsOpen(false)}
-          />
+          {/* Mobile Notifications Dropdown as fixed overlay */}
+          {mobileNotificationsOpen && (
+            <div className='fixed top-0 left-0 w-full z-[100] flex justify-center items-start pt-4'>
+              <div className='w-full max-w-md'>
+                <NotificationsDropdown
+                  isOpen={mobileNotificationsOpen}
+                  onClose={() => setMobileNotificationsOpen(false)}
+                />
+              </div>
+            </div>
+          )}
 
           {/* Profile Dropdown */}
           <ProfileDropdown isOpen={profileOpen} onClose={() => setProfileOpen(false)} />

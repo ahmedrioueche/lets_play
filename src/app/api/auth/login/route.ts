@@ -35,18 +35,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Invalid email or password' }, { status: 401 });
     }
 
+    // Update user online status
+    user.isOnline = true;
+    await user.save();
+
     // Create JWT token
     const token = jwt.sign({ userId: user._id?.toString() || '', email: user.email }, JWT_SECRET, {
       expiresIn: '7d',
     });
 
     // Create response
-    const response = NextResponse.json({
-      id: user._id?.toString() || '',
-      name: user.name,
-      email: user.email,
-      isPremium: user.isPremium || false,
-    });
+    const response = NextResponse.json(user);
 
     // Set HTTP-only cookie
     response.cookies.set('auth-token', token, {

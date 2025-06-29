@@ -1,7 +1,9 @@
 'use client';
 
 import Button from '@/components/ui/Button';
-import { gamesApi } from '@/lib/api/client';
+import InputField from '@/components/ui/InputField';
+import { useAuth } from '@/context/AuthContext';
+import { gamesApi } from '@/lib/api/gamesApi';
 import { Game } from '@/types/game';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useState } from 'react';
@@ -15,7 +17,10 @@ export default function CreateGamePage() {
     Omit<
       Game,
       'id' | 'status' | 'organizer' | 'currentPlayers' | 'participants' | 'createdAt' | 'updatedAt'
-    >
+    > & {
+      ageMin?: number;
+      ageMax?: number;
+    }
   >({
     title: '',
     description: '',
@@ -24,6 +29,8 @@ export default function CreateGamePage() {
     date: '',
     time: '',
     maxPlayers: 10,
+    ageMin: 18,
+    ageMax: 65,
     sport: 'football',
     skillLevel: 'beginner',
     price: 0,
@@ -31,6 +38,7 @@ export default function CreateGamePage() {
 
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const { user } = useAuth();
 
   // Auto-generate title if empty and sport changes
   const autoTitle =
@@ -115,6 +123,9 @@ export default function CreateGamePage() {
     if (formData.maxPlayers < 2) {
       newErrors.maxPlayers = 'Minimum 2 players required.';
     }
+    if (formData.ageMin && formData.ageMax && formData.ageMin > formData.ageMax) {
+      newErrors.ageRange = 'Minimum age cannot be greater than maximum age.';
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }, [formData]);
@@ -133,11 +144,7 @@ export default function CreateGamePage() {
           title: autoTitle,
           currentPlayers: 0,
           status: 'open',
-          organizer: {
-            id: 'current-user-id',
-            name: 'Current User',
-            avatar: '/images/avatars/default.jpg',
-          },
+          organizer: user,
           participants: [],
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
@@ -155,43 +162,54 @@ export default function CreateGamePage() {
   );
 
   return (
-    <div className='min-h-screen'>
-      <div className='container mx-auto p-0'>
-        <div className='flex flex-col lg:flex-row gap-8'>
-          {/* Left Column - Form */}
-          <div className='lg:w-1/2 '>
-            <div className='sticky top-8'>
-              <div className='bg-light-card dark:bg-dark-card rounded-2xl shadow-xl p-6'>
+    <div className='min-h-screen bg-light-background dark:bg-dark-background'>
+      <div className='container mx-auto '>
+        <div className='max-w-6xl mx-auto'>
+          <form
+            onSubmit={handleSubmit}
+            className='bg-light-card dark:bg-dark-card rounded-2xl shadow-xl p-6'
+          >
+            <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
+              {/* Left Column - Form Fields */}
+              <div className='space-y-6'>
                 <GameFormSection
                   formData={{ ...formData, title: autoTitle }}
                   errors={errors}
                   handleInputChange={handleInputChange}
                   handleSelectChange={handleSelectChange}
                 />
+              </div>
 
-                <div className='mt-8'>
-                  <Button
-                    type='submit'
-                    variant='primary'
-                    className='w-full py-3 text-lg font-medium'
-                    onClick={handleSubmit}
-                  >
-                    Create Game
-                  </Button>
+              {/* Right Column - Map */}
+              <div className='space-y-4'>
+                <MapSection
+                  formData={formData}
+                  errors={errors}
+                  mapCenter={mapCenter}
+                  handleMapClick={handleMapClick}
+                />
+
+                {/* Location Input */}
+                <div className='space-y-2'>
+                  <InputField
+                    label='Location Name'
+                    name='location'
+                    value={formData.location}
+                    onChange={handleInputChange}
+                    placeholder='e.g., Central Park Soccer Field'
+                    error={errors.location}
+                  />
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Right Column - Map */}
-          <div className='lg:w-1/2 h-[calc(100vh)]'>
-            <MapSection
-              formData={formData}
-              errors={errors}
-              mapCenter={mapCenter}
-              handleMapClick={handleMapClick}
-            />
-          </div>
+            {/* Submit Button */}
+            <div className='mt-8 pt-6 border-t border-light-border dark:border-dark-border'>
+              <Button type='submit' variant='primary' className='w-full py-3 text-lg font-medium'>
+                Create Game
+              </Button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

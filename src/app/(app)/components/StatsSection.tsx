@@ -39,13 +39,9 @@ const StatsSection: React.FC<StatsSectionProps> = ({
       <div className='flex items-center justify-between'>
         <div>
           <p className='text-sm text-light-text-secondary dark:text-dark-text-secondary'>{title}</p>
-          {isLoading ? (
-            <div className='h-8 w-20 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 dark:from-gray-700 dark:via-gray-800 dark:to-gray-700 animate-pulse bg-[length:200%_100%] bg-left bg-no-repeat' />
-          ) : (
-            <p className='text-2xl font-bold text-light-text-primary dark:text-dark-text-primary'>
-              {value}
-            </p>
-          )}
+          <p className='text-2xl font-bold text-light-text-primary dark:text-dark-text-primary'>
+            {value}
+          </p>
         </div>
         <div className={`w-10 h-10 ${bgColor} rounded-lg flex items-center justify-center`}>
           <Icon className={`w-5 h-5 ${iconColor}`} />

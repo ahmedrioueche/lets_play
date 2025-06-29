@@ -6,7 +6,10 @@ export async function GET() {
   await dbConnect();
 
   try {
-    const games = await GameModel.find({}).sort({ createdAt: -1 });
+    const games = await GameModel.find({})
+      .populate('organizer', 'name email avatar _id')
+      .populate('participants', 'name email avatar _id')
+      .sort({ createdAt: -1 });
     return NextResponse.json(games);
   } catch (error: any) {
     console.error('Error fetching games:', error);
@@ -48,8 +51,8 @@ export async function POST(req: NextRequest) {
     if (!gameData.skillLevel) {
       missingFields.push('skillLevel');
     }
-    if (!gameData.organizer || !gameData.organizer.id || !gameData.organizer.name) {
-      missingFields.push('organizer (id and name required)');
+    if (!gameData.organizer) {
+      missingFields.push('organizer required');
     }
 
     if (missingFields.length > 0) {

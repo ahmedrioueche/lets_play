@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 interface Location {
   lat: number;
   lng: number;
+  address?: string;
 }
 
 interface LocationStepProps {
@@ -20,7 +21,7 @@ const LocationStep: React.FC<LocationStepProps> = ({ value, onChange, onNext, on
   const [error, setError] = useState<string | null>(null);
   const [localLocation, setLocalLocation] = useState<Location | null>(value);
 
-  const handleGeolocate = () => {
+  const handleGeolocate = async () => {
     setLoading(true);
     setError(null);
     if (!navigator.geolocation) {
@@ -28,21 +29,48 @@ const LocationStep: React.FC<LocationStepProps> = ({ value, onChange, onNext, on
       setLoading(false);
       return;
     }
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const coords = {
-          lat: Number(pos.coords.latitude.toFixed(6)),
-          lng: Number(pos.coords.longitude.toFixed(6)),
-        };
-        setLocalLocation(coords);
-        onChange(coords);
-        setLoading(false);
-      },
-      () => {
-        setError('Unable to retrieve your location.');
-        setLoading(false);
+
+    try {
+      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 60000,
+        });
+      });
+
+      const { latitude, longitude } = position.coords;
+      const coords = {
+        lat: Number(latitude.toFixed(6)),
+        lng: Number(longitude.toFixed(6)),
+      };
+
+      // Get address using reverse geocoding
+      let address = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          address = data.display_name || address;
+        }
+      } catch (geocodeError) {
+        console.log('Reverse geocoding failed, using coordinates as address');
       }
-    );
+
+      const locationWithAddress = {
+        ...coords,
+        address,
+      };
+
+      setLocalLocation(locationWithAddress);
+      onChange(locationWithAddress);
+    } catch (geolocationError) {
+      setError('Unable to retrieve your location.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleNext = () => {
@@ -94,7 +122,7 @@ const LocationStep: React.FC<LocationStepProps> = ({ value, onChange, onNext, on
           <span className='font-semibold'>Detected:</span>
           <br />
           <span>
-            Lat: {localLocation.lat}, Lng: {localLocation.lng}
+            {localLocation.address || `Lat: ${localLocation.lat}, Lng: ${localLocation.lng}`}
           </span>
         </div>
       )}

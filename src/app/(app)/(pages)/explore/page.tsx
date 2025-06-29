@@ -1,13 +1,14 @@
 'use client';
 
+import GameDetailsModal from '@/app/(app)/components/GameDetailsModal';
 import GameCard from '@/components/games/GameCard';
 import GamesMap from '@/components/games/GamesMap';
 import { useExplore } from '@/hooks/useExplore';
 import { Game } from '@/types/game';
+import { User } from '@/types/user';
 import { useEffect, useState } from 'react';
 import CalendarView from './components/CalendarView';
 import FilterModal from './components/FilterModal';
-import GameDetailsModal from './components/GameDetailsModal';
 import SearchSection from './components/SearchSection';
 
 export default function ExplorePage() {
@@ -24,10 +25,18 @@ export default function ExplorePage() {
 
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [hasMounted, setHasMounted] = useState(false);
 
-  // Get user's location on component mount
+  // Ensure we're on the client side before using geolocation
   useEffect(() => {
-    if ('geolocation' in navigator) {
+    setHasMounted(true);
+  }, []);
+
+  // Get user's location on component mount (only after client-side hydration)
+  useEffect(() => {
+    if (!hasMounted) return;
+
+    if (typeof window !== 'undefined' && 'geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           setUserLocation({
@@ -44,22 +53,46 @@ export default function ExplorePage() {
           });
         }
       );
+    } else {
+      // Use default location if geolocation is not available
+      setUserLocation({
+        lat: 40.7128,
+        lng: -74.006,
+      });
     }
-  }, [setUserLocation]);
+  }, [setUserLocation, hasMounted]);
 
   const handleGameClick = (game: Game) => {
     setSelectedGame(game);
     setIsDetailsModalOpen(true);
   };
 
-  const handleRegister = async (gameId: string) => {
+  const handleRegister = async (gameId: string, user: User) => {
     // TODO: Implement registration logic
-    console.log('Registering for game:', gameId);
+    console.log('Registering for game:', gameId, user);
   };
 
-  const handleCancelRegistration = async (gameId: string) => {
+  const handleCancelRegistration = async (gameId: string, userId: string) => {
     // TODO: Implement cancel registration logic
-    console.log('Canceling registration for game:', gameId);
+    console.log('Canceling registration for game:', gameId, userId);
+  };
+
+  const handleLocationClick = () => {
+    if (!hasMounted) return;
+
+    if (typeof window !== 'undefined' && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.error('Error getting location:', error);
+        }
+      );
+    }
   };
 
   const renderContentView = () => {
@@ -136,21 +169,7 @@ export default function ExplorePage() {
       <SearchSection
         searchQuery={state.searchQuery}
         onSearchChange={setSearchQuery}
-        onLocationClick={() => {
-          if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-              (position) => {
-                setUserLocation({
-                  lat: position.coords.latitude,
-                  lng: position.coords.longitude,
-                });
-              },
-              (error) => {
-                console.error('Error getting location:', error);
-              }
-            );
-          }
-        }}
+        onLocationClick={handleLocationClick}
         currentView={state.viewMode}
         onViewChange={setViewMode}
         onFilterClick={() => setIsFilterModalOpen(true)}
@@ -161,18 +180,21 @@ export default function ExplorePage() {
         filters={state.filters}
         onFilterChange={setFilters}
       />
-      <GameDetailsModal
-        game={state.selectedGame!}
-        isOpen={isDetailsModalOpen}
-        onClose={() => {
-          setIsDetailsModalOpen(false);
-          setSelectedGame(null);
-        }}
-        userLocation={state.userLocation}
-        onRegister={handleRegister}
-        onCancelRegistration={handleCancelRegistration}
-        isRegistered={false} // TODO: Implement registration status check
-      />
+      {state.selectedGame && (
+        <GameDetailsModal
+          game={state.selectedGame}
+          isOpen={isDetailsModalOpen}
+          onClose={() => {
+            setIsDetailsModalOpen(false);
+            setSelectedGame(null);
+          }}
+          userLocation={state.userLocation}
+          onRegister={handleRegister}
+          onCancelRegistration={handleCancelRegistration}
+          isRegistered={false} // TODO: Implement registration status check
+          mode='explore'
+        />
+      )}
       <div className='flex-1 relative mt-4'>{renderContentView()}</div>
     </div>
   );

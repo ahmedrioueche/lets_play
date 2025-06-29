@@ -71,10 +71,10 @@ const SignupPage: React.FC = () => {
         router.push('/auth/email-verification');
       } else {
         setErrors({ general: result.error || text.auth.auth_failed });
+        setIsLoading(false);
       }
     } catch (error) {
       setErrors({ general: text.auth.something_went_wrong });
-    } finally {
       setIsLoading(false);
     }
   };
@@ -98,7 +98,7 @@ const SignupPage: React.FC = () => {
       >
         {/* Header */}
         <div className='text-center p-6 border-b border-gray-200 dark:border-gray-700'>
-          <h1 className='md:text-3xl text-2xl font-bold font-dancing text-light-text-primary dark:text-dark-text-primary mb-1'>
+          <h1 className='md:text-3xl text-2xl font-bold font-dancing text-light-primary dark:text-text-primary mb-1'>
             {text.app.name}
           </h1>
           <p className='text-sm text-light-text-secondary dark:text-dark-text-secondary'>

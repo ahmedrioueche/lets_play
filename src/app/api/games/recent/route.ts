@@ -9,7 +9,12 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '6', 10);
 
     // Find the most recent games, sorted by createdAt descending
-    const games = await GameModel.find({}).sort({ createdAt: -1 }).limit(limit).lean();
+    const games = await GameModel.find({})
+      .populate('organizer', 'name email avatar _id')
+      .populate('participants', 'name email avatar _id')
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .lean();
 
     return NextResponse.json(games);
   } catch (error) {

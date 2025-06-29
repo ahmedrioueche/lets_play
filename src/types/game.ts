@@ -18,12 +18,15 @@ export interface Game {
   time: string;
   currentPlayers: number;
   maxPlayers: number;
+  ageMin?: number;
+  ageMax?: number;
   status: GameStatus;
   sport: SportType;
   skillLevel: SkillLevel;
-  organizer: Partial<User>;
+  organizer: User;
   price: number;
   image?: string;
+  participants?: User[];
 }
 
 export interface FilterOptions {

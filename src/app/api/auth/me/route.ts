@@ -23,8 +23,24 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
 
-    // Return user data without password
-    return NextResponse.json(user);
+    // Determine which ID to use - prefer MongoDB _id, fallback to custom id field
+    const userId = user._id?.toString() || '';
+
+    // Return user data with proper ID structure
+    const userData = {
+      _id: userId,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      avatar: user.avatar,
+      isVerified: user.isVerified,
+      isOnline: user.isOnline,
+      hasCompletedOnboarding: user.hasCompletedOnboarding,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
+
+    return NextResponse.json(userData);
   } catch (error) {
     console.error('Auth check error:', error);
     return NextResponse.json({ message: 'Invalid token' }, { status: 401 });

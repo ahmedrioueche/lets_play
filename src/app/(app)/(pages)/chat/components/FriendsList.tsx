@@ -217,7 +217,7 @@ const FriendItem: React.FC<{
                     : 'border-2 border-light-border dark:border-dark-border grayscale-[20%] dark:grayscale-[40%]'
                 }`}
               >
-                <UserAvatar />
+                <UserAvatar className='w-full h-full' />
               </div>
             )}
             {friend.isOnline && (
@@ -246,7 +246,7 @@ const FriendItem: React.FC<{
                 : 'text-light-text-muted dark:text-dark-text-muted'
             }`}
           >
-            {friend.isOnline ? 'Active now' : 'Offline'}
+            {friend.isOnline ? 'Online' : 'Offline'}
           </div>
         </div>
 

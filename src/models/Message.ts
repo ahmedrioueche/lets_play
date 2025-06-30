@@ -12,6 +12,14 @@ interface IMessageModel extends Model<IMessage> {
   ): Promise<IMessage[]>;
   getUnreadCount(userId: string, fromUserId?: string): Promise<number>;
   markConversationAsRead(userId: string, friendId: string): Promise<any>;
+  getConversationStats(
+    userId1: string,
+    userId2: string
+  ): Promise<{
+    totalMessages: number;
+    unreadCount: number;
+    lastMessageAt?: Date;
+  }>;
 }
 
 const MessageSchema = new Schema<IMessage>(
@@ -29,7 +37,7 @@ const MessageSchema = new Schema<IMessage>(
     content: {
       type: String,
       required: true,
-      maxlength: 2000,
+      maxlength: 4000, // Increased for encrypted content
       trim: true,
     },
     messageType: {
@@ -52,6 +60,28 @@ const MessageSchema = new Schema<IMessage>(
     replyTo: {
       type: String,
     },
+    // Encryption fields
+    isEncrypted: {
+      type: Boolean,
+      default: true, // Default to encrypted
+    },
+    encryptionKey: {
+      type: String,
+      required: false, // Will be generated per conversation
+    },
+    // Message status tracking
+    deliveredAt: {
+      type: Date,
+    },
+    readAt: {
+      type: Date,
+    },
+    // Metadata for better performance - temporarily removed to fix validation
+    // conversationId: {
+    //   type: String,
+    //   required: false, // Will be set in pre-save middleware
+    //   index: true,
+    // },
   },
   {
     timestamps: true,
@@ -61,6 +91,9 @@ const MessageSchema = new Schema<IMessage>(
 // Compound indexes for efficient querying
 MessageSchema.index({ senderId: 1, receiverId: 1, createdAt: -1 });
 MessageSchema.index({ receiverId: 1, isRead: 1 });
+// conversationId indexes temporarily removed
+// MessageSchema.index({ conversationId: 1, createdAt: -1 });
+// MessageSchema.index({ conversationId: 1, isRead: 1 });
 
 // Pre-save middleware to set editedAt when message is edited
 MessageSchema.pre('save', function (next) {
@@ -68,12 +101,26 @@ MessageSchema.pre('save', function (next) {
     this.isEdited = true;
     this.editedAt = new Date();
   }
+
+  // conversationId generation temporarily removed
+  // if (!this.conversationId) {
+  //   const sortedIds = [this.senderId, this.receiverId].sort();
+  //   this.conversationId = sortedIds.join(':');
+  // }
+
   next();
 });
 
 // Instance method to mark message as read
 MessageSchema.methods.markAsRead = function () {
   this.isRead = true;
+  this.readAt = new Date();
+  return this.save();
+};
+
+// Instance method to mark message as delivered
+MessageSchema.methods.markAsDelivered = function () {
+  this.deliveredAt = new Date();
   return this.save();
 };
 
@@ -86,13 +133,14 @@ MessageSchema.statics.findConversation = function (
 ) {
   const skip = (page - 1) * limit;
 
+  // Use senderId and receiverId instead of conversationId
   return this.find({
     $or: [
       { senderId: userId1, receiverId: userId2 },
       { senderId: userId2, receiverId: userId1 },
     ],
   })
-    .sort({ createdAt: -1 })
+    .sort({ createdAt: -1 }) // Newest first (most recent at the beginning)
     .skip(skip)
     .limit(limit);
 };
@@ -112,12 +160,56 @@ MessageSchema.statics.getUnreadCount = function (userId: string, fromUserId?: st
 MessageSchema.statics.markConversationAsRead = function (userId: string, friendId: string) {
   return this.updateMany(
     {
-      senderId: friendId,
-      receiverId: userId,
+      $or: [
+        { senderId: friendId, receiverId: userId },
+        { senderId: userId, receiverId: friendId },
+      ],
       isRead: false,
     },
-    { isRead: true }
+    {
+      isRead: true,
+      readAt: new Date(),
+    }
   );
+};
+
+// Static method to get conversation statistics
+MessageSchema.statics.getConversationStats = function (userId1: string, userId2: string) {
+  return this.aggregate([
+    {
+      $match: {
+        $or: [
+          { senderId: userId1, receiverId: userId2 },
+          { senderId: userId2, receiverId: userId1 },
+        ],
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalMessages: { $sum: 1 },
+        unreadCount: {
+          $sum: {
+            $cond: [
+              { $and: [{ $eq: ['$receiverId', userId1] }, { $eq: ['$isRead', false] }] },
+              1,
+              0,
+            ],
+          },
+        },
+        lastMessageAt: { $max: '$createdAt' },
+      },
+    },
+  ]).then((result) => {
+    if (result.length === 0) {
+      return { totalMessages: 0, unreadCount: 0 };
+    }
+    return {
+      totalMessages: result[0].totalMessages,
+      unreadCount: result[0].unreadCount,
+      lastMessageAt: result[0].lastMessageAt,
+    };
+  });
 };
 
 const MessageModel: IMessageModel = (mongoose.models.Message ||

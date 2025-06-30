@@ -6,6 +6,9 @@ export const dict = {
     },
     general: {
       notifications: 'Notifications',
+      messages: 'Messages',
+      noMessages: 'No messages yet',
+      viewAllMessages: 'View all messages',
       profile: 'Profile',
       settings: 'Settings',
       sign_in: 'Sign In',
@@ -151,7 +154,7 @@ export const dict = {
       ],
       warning_title: 'Warning',
       warning_cancel: 'Cancel',
-      warning_confirm: 'Yes, Cancel',
+      warning_confirm: 'Yes, Go ahead',
       warning_credibility: 'Warning: Canceling affects your credibility!',
       warning_cancel_signup:
         'Are you sure you want to cancel your signup for this game? Canceling may affect your credibility.',

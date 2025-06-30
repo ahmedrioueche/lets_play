@@ -164,7 +164,7 @@ export default function CreateGamePage() {
   return (
     <div className='min-h-screen bg-light-background dark:bg-dark-background'>
       <div className='container mx-auto '>
-        <div className='max-w-6xl mx-auto'>
+        <div className='mx-auto'>
           <form
             onSubmit={handleSubmit}
             className='bg-light-card dark:bg-dark-card rounded-2xl shadow-xl p-6'

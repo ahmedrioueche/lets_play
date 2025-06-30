@@ -64,7 +64,7 @@ export default function ProfilePage() {
   }
 
   const handleMessage = () => {
-    router.push(`/chat/${userId}`);
+    router.push(`/chat?friend=${userId}`);
   };
 
   const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {

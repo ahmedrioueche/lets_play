@@ -183,9 +183,20 @@ export default function FriendsPage() {
     }
   };
 
+  const handleRemoveFriend = async (id: string) => {
+    if (!currentUser?._id) return;
+    try {
+      await friendsApi.removeFriend(currentUser._id, id);
+      await loadFriends();
+    } catch (error) {
+      console.error('Error removing friend:', error);
+      toast.error('Failed to remove friend');
+    }
+  };
+
   const handleMessage = useCallback(
     (id: string) => {
-      router.push(`/chat`);
+      router.push(`/chat?friend=${id}`);
     },
     [router]
   );
@@ -270,6 +281,7 @@ export default function FriendsPage() {
             friends={filteredFriends}
             onAddFriend={handleAddFriend}
             onMessage={handleMessage}
+            onRemoveFriend={handleRemoveFriend}
             onCardClick={handleCardClick}
           />
         ))}
@@ -282,6 +294,7 @@ export default function FriendsPage() {
             friends={filteredSuggestions}
             onAddFriend={handleAddFriend}
             onMessage={handleMessage}
+            onRemoveFriend={() => {}}
             onCardClick={handleCardClick}
           />
         ))}
@@ -294,6 +307,7 @@ export default function FriendsPage() {
             friends={filteredPlayedWith}
             onAddFriend={handleAddFriend}
             onMessage={handleMessage}
+            onRemoveFriend={() => {}}
             onCardClick={handleCardClick}
           />
         ))}

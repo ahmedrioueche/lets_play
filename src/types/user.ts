@@ -40,6 +40,7 @@ export interface UserProfile {
   isVerified?: boolean;
   hasCompletedOnboarding?: boolean;
   isOnline?: boolean;
+  lastSeen?: Date;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -137,20 +138,6 @@ interface PerformanceStats {
   _id: string;
   gamesPlayed: number;
   winRate: number;
-}
-
-export interface Message {
-  _id: string;
-  senderId: string;
-  receiverId: string;
-  content: string;
-  messageType: 'text' | 'image' | 'file' | 'audio';
-  isRead: boolean;
-  isEdited: boolean;
-  editedAt?: Date;
-  replyTo?: string;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 export interface FriendInvitation {

@@ -13,6 +13,7 @@ interface UseBadgesReturn {
   isLoading: boolean;
   error: string | null;
   refreshBadges: () => void;
+  updateBadge: (type: keyof BadgeData, value: number) => void;
 }
 
 export const useBadges = (): UseBadgesReturn => {
@@ -31,6 +32,52 @@ export const useBadges = (): UseBadgesReturn => {
   useEffect(() => {
     setHasMounted(true);
   }, []);
+
+  // Listen for new messages to update chat badge in real-time
+  useEffect(() => {
+    if (!user?._id || !hasMounted) return;
+
+    // Check if Pusher is configured
+    const isPusherConfigured =
+      process.env.NEXT_PUBLIC_PUSHER_KEY && process.env.NEXT_PUBLIC_PUSHER_CLUSTER;
+
+    if (isPusherConfigured) {
+      // Set up periodic badge refresh every 30 seconds to ensure accuracy
+      const refreshInterval = setInterval(() => {
+        fetchBadges();
+      }, 30000);
+
+      // Also refresh badges when the window becomes visible (user returns to tab)
+      const handleVisibilityChange = () => {
+        if (!document.hidden) {
+          fetchBadges();
+        }
+      };
+
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+
+      return () => {
+        clearInterval(refreshInterval);
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      };
+    }
+  }, [user?._id, hasMounted]);
+
+  // Add a global event listener for badge updates
+  useEffect(() => {
+    if (!hasMounted) return;
+
+    const handleBadgeUpdate = () => {
+      fetchBadges();
+    };
+
+    // Listen for custom badge update events
+    window.addEventListener('badge-update', handleBadgeUpdate);
+
+    return () => {
+      window.removeEventListener('badge-update', handleBadgeUpdate);
+    };
+  }, [hasMounted]);
 
   const fetchBadges = async () => {
     if (!user?._id || !hasMounted) {
@@ -80,8 +127,22 @@ export const useBadges = (): UseBadgesReturn => {
         }
       }
 
-      // For now, chat badge is hardcoded to 0 since we don't have a chat API yet
-      const chatCount = 0;
+      // Fetch unread messages count for chat badge
+      let chatCount = 0;
+      try {
+        const conversationsResponse = await fetch(`/api/chat/conversations?userId=${user._id}`);
+        if (conversationsResponse.ok) {
+          const conversationsData = await conversationsResponse.json();
+          chatCount =
+            conversationsData.conversations?.reduce(
+              (sum: number, conv: any) => sum + conv.unreadCount,
+              0
+            ) || 0;
+        }
+      } catch (chatError) {
+        console.error('Error fetching chat count:', chatError);
+        chatCount = 0;
+      }
 
       setBadges({
         explore: nearbyGamesCount,
@@ -111,10 +172,18 @@ export const useBadges = (): UseBadgesReturn => {
     }
   }, [user?._id, hasMounted]);
 
+  const updateBadge = (type: keyof BadgeData, value: number) => {
+    setBadges((prevBadges) => ({
+      ...prevBadges,
+      [type]: value,
+    }));
+  };
+
   return {
     badges,
     isLoading,
     error,
     refreshBadges,
+    updateBadge,
   };
 };

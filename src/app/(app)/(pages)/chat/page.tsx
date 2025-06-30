@@ -1,15 +1,26 @@
 'use client';
 import Loading from '@/components/ui/Loading';
 import { useAuth } from '@/context/AuthContext';
-import { friendsApi } from '@/lib/api/friendsApi';
-import { Message, User } from '@/types/user';
+import { useRealTimeChat } from '@/hooks/useRealTimeChat';
+import { chatApi } from '@/lib/api/chatApi';
+import { Message } from '@/types/chat';
+import { User } from '@/types/user';
+import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import ChatWindow from './components/ChatWindow';
 import FriendsList from './components/FriendsList';
 
+// Extended message type for optimistic updates
+interface OptimisticMessage extends Message {
+  isOptimistic?: boolean;
+  error?: string;
+  retryCount?: number;
+}
+
 function ChatPage() {
   const { user: currentUser } = useAuth();
+  const searchParams = useSearchParams();
   const [friends, setFriends] = useState<User[]>([]);
   const [selectedFriendId, setSelectedFriendId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -17,10 +28,56 @@ function ChatPage() {
   const [errorFriends, setErrorFriends] = useState<string | null>(null);
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [errorMessages, setErrorMessages] = useState<string | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<OptimisticMessage[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [sending, setSending] = useState(false);
   const [isMobileFriendsOpen, setMobileFriendsOpen] = useState(false);
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMoreMessages, setHasMoreMessages] = useState(true);
+  const [loadingOlderMessages, setLoadingOlderMessages] = useState(false);
+
+  // Get friend ID from search params
+  const friendIdFromParams = searchParams.get('friend');
+
+  const selectedFriend = friends.find((f) => f._id === selectedFriendId) || null;
+
+  // Real-time chat hook
+  const {
+    isConnected,
+    isTyping,
+    sendMessage,
+    sendTypingStatus,
+    editMessage,
+    deleteMessage,
+    markAsRead,
+  } = useRealTimeChat({
+    selectedFriend,
+    onMessageReceived: (message) => {
+      console.log('ChatPage: onMessageReceived called with:', message);
+      // Add real-time messages to the beginning (since DB returns newest first)
+      setMessages((prev) => {
+        // Remove any optimistic message with same content
+        const filtered = prev.filter((m) => !m.isOptimistic || m.content !== message.content);
+        // Add new message to the beginning
+        const newMessages = [message, ...filtered];
+        console.log('ChatPage: Updated messages:', newMessages);
+        return newMessages;
+      });
+    },
+    onTypingStatusChange: (isTyping) => {
+      // Handle typing status in UI if needed
+    },
+    onMessageStatusChange: (messageId, status) => {
+      // Handle message status updates if needed
+    },
+    onOnlineStatusChange: (userId, isOnline) => {
+      // Update friend's online status in real-time
+      setFriends((prev) =>
+        prev.map((friend) => (friend._id === userId ? { ...friend, isOnline } : friend))
+      );
+    },
+  });
 
   const loadFriends = useCallback(async () => {
     if (!currentUser?._id) return;
@@ -29,12 +86,20 @@ function ChatPage() {
     setErrorFriends(null);
 
     try {
-      const response = await friendsApi.getFriends(currentUser._id);
-      setFriends(response || []);
+      const response = await fetch(`/api/users/${currentUser._id}/friends`);
+      const data = await response.json();
+      setFriends(data.friends || []);
 
-      // Auto-select first friend if none selected and friends exist
-      if (!selectedFriendId && response && response.length > 0) {
-        setSelectedFriendId(response[0]._id);
+      // Auto-select friend from URL params if provided and exists in friends list
+      if (friendIdFromParams && data.friends) {
+        const friendExists = data.friends.find((f: User) => f._id === friendIdFromParams);
+        if (friendExists) {
+          setSelectedFriendId(friendIdFromParams);
+        }
+      }
+      // Otherwise, auto-select first friend if none selected and friends exist
+      else if (!selectedFriendId && data.friends && data.friends.length > 0) {
+        setSelectedFriendId(data.friends[0]._id);
       }
     } catch (error) {
       console.error('Error loading friends:', error);
@@ -43,25 +108,50 @@ function ChatPage() {
     } finally {
       setLoadingFriends(false);
     }
-  }, [currentUser?._id, selectedFriendId]);
+  }, [currentUser?._id, selectedFriendId, friendIdFromParams]);
 
-  const loadMessages = useCallback(async () => {
-    if (!selectedFriendId || !currentUser?._id) return;
+  const loadMessages = useCallback(
+    async (page: number = 1, append: boolean = false) => {
+      if (!selectedFriendId || !currentUser?._id) return;
 
-    setLoadingMessages(true);
-    setErrorMessages(null);
+      if (page === 1) {
+        setLoadingMessages(true);
+      } else {
+        setLoadingOlderMessages(true);
+      }
+      setErrorMessages(null);
 
-    try {
-      const messages = await friendsApi.getMessages(selectedFriendId, currentUser._id);
-      setMessages(messages || []);
-    } catch (error) {
-      console.error('Error loading messages:', error);
-      setErrorMessages('Failed to load messages');
-      toast.error('Failed to load messages');
-    } finally {
-      setLoadingMessages(false);
-    }
-  }, [selectedFriendId, currentUser?._id]);
+      try {
+        const messages = await chatApi.getMessages(selectedFriendId, currentUser._id, page);
+
+        if (append) {
+          // Append older messages to the end
+          setMessages((prev) => [...prev, ...(messages || [])]);
+        } else {
+          // Replace messages (first page)
+          setMessages(messages || []);
+        }
+
+        // Check if there are more messages
+        setHasMoreMessages(messages && messages.length >= 50); // Assuming 50 is the page size
+
+        // Mark messages as read only for first page
+        if (page === 1) {
+          await markAsRead();
+          // Trigger badge update when messages are read
+          window.dispatchEvent(new CustomEvent('badge-update'));
+        }
+      } catch (error) {
+        console.error('Error loading messages:', error);
+        setErrorMessages('Failed to load messages');
+        toast.error('Failed to load messages');
+      } finally {
+        setLoadingMessages(false);
+        setLoadingOlderMessages(false);
+      }
+    },
+    [selectedFriendId, currentUser?._id, markAsRead]
+  );
 
   // Load friends on component mount
   useEffect(() => {
@@ -73,32 +163,128 @@ function ChatPage() {
   // Load messages when friend is selected
   useEffect(() => {
     if (selectedFriendId && currentUser?._id) {
-      loadMessages();
+      // Reset pagination when switching friends
+      setCurrentPage(1);
+      setHasMoreMessages(true);
+      loadMessages(1, false);
     } else {
       setMessages([]);
+      setCurrentPage(1);
+      setHasMoreMessages(true);
     }
   }, [selectedFriendId, currentUser?._id, loadMessages]);
+
+  // Load older messages
+  const handleLoadOlderMessages = useCallback(async () => {
+    if (!hasMoreMessages || loadingOlderMessages) return;
+
+    const nextPage = currentPage + 1;
+    setCurrentPage(nextPage);
+    await loadMessages(nextPage, true);
+  }, [hasMoreMessages, loadingOlderMessages, currentPage, loadMessages]);
+
+  // Handle URL parameter changes
+  useEffect(() => {
+    if (friendIdFromParams && friends.length > 0) {
+      const friendExists = friends.find((f) => f._id === friendIdFromParams);
+      if (friendExists) {
+        setSelectedFriendId(friendIdFromParams);
+      } else {
+        toast.error('Friend not found in your friends list');
+      }
+    }
+  }, [friendIdFromParams, friends]);
 
   const handleSendMessage = useCallback(
     async (msg: string) => {
       if (!selectedFriendId || !currentUser?._id || !msg.trim()) return;
 
-      setSending(true);
+      const messageContent = msg.trim();
+      setInputValue('');
+
+      // Create optimistic message
+      const optimisticMessage: OptimisticMessage = {
+        _id: `optimistic-${Date.now()}`,
+        senderId: currentUser._id,
+        receiverId: selectedFriendId,
+        content: messageContent,
+        messageType: 'text',
+        isRead: false,
+        isEdited: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        isOptimistic: true,
+      };
+
+      // Add optimistic message immediately
+      setMessages((prev) => [optimisticMessage, ...prev]);
 
       try {
-        const newMessage = await friendsApi.sendMessage(selectedFriendId, msg, currentUser._id);
+        // Try to send the message
+        const newMessage = await sendMessage(messageContent);
+
         if (newMessage) {
-          setMessages((prev) => [...prev, newMessage]);
-          setInputValue('');
+          // Remove optimistic message and add real message to the beginning
+          setMessages((prev) => {
+            const filtered = prev.filter((m) => m._id !== optimisticMessage._id);
+            return [newMessage, ...filtered];
+          });
         }
       } catch (error) {
         console.error('Error sending message:', error);
+
+        // Mark optimistic message as failed
+        setMessages((prev) =>
+          prev.map((m) =>
+            m._id === optimisticMessage._id
+              ? { ...m, error: 'Failed to send message', retryCount: (m.retryCount || 0) + 1 }
+              : m
+          )
+        );
+
         toast.error('Failed to send message');
-      } finally {
-        setSending(false);
       }
     },
-    [selectedFriendId, currentUser?._id]
+    [selectedFriendId, currentUser?._id, sendMessage]
+  );
+
+  // Retry sending a failed message
+  const retryMessage = useCallback(
+    async (messageId: string) => {
+      const message = messages.find((m) => m._id === messageId);
+      if (!message || !message.error) return;
+
+      // Remove error state
+      setMessages((prev) =>
+        prev.map((m) => (m._id === messageId ? { ...m, error: undefined, isOptimistic: true } : m))
+      );
+
+      try {
+        const newMessage = await sendMessage(message.content);
+
+        if (newMessage) {
+          // Remove optimistic message and add real message to the beginning
+          setMessages((prev) => {
+            const filtered = prev.filter((m) => m._id !== messageId);
+            return [newMessage, ...filtered];
+          });
+        }
+      } catch (error) {
+        console.error('Error retrying message:', error);
+
+        // Mark as failed again
+        setMessages((prev) =>
+          prev.map((m) =>
+            m._id === messageId
+              ? { ...m, error: 'Failed to send message', retryCount: (m.retryCount || 0) + 1 }
+              : m
+          )
+        );
+
+        toast.error('Failed to send message');
+      }
+    },
+    [messages, sendMessage]
   );
 
   const handleRemoveFriend = useCallback(
@@ -106,7 +292,12 @@ function ChatPage() {
       if (!currentUser?._id) return;
 
       try {
-        await friendsApi.removeFriend(currentUser._id, friendId);
+        await fetch(`/api/users/${currentUser._id}/friends`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ friendId, action: 'remove' }),
+        });
+
         setFriends((prev) => prev.filter((f) => f._id !== friendId));
 
         // If the removed friend was selected, clear selection
@@ -129,7 +320,12 @@ function ChatPage() {
       if (!currentUser?._id) return;
 
       try {
-        await friendsApi.blockUser(currentUser._id, friendId);
+        await fetch(`/api/users/${currentUser._id}/friends`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ friendId, action: 'block' }),
+        });
+
         setFriends((prev) => prev.filter((f) => f._id !== friendId));
 
         // If the blocked friend was selected, clear selection
@@ -147,12 +343,24 @@ function ChatPage() {
     [currentUser?._id, selectedFriendId]
   );
 
+  // Handle friend selection and clear URL params if needed
+  const handleFriendSelection = useCallback(
+    (friendId: string) => {
+      setSelectedFriendId(friendId);
+      // Clear URL search params when manually selecting a friend
+      if (friendIdFromParams && friendIdFromParams !== friendId) {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('friend');
+        window.history.replaceState({}, '', url.toString());
+      }
+    },
+    [friendIdFromParams]
+  );
+
   // Filter friends by search
   const filteredFriends = friends.filter((f) =>
     f.name.toLowerCase().includes(search.toLowerCase())
   );
-
-  const selectedFriend = friends.find((f) => f._id === selectedFriendId) || null;
 
   // Handle empty state
   if (loadingFriends) {
@@ -228,7 +436,7 @@ function ChatPage() {
               friends={filteredFriends}
               selectedFriendId={selectedFriendId}
               onSelectFriend={(id) => {
-                setSelectedFriendId(id);
+                handleFriendSelection(id);
                 setMobileFriendsOpen(false);
               }}
               loading={loadingFriends}
@@ -248,7 +456,7 @@ function ChatPage() {
           <FriendsList
             friends={filteredFriends}
             selectedFriendId={selectedFriendId}
-            onSelectFriend={setSelectedFriendId}
+            onSelectFriend={handleFriendSelection}
             loading={loadingFriends}
             error={errorFriends}
             searchValue={search}
@@ -272,6 +480,15 @@ function ChatPage() {
             currentUserId={currentUser?._id || ''}
             isMobileFriendsOpen={isMobileFriendsOpen}
             onMobileFriendsToggle={() => setMobileFriendsOpen((v) => !v)}
+            isConnected={isConnected}
+            isTyping={isTyping}
+            onTypingChange={sendTypingStatus}
+            onEditMessage={editMessage}
+            onDeleteMessage={deleteMessage}
+            onRetryMessage={retryMessage}
+            hasMoreMessages={hasMoreMessages}
+            loadingOlderMessages={loadingOlderMessages}
+            onLoadOlderMessages={handleLoadOlderMessages}
           />
         </div>
       </div>

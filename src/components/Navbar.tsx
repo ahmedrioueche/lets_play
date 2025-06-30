@@ -2,6 +2,7 @@
 
 import { useAuth } from '@/context/AuthContext';
 import { useSidebar } from '@/context/SidebarContext';
+import { useBadges } from '@/hooks/useBadges';
 import useTranslator from '@/hooks/useTranslator';
 import { capitalize } from '@/utils/helper';
 import {
@@ -21,6 +22,7 @@ import { useTheme } from 'next-themes';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import MessagesDropdown from './MessagesDropdown';
 import NotificationsDropdown from './NotificationsDropdown';
 import ProfileDropdown from './ProfileDropdown';
 import Dropdown from './ui/BaseDropdown';
@@ -30,12 +32,15 @@ const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [mobileNotificationsOpen, setMobileNotificationsOpen] = useState(false);
+  const [mobileMessagesOpen, setMobileMessagesOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isMessagesOpen, setIsMessagesOpen] = useState(false);
   const { toggle, isOpen } = useSidebar();
   const text = useTranslator();
   const { user, logout } = useAuth();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
+  const { badges, refreshBadges, updateBadge } = useBadges();
 
   //useEffect(() => {
   //  usersApi.deleteCurrentUser(user?._id!);
@@ -73,8 +78,19 @@ const Navbar = () => {
       showNotification: true,
     },
     {
+      id: 'messages',
+      icon: <MessageSquare className='h-5 w-5' />,
+      label: text.general.messages || 'Messages',
+      onClick: () => {
+        setMobileMenuOpen(false);
+        setTimeout(() => setMobileMessagesOpen(true), 300);
+      },
+      showNotification: badges.chat > 0,
+      notificationCount: badges.chat,
+    },
+    {
       id: 'settings',
-      icon: <Settings className='h-7 w-7' />,
+      icon: <Settings className='h-5 w-5' />,
       label: text.general.settings,
       onClick: () => {
         handleSettingsClick();
@@ -180,13 +196,28 @@ const Navbar = () => {
                   onClose={() => setIsNotificationsOpen(false)}
                 />
               </div>
-              <button
-                className='p-2 rounded-full hover:bg-light-card dark:hover:bg-dark-card'
-                aria-label='Settings'
-                onClick={handleSettingsClick}
-              >
-                <Settings className='h-5 w-5' />
-              </button>
+
+              {/* Messages Dropdown */}
+              <div className='relative'>
+                <button
+                  className='p-2 rounded-full hover:bg-light-card dark:hover:bg-dark-card relative'
+                  aria-label='Messages'
+                  onClick={() => setIsMessagesOpen((prev) => !prev)}
+                >
+                  <MessageSquare className='h-6 w-6' />
+                  {badges.chat > 0 && (
+                    <span className='absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center'>
+                      {badges.chat > 9 ? '9+' : badges.chat}
+                    </span>
+                  )}
+                </button>
+                <MessagesDropdown
+                  isOpen={isMessagesOpen}
+                  onClose={() => setIsMessagesOpen(false)}
+                  onUnreadCountChange={(count) => updateBadge('chat', count)}
+                  onRefreshBadges={refreshBadges}
+                />
+              </div>
 
               <button
                 onClick={() => setProfileOpen(!profileOpen)}
@@ -223,6 +254,11 @@ const Navbar = () => {
                   <span>{item.label}</span>
                   {item.showNotification && (
                     <span className='ml-auto h-2 w-2 rounded-full bg-red-500'></span>
+                  )}
+                  {item.notificationCount && item.notificationCount > 0 && (
+                    <span className='ml-auto h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center'>
+                      {item.notificationCount > 9 ? '9+' : item.notificationCount}
+                    </span>
                   )}
                 </button>
               ))}
@@ -283,6 +319,20 @@ const Navbar = () => {
                 <NotificationsDropdown
                   isOpen={mobileNotificationsOpen}
                   onClose={() => setMobileNotificationsOpen(false)}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Mobile Messages Dropdown as fixed overlay */}
+          {mobileMessagesOpen && (
+            <div className='fixed top-0 left-0 w-full z-[100] flex justify-center items-start pt-4'>
+              <div className='w-full max-w-md'>
+                <MessagesDropdown
+                  isOpen={mobileMessagesOpen}
+                  onClose={() => setMobileMessagesOpen(false)}
+                  onUnreadCountChange={(count) => updateBadge('chat', count)}
+                  onRefreshBadges={refreshBadges}
                 />
               </div>
             </div>

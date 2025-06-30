@@ -1,28 +1,29 @@
+import Button from '@/components/ui/Button';
 import useTranslator from '@/hooks/useTranslator';
 import { User } from '@/types/user';
-import { BadgeCheck, MapPin, MessageCircle, UserPlus } from 'lucide-react';
-import React from 'react';
+import { BadgeCheck, MapPin, MessageCircle, Trash } from 'lucide-react';
+import React, { useState } from 'react';
+import WarningModal from '../../games/components/WarningModal';
 
 interface FriendsSectionProps {
   friends: User[];
   onAddFriend: (id: string) => void;
   onMessage: (id: string) => void;
+  onRemoveFriend: (id: string) => void;
 }
 
 const UserCard: React.FC<{
   friend: User;
   onAddFriend: (id: string) => void;
   onMessage: (id: string) => void;
+  onRemoveFriend: (id: string) => void;
   onCardClick?: (id: string) => void;
-}> = ({ friend, onAddFriend, onMessage, onCardClick }) => {
+  onRequestRemove?: (friend: User) => void;
+}> = ({ friend, onAddFriend, onMessage, onRemoveFriend, onCardClick, onRequestRemove }) => {
   const text = useTranslator();
 
   // Convert location to string for display
-  const locationString = friend.location
-    ? typeof friend.location === 'string'
-      ? friend.location
-      : `${friend.location.city || ''}${friend.location.state ? `, ${friend.location.state}` : ''}`
-    : '';
+  const locationString = friend.location?.address || '';
 
   return (
     <div
@@ -54,25 +55,34 @@ const UserCard: React.FC<{
           {locationString}
         </div>
       )}
+      {friend.email && (
+        <div className='text-xs text-gray-400 mb-2'>
+          <span className='font-semibold'>Email:</span> {friend.email}
+        </div>
+      )}
       <div className='flex gap-2 mt-3'>
-        <button
-          className='px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg flex items-center gap-1 text-sm font-medium transition-colors'
+        <Button
+          variant='primary'
+          size='sm'
+          icon={<MessageCircle className='w-4 h-4' />}
           onClick={(e) => {
             e.stopPropagation();
             onMessage(friend._id);
           }}
         >
-          <MessageCircle className='w-4 h-4' /> {text.friends.message}
-        </button>
-        <button
-          className='px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg flex items-center gap-1 text-sm font-medium transition-colors'
+          {text.friends.message}
+        </Button>
+        <Button
+          variant='danger'
+          size='sm'
+          icon={<Trash className='w-4 h-4' />}
           onClick={(e) => {
             e.stopPropagation();
-            onAddFriend(friend._id);
+            onRequestRemove?.(friend);
           }}
         >
-          <UserPlus className='w-4 h-4' /> {text.friends.add_friend}
-        </button>
+          {text.friends.remove || 'Remove Friend'}
+        </Button>
       </div>
     </div>
   );
@@ -82,20 +92,57 @@ const FriendsSection: React.FC<FriendsSectionProps & { onCardClick?: (id: string
   friends,
   onAddFriend,
   onMessage,
+  onRemoveFriend,
   onCardClick,
 }) => {
+  const [modalOpen, setModalOpen] = useState(false);
+  const [pendingRemove, setPendingRemove] = useState<User | null>(null);
+
+  const handleRequestRemove = (friend: User) => {
+    setPendingRemove(friend);
+    setModalOpen(true);
+  };
+
+  const handleConfirmRemove = () => {
+    if (pendingRemove) {
+      onRemoveFriend(pendingRemove._id);
+      setModalOpen(false);
+      setPendingRemove(null);
+    }
+  };
+
+  const handleCancelRemove = () => {
+    setModalOpen(false);
+    setPendingRemove(null);
+  };
+
   return friends.length === 0 ? null : (
-    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8'>
-      {friends.map((friend) => (
-        <UserCard
-          key={friend._id}
-          friend={friend}
-          onAddFriend={onAddFriend}
-          onMessage={onMessage}
-          onCardClick={onCardClick}
-        />
-      ))}
-    </div>
+    <>
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8'>
+        {friends.map((friend) => (
+          <UserCard
+            key={friend._id}
+            friend={friend}
+            onAddFriend={onAddFriend}
+            onMessage={onMessage}
+            onRemoveFriend={onRemoveFriend}
+            onCardClick={onCardClick}
+            onRequestRemove={handleRequestRemove}
+          />
+        ))}
+      </div>
+      <WarningModal
+        isOpen={modalOpen}
+        onConfirm={handleConfirmRemove}
+        onCancel={handleCancelRemove}
+        message={
+          pendingRemove
+            ? `Are you sure you want to remove ${pendingRemove.name} from your friends?`
+            : ''
+        }
+        warning={'Remove Friend'}
+      />
+    </>
   );
 };
 

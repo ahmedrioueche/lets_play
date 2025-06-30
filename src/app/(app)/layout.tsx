@@ -1,4 +1,5 @@
 import Navbar from '@/components/Navbar';
+import OnlineStatusTracker from '@/components/OnlineStatusTracker';
 import SideBar from '@/components/Sidebar';
 import { Toaster } from 'react-hot-toast';
 import ProtectedRoute from '../ProtectedRoute';
@@ -13,6 +14,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <main className='flex-1 overflow-y-auto p-6 scrollbar-hide'>{children}</main>
         </div>
         <Toaster position='top-right' />
+        <OnlineStatusTracker />
       </div>
     </ProtectedRoute>
   );

@@ -1,6 +1,15 @@
 import { useAuth } from '@/context/AuthContext';
 import { capitalize } from '@/utils/helper';
-import { HelpCircle, LogOut, MessageSquare, Monitor, Moon, Palette, Sun } from 'lucide-react';
+import {
+  HelpCircle,
+  LogOut,
+  MessageSquare,
+  Monitor,
+  Moon,
+  Palette,
+  Settings,
+  Sun,
+} from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useRouter } from 'next/navigation';
 import Dropdown from './ui/BaseDropdown';
@@ -24,6 +33,15 @@ const ProfileDropdown = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
       label: capitalize(user?.name || 'profile'),
       onClick: () => {
         router.push(`/profile/${user?._id}`);
+        onClose();
+      },
+    },
+    {
+      id: 'settings',
+      icon: <Settings className='h-5 w-5' />,
+      label: 'Settings',
+      onClick: () => {
+        router.push('/settings');
         onClose();
       },
     },

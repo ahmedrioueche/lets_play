@@ -1,11 +1,12 @@
 import { useAuth } from '@/context/AuthContext';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface BadgeData {
   explore: number; // nearby games count
   games: number; // user's active games count
   friends: number; // friends online count
   chat: number; // unread messages count
+  notifications: number; // unread notifications count
 }
 
 interface UseBadgesReturn {
@@ -23,6 +24,7 @@ export const useBadges = (): UseBadgesReturn => {
     games: 0,
     friends: 0,
     chat: 0,
+    notifications: 0,
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -79,9 +81,9 @@ export const useBadges = (): UseBadgesReturn => {
     };
   }, [hasMounted]);
 
-  const fetchBadges = async () => {
+  const fetchBadges = useCallback(async () => {
     if (!user?._id || !hasMounted) {
-      setBadges({ explore: 0, games: 0, friends: 0, chat: 0 });
+      setBadges({ explore: 0, games: 0, friends: 0, chat: 0, notifications: 0 });
       return;
     }
 
@@ -144,20 +146,34 @@ export const useBadges = (): UseBadgesReturn => {
         chatCount = 0;
       }
 
+      // Fetch unread notifications count for notification badge
+      let notificationCount = 0;
+      try {
+        const notificationsResponse = await fetch(`/api/notifications?userId=${user._id}`);
+        if (notificationsResponse.ok) {
+          const notificationsData = await notificationsResponse.json();
+          notificationCount = notificationsData.filter((n: any) => !n.isRead).length;
+        }
+      } catch (notificationError) {
+        console.error('Error fetching notification count:', notificationError);
+        notificationCount = 0;
+      }
+
       setBadges({
         explore: nearbyGamesCount,
         games: statsData?.activeGames || 0,
         friends: statsData?.friendsOnline || 0,
         chat: chatCount,
+        notifications: notificationCount,
       });
     } catch (err) {
       console.error('Error fetching badges:', err);
       setError('Failed to fetch badge data');
-      setBadges({ explore: 0, games: 0, friends: 0, chat: 0 });
+      setBadges({ explore: 0, games: 0, friends: 0, chat: 0, notifications: 0 });
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user?._id, hasMounted]);
 
   const refreshBadges = () => {
     if (hasMounted) {
@@ -167,10 +183,10 @@ export const useBadges = (): UseBadgesReturn => {
 
   // Only fetch badges after component has mounted on the client
   useEffect(() => {
-    if (hasMounted) {
+    if (hasMounted && user?._id) {
       fetchBadges();
     }
-  }, [user?._id, hasMounted]);
+  }, [hasMounted, fetchBadges]);
 
   const updateBadge = (type: keyof BadgeData, value: number) => {
     setBadges((prevBadges) => ({

@@ -3,10 +3,12 @@
 import GameDetailsModal from '@/app/(app)/components/GameDetailsModal';
 import GameCard from '@/components/games/GameCard';
 import GamesMap from '@/components/games/GamesMap';
+import { useAuth } from '@/context/AuthContext';
 import { useExplore } from '@/hooks/useExplore';
 import { Game } from '@/types/game';
 import { User } from '@/types/user';
 import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import CalendarView from './components/CalendarView';
 import FilterModal from './components/FilterModal';
 import SearchSection from './components/SearchSection';
@@ -22,6 +24,8 @@ export default function ExplorePage() {
     handleGameSelect,
     resetFilters,
   } = useExplore();
+
+  const { user } = useAuth();
 
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
@@ -67,14 +71,44 @@ export default function ExplorePage() {
     setIsDetailsModalOpen(true);
   };
 
-  const handleRegister = async (gameId: string, user: User) => {
-    // TODO: Implement registration logic
-    console.log('Registering for game:', gameId, user);
+  const handleRegister = async (gameId: string, userObj: User) => {
+    if (!userObj) return;
+    try {
+      const res = await fetch(`/api/games/${gameId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: userObj._id }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Registration failed');
+      toast.success('Registered successfully!');
+      // Fetch updated game and update selectedGame
+      const updatedRes = await fetch(`/api/games/${gameId}`);
+      const updatedGame = await updatedRes.json();
+      setSelectedGame(updatedGame);
+    } catch (err: any) {
+      toast.error(err.message || 'Registration failed');
+    }
   };
 
   const handleCancelRegistration = async (gameId: string, userId: string) => {
-    // TODO: Implement cancel registration logic
-    console.log('Canceling registration for game:', gameId, userId);
+    if (!userId) return;
+    try {
+      const res = await fetch(`/api/games/${gameId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Cancellation failed');
+      toast.success('Registration cancelled!');
+      // Fetch updated game and update selectedGame
+      const updatedRes = await fetch(`/api/games/${gameId}`);
+      const updatedGame = await updatedRes.json();
+      setSelectedGame(updatedGame);
+    } catch (err: any) {
+      toast.error(err.message || 'Cancellation failed');
+    }
   };
 
   const handleLocationClick = () => {
@@ -191,7 +225,13 @@ export default function ExplorePage() {
           userLocation={state.userLocation}
           onRegister={handleRegister}
           onCancelRegistration={handleCancelRegistration}
-          isRegistered={false} // TODO: Implement registration status check
+          isRegistered={
+            user
+              ? state.selectedGame.participants?.some(
+                  (p: any) => (typeof p === 'object' ? p._id : p) === user._id
+                )
+              : false
+          }
           mode='explore'
         />
       )}

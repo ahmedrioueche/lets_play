@@ -152,7 +152,14 @@ export interface FriendInvitation {
 export interface Notification {
   _id?: string;
   userId: string;
-  type: 'friend_invitation' | 'friend_accepted' | 'game_invitation' | 'game_reminder' | 'system';
+  type:
+    | 'friend_invitation'
+    | 'friend_accepted'
+    | 'game_invitation'
+    | 'game_reminder'
+    | 'game_registration'
+    | 'game_cancellation'
+    | 'system';
   title: string;
   message: string;
   data?: {

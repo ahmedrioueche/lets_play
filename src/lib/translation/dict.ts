@@ -171,7 +171,7 @@ export const dict = {
       search_placeholder: 'Search friends or players...',
       add_friend: 'Add Friend',
       message: 'Message',
-      no_friends: 'You have no friends yet.',
+      no_friends: 'No friends found.',
       no_played_with: 'No recent players found.',
       no_suggestions: 'No suggestions at the moment.',
       mutual_friends: 'mutual friends',

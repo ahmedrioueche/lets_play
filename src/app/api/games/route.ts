@@ -1,5 +1,10 @@
 import dbConnect from '@/config/db';
+import { GAME_NOTIFICATION_DISTANCE_KM } from '@/constants/general';
 import GameModel from '@/models/Game'; // Assuming you'll create this model
+import NotificationModel from '@/models/Notification';
+import UserModel from '@/models/User';
+import UserProfileModel from '@/models/UserProfile';
+import { getDistanceFromLatLonInKm } from '@/utils/helper';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET() {
@@ -10,7 +15,17 @@ export async function GET() {
       .populate('organizer', 'name email avatar _id')
       .populate('participants', 'name email avatar _id')
       .sort({ createdAt: -1 });
-    return NextResponse.json(games);
+
+    // Transform games to include 'id' field
+    const transformedGames = games.map((game) => {
+      const gameObj = game.toObject();
+      return {
+        ...gameObj,
+        id: gameObj._id.toString(),
+      };
+    });
+
+    return NextResponse.json(transformedGames);
   } catch (error: any) {
     console.error('Error fetching games:', error);
     return NextResponse.json({ message: error.message || 'Something went wrong' }, { status: 500 });
@@ -62,7 +77,77 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Ensure organizer is just the user ID
+    if (typeof gameData.organizer === 'object' && gameData.organizer._id) {
+      gameData.organizer = gameData.organizer._id;
+    }
+
     const newGame = await GameModel.create(gameData);
+    const newGameId = newGame._id?.toString ? newGame._id.toString() : String(newGame._id);
+
+    // --- Notification Logic ---
+    const organizerId = gameData.organizer?._id || gameData.organizer;
+    // 1. Get organizer's friends
+    const organizerProfile = await UserProfileModel.findOne({ userId: organizerId }).lean();
+    const friendIds = (organizerProfile?.friends || []).map((id) => id.toString());
+
+    // 2. Get all users (excluding organizer)
+    const allUsers = await UserModel.find({ _id: { $ne: organizerId } }).lean();
+
+    // 3. Find users within distance
+    const nearbyUserIds = allUsers
+      .filter((user) => {
+        if (!user.location || !user.location.cords) return false;
+        const dist = getDistanceFromLatLonInKm(
+          gameData.coordinates.lat,
+          gameData.coordinates.lng,
+          user.location.cords.lat,
+          user.location.cords.lng
+        );
+        return dist <= GAME_NOTIFICATION_DISTANCE_KM;
+      })
+      .map((user) => user._id.toString());
+
+    // 4. Deduplicate: friends + nearby (excluding organizer)
+    const notifyUserIds = Array.from(new Set([...friendIds, ...nearbyUserIds])).filter(
+      (id) => id !== organizerId
+    );
+
+    // 5. Create notifications
+    const notifications = notifyUserIds.map((userId) => {
+      const isFriend = friendIds.includes(userId);
+      return {
+        userId,
+        type: isFriend ? 'game_invitation' : 'game_reminder',
+        title: isFriend ? 'Your friend created a new game!' : 'New game near you!',
+        message: `${gameData.title} (${gameData.sport}) at ${gameData.location || 'a nearby location'} on ${gameData.date} ${gameData.time}`,
+        data: {
+          gameId: newGameId,
+          route: `/game/${newGameId}`,
+          fromUserId: organizerId,
+        },
+        isRead: false,
+      };
+    });
+    let createdNotifications = [];
+    if (notifications.length > 0) {
+      createdNotifications = await NotificationModel.insertMany(notifications);
+      // Send real-time notification via Pusher for each user
+      const { pusherServer } = await import('@/lib/pusherServer');
+      for (const notification of createdNotifications) {
+        try {
+          await pusherServer.trigger(
+            `user-${notification.userId}`,
+            notification.type,
+            notification
+          );
+        } catch (error) {
+          console.error('Pusher error:', error);
+        }
+      }
+    }
+    // --- End Notification Logic ---
+
     return NextResponse.json(newGame, { status: 201 });
   } catch (error: any) {
     console.error('Error creating game:', error);

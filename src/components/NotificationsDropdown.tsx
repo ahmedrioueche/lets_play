@@ -7,9 +7,14 @@ import { useEffect, useRef } from 'react';
 interface NotificationsDropdownProps {
   isOpen: boolean;
   onClose?: () => void;
+  onUnreadCountChange?: (count: number) => void;
 }
 
-const NotificationsDropdown = ({ isOpen, onClose }: NotificationsDropdownProps) => {
+const NotificationsDropdown = ({
+  isOpen,
+  onClose,
+  onUnreadCountChange,
+}: NotificationsDropdownProps) => {
   const { user } = useAuth();
   const text = useTranslator();
   const router = useRouter();
@@ -18,6 +23,8 @@ const NotificationsDropdown = ({ isOpen, onClose }: NotificationsDropdownProps) 
   const { notifications, unreadCount, loading, markAsRead, markAllAsRead } = useNotifications(
     user?._id || ''
   );
+
+  const hasMarkedAsRead = useRef(false);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -28,12 +35,15 @@ const NotificationsDropdown = ({ isOpen, onClose }: NotificationsDropdownProps) 
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
-  // Mark all notifications as read when dropdown is opened
   useEffect(() => {
-    if (isOpen && unreadCount > 0) {
+    if (isOpen && unreadCount > 0 && !hasMarkedAsRead.current) {
       markAllAsRead();
+      hasMarkedAsRead.current = true;
+    }
+    if (!isOpen) {
+      hasMarkedAsRead.current = false;
     }
   }, [isOpen, unreadCount, markAllAsRead]);
 
@@ -43,6 +53,12 @@ const NotificationsDropdown = ({ isOpen, onClose }: NotificationsDropdownProps) 
       await markAsRead(notification._id);
     }
     if (onClose) onClose();
+
+    // Use custom route if provided in notification data
+    if (notification.data?.route) {
+      router.push(notification.data.route);
+      return;
+    }
 
     // Handle navigation based on notification type
     switch (notification.type) {
@@ -92,6 +108,10 @@ const NotificationsDropdown = ({ isOpen, onClose }: NotificationsDropdownProps) 
         return '🎮';
       case 'game_reminder':
         return '⏰';
+      case 'game_registration':
+        return '➕';
+      case 'game_cancellation':
+        return '➖';
       default:
         return '🔔';
     }

@@ -4,7 +4,7 @@ import useTranslator from '@/hooks/useTranslator';
 import { Game } from '@/types/game';
 import { User as UserType } from '@/types/user';
 import { AlertTriangle, MapPin } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import ModalHeader from './ModalHeader';
 
@@ -17,15 +17,33 @@ interface RegisterViewProps {
 
 const RegisterView: React.FC<RegisterViewProps> = ({ game, onBack, onClose, onRegister }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [alreadyRegistered, setAlreadyRegistered] = useState(false);
   const { user } = useAuth();
   const text = useTranslator();
 
+  useEffect(() => {
+    if (user && game.participants && Array.isArray(game.participants)) {
+      setAlreadyRegistered(
+        game.participants.some((p: any) => (typeof p === 'object' ? p._id : p) === user._id)
+      );
+    }
+  }, [user, game.participants]);
+
   const handleRegister = async () => {
     if (!onRegister) return;
+    if (alreadyRegistered) {
+      toast.error('You are already registered for this game.');
+      return;
+    }
 
     try {
       setIsLoading(true);
-      await onRegister(game.id, user as UserType);
+      // Use _id as fallback if id is not available
+      const gameId = game.id || (game as any)._id;
+      if (!gameId) {
+        throw new Error('Game ID not found');
+      }
+      await onRegister(gameId, user as UserType);
       toast.success(text.messages.success.game_registration);
       onClose();
     } catch (error) {
@@ -108,11 +126,20 @@ const RegisterView: React.FC<RegisterViewProps> = ({ game, onBack, onClose, onRe
         <div className='pt-4'>
           <button
             onClick={handleRegister}
-            disabled={isLoading}
+            disabled={isLoading || alreadyRegistered}
             className='w-full bg-light-primary dark:bg-dark-primary hover:opacity-90 text-white rounded-xl py-3 font-medium transition-opacity disabled:opacity-50'
           >
-            {isLoading ? 'Registering...' : 'Confirm Registration'}
+            {alreadyRegistered
+              ? 'Already Registered'
+              : isLoading
+                ? 'Registering...'
+                : 'Confirm Registration'}
           </button>
+          {alreadyRegistered && (
+            <div className='text-center text-green-600 dark:text-green-400 mt-2'>
+              You are already registered for this game.
+            </div>
+          )}
         </div>
       </div>
     </>

@@ -57,7 +57,15 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
           </div>
           {onCancelRegistration && (
             <button
-              onClick={() => onCancelRegistration(game.id, user?._id || '')}
+              onClick={() => {
+                // Use _id as fallback if id is not available
+                const gameId = game.id || (game as any)._id;
+                if (!gameId) {
+                  console.error('Game ID not found in ActionButtons');
+                  return;
+                }
+                onCancelRegistration(gameId, user?._id || '');
+              }}
               className='w-full bg-red-500 hover:bg-red-600 text-white rounded-xl py-3 font-medium transition-colors'
             >
               Cancel Registration
@@ -87,7 +95,15 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         <div className='pt-4 space-y-3'>
           {onCancelRegistration && (
             <button
-              onClick={() => onCancelRegistration(game.id, user?._id || '')}
+              onClick={() => {
+                // Use _id as fallback if id is not available
+                const gameId = game.id || (game as any)._id;
+                if (!gameId) {
+                  console.error('Game ID not found in ActionButtons');
+                  return;
+                }
+                onCancelRegistration(gameId, user?._id || '');
+              }}
               className='w-full bg-red-500 hover:bg-red-600 text-white rounded-xl py-3 font-medium transition-colors'
             >
               Cancel Registration

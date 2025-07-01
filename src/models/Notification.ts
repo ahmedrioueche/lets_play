@@ -18,6 +18,8 @@ const NotificationSchema: Schema = new Schema(
         'system',
         'game_invitation',
         'game_reminder',
+        'game_registration',
+        'game_cancellation',
       ],
       required: true,
     },

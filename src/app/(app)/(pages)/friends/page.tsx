@@ -10,6 +10,7 @@ import { Sparkles, UserPlus, Users } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { FC, useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import WarningModal from './components/../../games/components/WarningModal';
 import FriendsSection from './components/FriendsSection';
 
 // Empty state components
@@ -23,9 +24,6 @@ const EmptyFriends: FC = () => {
       <h3 className='text-2xl font-bold text-light-text-primary dark:text-dark-text-primary mb-3'>
         {text.friends.no_friends}
       </h3>
-      <p className='text-light-text-secondary dark:text-dark-text-secondary mb-8 max-w-md mx-auto leading-relaxed'>
-        {text.friends.suggestions}
-      </p>
     </div>
   );
 };
@@ -130,6 +128,19 @@ const TABS = [
   { key: 'playedWith', label: 'Played With' },
 ];
 
+// Add a function to determine relationship
+function getRelationship(
+  user: User,
+  currentUser: User,
+  friends: User[],
+  pendingIds: string[]
+): 'friend' | 'pending' | 'not_friend' | 'self' {
+  if (user._id === currentUser._id) return 'self';
+  if (friends.some((f) => f._id === user._id)) return 'friend';
+  if (pendingIds.includes(user._id)) return 'pending';
+  return 'not_friend';
+}
+
 export default function FriendsPage() {
   const { user: currentUser } = useAuth();
   const [search, setSearch] = useState('');
@@ -140,6 +151,18 @@ export default function FriendsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+
+  // Add state for search
+  const [searchActive, setSearchActive] = useState(false);
+  const [searchResults, setSearchResults] = useState<User[]>([]);
+  const [searchPage, setSearchPage] = useState(1);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchHasMore, setSearchHasMore] = useState(true);
+  const [pendingIds, setPendingIds] = useState<string[]>([]); // For pending invitations
+
+  // Add modal state
+  const [modalOpen, setModalOpen] = useState(false);
+  const [pendingRemove, setPendingRemove] = useState<User | null>(null);
 
   // Load friends data
   const loadFriends = useCallback(async () => {
@@ -219,6 +242,84 @@ export default function FriendsPage() {
     f.name.toLowerCase().includes(search.toLowerCase())
   );
 
+  // Fetch pending invitations (for pending status)
+  useEffect(() => {
+    async function fetchPending() {
+      if (!currentUser?._id) return;
+      try {
+        const res = await friendInvitationsApi.getInvitations(currentUser._id, 'sent');
+        setPendingIds(res?.map((inv: any) => inv.toUserId) || []);
+      } catch {}
+    }
+    fetchPending();
+  }, [currentUser?._id]);
+
+  // Search users API
+  const searchUsers = async (query: string, page = 1) => {
+    setSearchLoading(true);
+    try {
+      const res = await fetch(`/api/users/search?q=${encodeURIComponent(query)}&page=${page}`);
+      const data = await res.json();
+      if (page === 1) {
+        setSearchResults(data.users || []);
+      } else {
+        setSearchResults((prev) => [...prev, ...(data.users || [])]);
+      }
+      setSearchHasMore(data.hasMore);
+    } catch {
+      setSearchResults([]);
+      setSearchHasMore(false);
+    } finally {
+      setSearchLoading(false);
+    }
+  };
+
+  // Handle search button click
+  const handleSearch = () => {
+    if (search.trim()) {
+      setSearchActive(true);
+      setSearchPage(1);
+      searchUsers(search, 1);
+    }
+  };
+
+  // Handle search pagination
+  const handleLoadMoreSearch = () => {
+    if (searchHasMore && !searchLoading) {
+      const nextPage = searchPage + 1;
+      setSearchPage(nextPage);
+      searchUsers(search, nextPage);
+    }
+  };
+
+  // Handle search bar change
+  const handleSearchChange = (val: string) => {
+    setSearch(val);
+    if (!val) {
+      setSearchActive(false);
+      setSearchResults([]);
+    }
+  };
+
+  // Handle request to remove a friend
+  const handleRequestRemove = (user: User) => {
+    setPendingRemove(user);
+    setModalOpen(true);
+  };
+
+  const handleConfirmRemove = () => {
+    if (pendingRemove) {
+      handleRemoveFriend(pendingRemove._id);
+      setModalOpen(false);
+      setPendingRemove(null);
+    }
+  };
+
+  const handleCancelRemove = () => {
+    setModalOpen(false);
+    setPendingRemove(null);
+  };
+
   // Loading state
   if (loading) {
     return <Loading />;
@@ -251,29 +352,68 @@ export default function FriendsPage() {
       {/* Search Bar and Tabs */}
       <div className='flex flex-col sm:flex-row items-center gap-4 mb-8 w-full'>
         <div className='flex-grow min-w-0 w-full'>
-          <SearchBar value={search} onChange={setSearch} onActionClick={() => {}} />
+          <SearchBar value={search} onChange={handleSearchChange} onActionClick={handleSearch} />
         </div>
-        <div className='flex-shrink-0 w-full sm:w-auto flex justify-end'>
-          <div className='inline-flex rounded-xl bg-light-card dark:bg-dark-card p-1 shadow border border-light-border dark:border-dark-border'>
-            {TABS.map((tab) => (
-              <button
-                key={tab.key}
-                className={`px-6 py-2 rounded-lg font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400
-                  ${activeTab === tab.key ? 'bg-light-primary dark:bg-dark-primary text-white shadow' : 'text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-background dark:hover:bg-dark-accent'}`}
-                onClick={() => setActiveTab(tab.key as any)}
-              >
-                {tab.label}
-              </button>
-            ))}
+        {!searchActive && (
+          <div className='flex-shrink-0 w-full sm:w-auto flex justify-end'>
+            <div className='inline-flex rounded-xl bg-light-card dark:bg-dark-card p-1 shadow border border-light-border dark:border-dark-border'>
+              {TABS.map((tab) => (
+                <button
+                  key={tab.key}
+                  className={`px-6 py-2 rounded-lg font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400
+                    ${activeTab === tab.key ? 'bg-light-primary dark:bg-dark-primary text-white shadow' : 'text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-background dark:hover:bg-dark-accent'}`}
+                  onClick={() => setActiveTab(tab.key as any)}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Stats Overview */}
-      <FriendsStatsOverview friends={friends} playedWith={playedWith} suggestions={suggestions} />
+      {!searchActive && (
+        <FriendsStatsOverview friends={friends} playedWith={playedWith} suggestions={suggestions} />
+      )}
+
+      {/* Search Results */}
+      {searchActive && (
+        <>
+          {searchLoading && searchPage === 1 ? (
+            <Loading />
+          ) : searchResults.length === 0 ? (
+            <div className='text-center py-16 text-gray-400'>No users found.</div>
+          ) : (
+            <>
+              <FriendsSection
+                friends={searchResults}
+                onAddFriend={handleAddFriend}
+                onMessage={handleMessage}
+                getRelationship={(user) => getRelationship(user, currentUser!, friends, pendingIds)}
+                relationship='not_friend'
+                onCardClick={handleCardClick}
+                onRequestRemove={handleRequestRemove}
+              />
+              {searchHasMore && (
+                <div className='flex justify-center mt-6'>
+                  <button
+                    className='px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600'
+                    onClick={handleLoadMoreSearch}
+                    disabled={searchLoading}
+                  >
+                    {searchLoading ? 'Loading...' : 'Load More'}
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+        </>
+      )}
 
       {/* Tab Content */}
-      {activeTab === 'friends' &&
+      {!searchActive &&
+        activeTab === 'friends' &&
         (filteredFriends.length === 0 ? (
           <EmptyFriends />
         ) : (
@@ -281,12 +421,15 @@ export default function FriendsPage() {
             friends={filteredFriends}
             onAddFriend={handleAddFriend}
             onMessage={handleMessage}
-            onRemoveFriend={handleRemoveFriend}
+            getRelationship={(user) => getRelationship(user, currentUser!, friends, pendingIds)}
+            relationship='friend'
             onCardClick={handleCardClick}
+            onRequestRemove={handleRequestRemove}
           />
         ))}
 
-      {activeTab === 'suggestions' &&
+      {!searchActive &&
+        activeTab === 'suggestions' &&
         (filteredSuggestions.length === 0 ? (
           <EmptySuggestions />
         ) : (
@@ -294,12 +437,15 @@ export default function FriendsPage() {
             friends={filteredSuggestions}
             onAddFriend={handleAddFriend}
             onMessage={handleMessage}
-            onRemoveFriend={() => {}}
+            getRelationship={(user) => getRelationship(user, currentUser!, friends, pendingIds)}
+            relationship='not_friend'
             onCardClick={handleCardClick}
+            onRequestRemove={handleRequestRemove}
           />
         ))}
 
-      {activeTab === 'playedWith' &&
+      {!searchActive &&
+        activeTab === 'playedWith' &&
         (filteredPlayedWith.length === 0 ? (
           <EmptyPlayedWith />
         ) : (
@@ -307,10 +453,22 @@ export default function FriendsPage() {
             friends={filteredPlayedWith}
             onAddFriend={handleAddFriend}
             onMessage={handleMessage}
-            onRemoveFriend={() => {}}
+            getRelationship={(user) => getRelationship(user, currentUser!, friends, pendingIds)}
+            relationship='not_friend'
             onCardClick={handleCardClick}
+            onRequestRemove={handleRequestRemove}
           />
         ))}
+
+      {pendingRemove && (
+        <WarningModal
+          isOpen={modalOpen}
+          onConfirm={handleConfirmRemove}
+          onCancel={handleCancelRemove}
+          message={`Are you sure you want to remove ${pendingRemove.name} from your friends?`}
+          warning={'Remove Friend'}
+        />
+      )}
     </div>
   );
 }

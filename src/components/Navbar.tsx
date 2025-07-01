@@ -21,7 +21,7 @@ import {
 import { useTheme } from 'next-themes';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import MessagesDropdown from './MessagesDropdown';
 import NotificationsDropdown from './NotificationsDropdown';
 import ProfileDropdown from './ProfileDropdown';
@@ -41,6 +41,21 @@ const Navbar = () => {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const { badges, refreshBadges, updateBadge } = useBadges();
+
+  // Stable callbacks to prevent infinite loop
+  const handleNotificationsUnreadCountChange = useCallback(
+    (count: number) => {
+      updateBadge('notifications', count);
+    },
+    [updateBadge]
+  );
+
+  const handleChatUnreadCountChange = useCallback(
+    (count: number) => {
+      updateBadge('chat', count);
+    },
+    [updateBadge]
+  );
 
   //useEffect(() => {
   //  usersApi.deleteCurrentUser(user?._id!);
@@ -190,10 +205,16 @@ const Navbar = () => {
                   onClick={() => setIsNotificationsOpen((prev) => !prev)}
                 >
                   <Bell className='h-6 w-6' />
+                  {badges.notifications > 0 && (
+                    <span className='absolute -top-2 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center'>
+                      {badges.notifications > 9 ? '9+' : badges.notifications}
+                    </span>
+                  )}
                 </button>
                 <NotificationsDropdown
                   isOpen={isNotificationsOpen}
                   onClose={() => setIsNotificationsOpen(false)}
+                  onUnreadCountChange={handleNotificationsUnreadCountChange}
                 />
               </div>
 
@@ -206,7 +227,7 @@ const Navbar = () => {
                 >
                   <MessageSquare className='h-6 w-6' />
                   {badges.chat > 0 && (
-                    <span className='absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center'>
+                    <span className='absolute -top-3 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center'>
                       {badges.chat > 9 ? '9+' : badges.chat}
                     </span>
                   )}
@@ -214,7 +235,7 @@ const Navbar = () => {
                 <MessagesDropdown
                   isOpen={isMessagesOpen}
                   onClose={() => setIsMessagesOpen(false)}
-                  onUnreadCountChange={(count) => updateBadge('chat', count)}
+                  onUnreadCountChange={handleChatUnreadCountChange}
                   onRefreshBadges={refreshBadges}
                 />
               </div>
@@ -252,12 +273,9 @@ const Navbar = () => {
                 >
                   {item.icon}
                   <span>{item.label}</span>
-                  {item.showNotification && (
-                    <span className='ml-auto h-2 w-2 rounded-full bg-red-500'></span>
-                  )}
-                  {item.notificationCount && item.notificationCount > 0 && (
-                    <span className='ml-auto h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center'>
-                      {item.notificationCount > 9 ? '9+' : item.notificationCount}
+                  {typeof item.notificationCount === 'number' && item.notificationCount > 0 && (
+                    <span className='ml-auto text-red-500 font-bold'>
+                      {item.notificationCount > 99 ? '99+' : item.notificationCount}
                     </span>
                   )}
                 </button>
@@ -319,6 +337,7 @@ const Navbar = () => {
                 <NotificationsDropdown
                   isOpen={mobileNotificationsOpen}
                   onClose={() => setMobileNotificationsOpen(false)}
+                  onUnreadCountChange={handleNotificationsUnreadCountChange}
                 />
               </div>
             </div>
@@ -331,7 +350,7 @@ const Navbar = () => {
                 <MessagesDropdown
                   isOpen={mobileMessagesOpen}
                   onClose={() => setMobileMessagesOpen(false)}
-                  onUnreadCountChange={(count) => updateBadge('chat', count)}
+                  onUnreadCountChange={handleChatUnreadCountChange}
                   onRefreshBadges={refreshBadges}
                 />
               </div>

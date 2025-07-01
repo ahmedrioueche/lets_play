@@ -39,6 +39,7 @@ export default function CreateGamePage() {
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const { user } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
 
   // Auto-generate title if empty and sport changes
   const autoTitle =
@@ -137,14 +138,14 @@ export default function CreateGamePage() {
         toast.error('Please fill in all required fields correctly.');
         return;
       }
-
+      setIsLoading(true);
       try {
         const newGameData = {
           ...formData,
           title: autoTitle,
           currentPlayers: 0,
           status: 'open',
-          organizer: user,
+          organizer: user?._id,
           participants: [],
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
@@ -156,6 +157,8 @@ export default function CreateGamePage() {
       } catch (error) {
         console.error('Error creating game:', error);
         toast.error('Failed to create game. Please try again.');
+      } finally {
+        setIsLoading(false);
       }
     },
     [formData, validateForm, router, autoTitle]
@@ -205,7 +208,12 @@ export default function CreateGamePage() {
 
             {/* Submit Button */}
             <div className='mt-8 pt-6 border-t border-light-border dark:border-dark-border'>
-              <Button type='submit' variant='primary' className='w-full py-3 text-lg font-medium'>
+              <Button
+                disabled={isLoading}
+                type='submit'
+                variant='primary'
+                className='w-full py-3 text-lg font-medium'
+              >
                 Create Game
               </Button>
             </div>

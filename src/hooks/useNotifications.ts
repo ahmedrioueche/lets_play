@@ -178,6 +178,22 @@ export const useNotifications = (userId: string) => {
         removeNotification(data.invitationId);
       });
       // Add more event bindings as needed
+      channel.bind('game_invitation', (notification: Notification) => {
+        console.log('Received game_invitation notification:', notification);
+        addNotification(notification);
+      });
+      channel.bind('game_reminder', (notification: Notification) => {
+        console.log('Received game_reminder notification:', notification);
+        addNotification(notification);
+      });
+      channel.bind('game_registration', (notification: Notification) => {
+        console.log('Received game_registration notification:', notification);
+        addNotification(notification);
+      });
+      channel.bind('game_cancellation', (notification: Notification) => {
+        console.log('Received game_cancellation notification:', notification);
+        addNotification(notification);
+      });
     }
 
     return () => {

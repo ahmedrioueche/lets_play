@@ -1,0 +1,1 @@
+export const GAME_NOTIFICATION_DISTANCE_KM = 100;

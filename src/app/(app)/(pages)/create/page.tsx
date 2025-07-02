@@ -14,21 +14,19 @@ import { MapSection } from './components/MapSection';
 export default function CreateGamePage() {
   const router = useRouter();
   const [formData, setFormData] = useState<
-    Omit<
-      Game,
-      'id' | 'status' | 'organizer' | 'currentPlayers' | 'participants' | 'createdAt' | 'updatedAt'
-    > & {
+    Omit<Game, 'id' | 'status' | 'organizer' | 'participants' | 'createdAt' | 'updatedAt'> & {
       ageMin?: number;
       ageMax?: number;
     }
   >({
+    _id: '',
     title: '',
     description: '',
     location: '',
     coordinates: { lat: 0, lng: 0 },
     date: '',
     time: '',
-    maxPlayers: 10,
+    maxParticipants: 10,
     ageMin: 18,
     ageMax: 65,
     sport: 'football',
@@ -111,7 +109,6 @@ export default function CreateGamePage() {
 
   const validateForm = useCallback(() => {
     const newErrors: { [key: string]: string } = {};
-    // Title is now optional, so no check
     if (formData.coordinates.lat === 0 && formData.coordinates.lng === 0) {
       newErrors.coordinates = 'Please select a location on the map.';
     }
@@ -121,8 +118,8 @@ export default function CreateGamePage() {
     if (!formData.time) {
       newErrors.time = 'Time is required.';
     }
-    if (formData.maxPlayers < 2) {
-      newErrors.maxPlayers = 'Minimum 2 players required.';
+    if (formData.maxParticipants < 2) {
+      newErrors.maxParticipants = 'Minimum 2 participants required.';
     }
     if (formData.ageMin && formData.ageMax && formData.ageMin > formData.ageMax) {
       newErrors.ageRange = 'Minimum age cannot be greater than maximum age.';
@@ -143,10 +140,9 @@ export default function CreateGamePage() {
         const newGameData = {
           ...formData,
           title: autoTitle,
-          currentPlayers: 0,
           status: 'open',
           organizer: user?._id,
-          participants: [],
+          participants: [user?._id],
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
@@ -161,7 +157,7 @@ export default function CreateGamePage() {
         setIsLoading(false);
       }
     },
-    [formData, validateForm, router, autoTitle]
+    [formData, validateForm, router, autoTitle, user?._id]
   );
 
   return (

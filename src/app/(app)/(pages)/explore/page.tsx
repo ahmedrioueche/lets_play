@@ -3,33 +3,28 @@
 import GameDetailsModal from '@/app/(app)/components/GameDetailsModal';
 import GameCard from '@/components/games/GameCard';
 import GamesMap from '@/components/games/GamesMap';
+import NotFound from '@/components/ui/NotFound';
 import { useAuth } from '@/context/AuthContext';
 import { useExplore } from '@/hooks/useExplore';
 import { Game } from '@/types/game';
 import { User } from '@/types/user';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import WarningModal from '../games/components/WarningModal';
 import CalendarView from './components/CalendarView';
 import FilterModal from './components/FilterModal';
 import SearchSection from './components/SearchSection';
 
 export default function ExplorePage() {
-  const {
-    state,
-    setViewMode,
-    setFilters,
-    setSearchQuery,
-    setUserLocation,
-    setSelectedGame,
-    handleGameSelect,
-    resetFilters,
-  } = useExplore();
+  const { state, setViewMode, setFilters, setSearchQuery, setUserLocation, setSelectedGame } =
+    useExplore();
 
   const { user } = useAuth();
 
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
+  const [gameToCancel, setGameToCancel] = useState('');
 
   // Ensure we're on the client side before using geolocation
   useEffect(() => {
@@ -81,8 +76,6 @@ export default function ExplorePage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Registration failed');
-      toast.success('Registered successfully!');
-      // Fetch updated game and update selectedGame
       const updatedRes = await fetch(`/api/games/${gameId}`);
       const updatedGame = await updatedRes.json();
       setSelectedGame(updatedGame);
@@ -91,13 +84,13 @@ export default function ExplorePage() {
     }
   };
 
-  const handleCancelRegistration = async (gameId: string, userId: string) => {
-    if (!userId) return;
+  const handleCancelRegistration = async (gameId: string) => {
+    if (!user) return;
     try {
       const res = await fetch(`/api/games/${gameId}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId }),
+        body: JSON.stringify({ userId: user._id }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Cancellation failed');
@@ -108,6 +101,8 @@ export default function ExplorePage() {
       setSelectedGame(updatedGame);
     } catch (err: any) {
       toast.error(err.message || 'Cancellation failed');
+    } finally {
+      setGameToCancel('');
     }
   };
 
@@ -155,32 +150,17 @@ export default function ExplorePage() {
                 ))}
               </div>
             ) : (
-              <div className='flex flex-col items-center justify-center py-16 text-center'>
-                <div className='w-24 h-24 rounded-full bg-light-hover/50 dark:bg-dark-hover/50 flex items-center justify-center'>
-                  <svg
-                    className='w-12 h-12 text-light-text-secondary dark:text-dark-text-secondary'
-                    fill='none'
-                    stroke='currentColor'
-                    viewBox='0 0 24 24'
-                  >
-                    <path
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth={2}
-                      d='M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10'
-                    />
-                  </svg>
-                </div>
-                <h3 className='text-xl font-semibold text-light-text-primary dark:text-dark-text-primary mb-2'>
-                  No games found
-                </h3>
-                <p className='text-light-text-secondary dark:text-dark-text-secondary max-w-md'>
-                  {state.searchQuery ||
-                  state.filters.sports.length > 0 ||
-                  state.filters.skillLevels.length > 0
-                    ? 'Try adjusting your search or filters to find more games.'
-                    : 'Be the first to create a game in your area!'}
-                </p>
+              <div className='min-h-[50vh] flex items-center justify-center'>
+                <NotFound
+                  text='No games found'
+                  subtext={
+                    state.searchQuery ||
+                    state.filters.sports.length > 0 ||
+                    state.filters.skillLevels.length > 0
+                      ? 'Try adjusting your search or filters to find more games.'
+                      : 'Be the first to create a game in your area!'
+                  }
+                />
               </div>
             )}
           </div>
@@ -224,7 +204,7 @@ export default function ExplorePage() {
           }}
           userLocation={state.userLocation}
           onRegister={handleRegister}
-          onCancelRegistration={handleCancelRegistration}
+          onCancelRegistration={(gameId) => setGameToCancel(gameId)}
           isRegistered={
             user
               ? state.selectedGame.participants?.some(
@@ -236,6 +216,14 @@ export default function ExplorePage() {
         />
       )}
       <div className='flex-1 relative mt-4'>{renderContentView()}</div>
+
+      <WarningModal
+        isOpen={gameToCancel.trim() !== ''}
+        onConfirm={() => handleCancelRegistration(gameToCancel)}
+        onCancel={() => setGameToCancel('')}
+        message='Canceling your registration will impact your credibility. Are you sure you want to proceed?'
+        warning='Warning'
+      />
     </div>
   );
 }

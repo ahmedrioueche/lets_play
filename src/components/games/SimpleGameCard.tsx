@@ -37,7 +37,7 @@ const SimpleGameCard: React.FC<GameCardProps> = ({ game, onClick }) => {
         <div className='flex items-center gap-1'>
           <Users className='w-4 h-4' />
           <span>
-            {game.currentPlayers}/{game.maxPlayers} players
+            {game.participants.length}/{game.maxParticipants} participants
           </span>
         </div>
         <div className='flex items-center gap-1'>

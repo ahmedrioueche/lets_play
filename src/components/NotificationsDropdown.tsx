@@ -75,10 +75,8 @@ const NotificationsDropdown = ({
         }
         break;
       case 'game_invitation':
-        // Navigate to the game details
         if (notification.data?.gameId) {
-          // You might want to open a game modal or navigate to games page
-          router.push('/games');
+          router.push(`/games/${notification.data?.gameId}`);
         }
         break;
       default:

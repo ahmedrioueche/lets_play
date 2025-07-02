@@ -1,5 +1,6 @@
 import dbConnect from '@/config/db';
 import NotificationModel from '@/models/Notification';
+import { sendNotification } from '@/utils/notifications';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
@@ -45,13 +46,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const notification = await NotificationModel.create({
-      userId,
+    const [notification] = await sendNotification({
+      userIds: [userId],
       type,
       title,
       message,
       data,
-      isRead: false,
     });
 
     return NextResponse.json(notification, { status: 201 });

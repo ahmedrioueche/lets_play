@@ -226,8 +226,8 @@ const GamesMap: React.FC<GamesMapProps> = ({
                       <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
                       <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                     </svg>
-                    <span>${game.currentPlayers}/${game.maxPlayers} players</span>
-                  </div>
+                     <span> ${game.participants.length}/${game.maxParticipants} participants
+                    </span>                  </div>
                     <span class="px-2 py-1 rounded-full text-xs font-medium bg-light-primary/10 dark:bg-dark-primary/10 text-light-primary dark:text-dark-primary">
                     ${game.skillLevel.charAt(0).toUpperCase() + game.skillLevel.slice(1)}
                   </span>

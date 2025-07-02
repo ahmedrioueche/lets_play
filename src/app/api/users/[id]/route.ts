@@ -36,7 +36,8 @@ export async function GET(request: NextRequest, context: { params: { id: string 
       .populate('social')
       .populate('history')
       .populate('analytics')
-      .populate('achievements');
+      .populate('achievements')
+      .populate('friends');
 
     if (!userProfile) {
       return NextResponse.json({ message: 'User profile not found' }, { status: 404 });
@@ -52,6 +53,7 @@ export async function GET(request: NextRequest, context: { params: { id: string 
       history: userProfile.history,
       analytics: userProfile.analytics,
       achievements: userProfile.achievements,
+      friends: userProfile.friends,
       // Optionally include core user fields
       name: user.name,
       email: user.email,

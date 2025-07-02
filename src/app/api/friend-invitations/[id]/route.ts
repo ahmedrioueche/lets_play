@@ -1,8 +1,7 @@
 import dbConnect from '@/config/db';
-import { pusherServer } from '@/lib/api/notificationsApi';
 import FriendInvitationModel from '@/models/FriendInvitation';
-import NotificationModel from '@/models/Notification';
 import UserSocialModel from '@/models/UserSocial';
+import { sendNotification } from '@/utils/notifications';
 import { ObjectId } from 'mongodb';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -66,40 +65,6 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     const fromUser = invitation.fromUserId as any;
     const toUser = invitation.toUserId as any;
 
-    // Create notification for the other user
-    const notificationMessage =
-      userId === fromUserId
-        ? `${fromUser.name} cancelled the friend invitation`
-        : `${toUser.name} cancelled the friend invitation`;
-
-    const notification = await NotificationModel.create({
-      userId: userId === fromUserId ? toUserId : fromUserId,
-      type: 'friend_invitation_cancelled',
-      title: 'Friend Invitation Cancelled',
-      message: notificationMessage,
-      data: {
-        friendInvitationId: invitation._id,
-        cancelledByUserId: userId,
-      },
-    });
-
-    // Send real-time notification via Pusher to both users
-    try {
-      await Promise.all([
-        pusherServer.trigger(`user-${fromUserId}`, 'friend-invitation-cancelled', {
-          invitationId: invitation._id,
-          cancelledByUserId: userId,
-        }),
-        pusherServer.trigger(`user-${toUserId}`, 'friend-invitation-cancelled', {
-          invitationId: invitation._id,
-          cancelledByUserId: userId,
-        }),
-      ]);
-    } catch (error) {
-      console.error('Pusher error:', error);
-      // Don't fail the request if Pusher fails
-    }
-
     // Remove from social stats before deleting
     try {
       await Promise.all([
@@ -119,6 +84,16 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 
     // Delete the invitation
     await FriendInvitationModel.findByIdAndDelete(id);
+
+    // Send notification to the other user
+    await sendNotification({
+      userIds: [toUserId],
+      type: 'friend_invitation_cancelled',
+      event: 'friend-invitation-cancelled',
+      title: 'Friend Invitation Cancelled',
+      message: `${fromUser.name} cancelled the friend invitation.`,
+      data: { fromUserId: fromUser._id },
+    });
 
     return NextResponse.json({
       success: true,

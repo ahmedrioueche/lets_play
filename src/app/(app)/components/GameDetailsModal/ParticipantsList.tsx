@@ -1,35 +1,34 @@
 import UserAvatar from '@/components/ui/UserAvatar';
 import { User } from '@/types/user';
+import { capitalize } from '@/utils/helper';
+import { useRouter } from 'next/navigation';
 
 interface ParticipantsListProps {
-  participants: (User | string)[];
+  participants: User[];
+  organizer: User;
 }
 
-const ParticipantsList: React.FC<ParticipantsListProps> = ({ participants }) => {
-  if (!participants || participants.length === 0) {
-    return (
-      <div className='text-light-text-secondary dark:text-dark-text-secondary'>
-        No participants yet.
-      </div>
-    );
-  }
+const ParticipantsList: React.FC<ParticipantsListProps> = ({ participants, organizer }) => {
+  const router = useRouter();
+
   return (
-    <div className='flex flex-wrap gap-3'>
-      {participants.map((p, idx) => {
-        const user = typeof p === 'object' ? p : null;
-        return (
-          <div
-            key={user?._id || (p as string)}
-            className='flex items-center gap-2 bg-light-hover dark:bg-dark-hover rounded-lg px-3 py-2'
-          >
-            <UserAvatar avatar={user?.avatar} />
-            <span className='font-medium text-light-text-primary dark:text-dark-text-primary'>
-              {user?.name || 'User'}
+    <ul className='space-y-3'>
+      {participants.map((participant) => (
+        <li
+          onClick={() => router.push(`/profile/${participant._id}`)}
+          key={participant._id}
+          className='flex items-center gap-4 cursor-pointer'
+        >
+          <UserAvatar avatar={participant.avatar} />
+          <span>{capitalize(participant.name)}</span>
+          {participant._id === organizer._id && (
+            <span className='ml-2 text-xs text-light-primary dark:text-dark-primary'>
+              (Organizer)
             </span>
-          </div>
-        );
-      })}
-    </div>
+          )}
+        </li>
+      ))}
+    </ul>
   );
 };
 

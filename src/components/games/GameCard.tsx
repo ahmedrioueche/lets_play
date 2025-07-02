@@ -58,11 +58,13 @@ const GameCard: React.FC<GameCardProps> = ({ game, onClick, userLocation }) => {
           <div className='flex items-center gap-2 text-light-text-secondary dark:text-dark-text-secondary'>
             <Users className='w-4 h-4' />
             <span>
-              {game.currentPlayers}/{game.maxPlayers} players
+              {game.participants.length}/{game.maxParticipants} players
             </span>
           </div>
           <span className='px-2 py-1 rounded-full text-xs font-medium bg-light-secondary/10 dark:bg-dark-secondary/10 text-light-secondary dark:text-dark-secondary'>
-            {capitalize(game.organizer.name)}
+            {typeof game.organizer === 'string'
+              ? capitalize(game.organizer)
+              : capitalize(game.organizer.name)}
           </span>
         </div>
         <div className='flex items-center justify-between text-sm'>

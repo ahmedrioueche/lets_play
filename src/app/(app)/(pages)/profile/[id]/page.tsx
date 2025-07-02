@@ -1,6 +1,7 @@
 'use client';
 
 import FriendButton from '@/app/(app)/(pages)/profile/components/FriendButton';
+import Loading from '@/components/ui/Loading';
 import { useAuth } from '@/context/AuthContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { capitalize } from '@/utils/helper';
@@ -13,6 +14,7 @@ import {
   Edit3,
   Heart,
   MapPin,
+  MessageCircle,
   Settings,
   Star,
   Target,
@@ -21,8 +23,9 @@ import {
   User,
 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
+import UserCard from '../../friends/components/UserCard';
 import AvatarModal from './components/AvatarModal';
 import EditProfileModal from './components/EditProfileModal';
 
@@ -32,7 +35,9 @@ export default function ProfilePage() {
   const router = useRouter();
   const userId = params.id as string;
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'stats' | 'achievements'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'stats' | 'achievements' | 'friends'>(
+    'overview'
+  );
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [showAvatarModal, setShowAvatarModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -43,11 +48,26 @@ export default function ProfilePage() {
   } = useUserProfile(userId);
   const isCurrentUser = currentUser?._id === userId;
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [hasMounted, setHasMounted] = useState(false);
 
-  const handleFriendStatusChange = async (status: string) => {
-    // The FriendButton will handle its own state updates
-    console.log('Friend status changed to:', status);
-  };
+  // Ensure client-only rendering for anything that depends on client-side data
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      console.log('CLIENT profileUser', profileUser);
+      console.log('CLIENT currentUser', currentUser);
+    }
+  }, [profileUser, currentUser]);
+
+  if (typeof window === 'undefined') {
+    console.log('SERVER profileUser', profileUser);
+    console.log('SERVER currentUser', currentUser);
+  }
+
+  if (!hasMounted) return null;
 
   let locationDisplay = 'Location not available';
   if (profileUser?.location) {
@@ -142,27 +162,8 @@ export default function ProfilePage() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className='min-h-screen flex items-center justify-center'>
-        <div className='animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500'></div>
-      </div>
-    );
-  }
-
-  if (!profileUser) {
-    return (
-      <div className='min-h-screen flex items-center justify-center'>
-        <div className='text-center'>
-          <h1 className='text-2xl font-bold text-gray-700 dark:text-gray-300 mb-4'>
-            User Not Found
-          </h1>
-          <p className='text-gray-500 dark:text-gray-400'>
-            The user you're looking for doesn't exist.
-          </p>
-        </div>
-      </div>
-    );
+  if (isLoading || !profileUser) {
+    return <Loading />;
   }
 
   return (
@@ -283,13 +284,14 @@ export default function ProfilePage() {
                     <>
                       <FriendButton
                         targetUser={profileUser}
-                        onStatusChange={handleFriendStatusChange}
+                        onStatusChange={() => {}}
                         className='px-6 py-2 rounded-xl font-medium transition-colors flex items-center gap-2'
                       />
                       <button
                         onClick={handleMessage}
                         className='px-6 py-2 bg-light-secondary/80 dark:bg-dark-secondary/80 hover:bg-light-secondary/70 dark:hover:bg-dark-secondary/70  text-white rounded-xl font-medium transition-colors flex items-center gap-2'
                       >
+                        <MessageCircle className='w-5 h-5' />
                         Message
                       </button>
                     </>
@@ -381,6 +383,7 @@ export default function ProfilePage() {
                 { id: 'overview', label: 'Overview', icon: User },
                 { id: 'stats', label: 'Stats', icon: TrendingUp },
                 { id: 'achievements', label: 'Achievements', icon: Award },
+                { id: 'friends', label: 'Friends', icon: Heart },
               ].map((tab) => {
                 const Icon = tab.icon;
                 return (
@@ -472,13 +475,36 @@ export default function ProfilePage() {
               </div>
             </div>
           )}
+
+          {activeTab === 'friends' && (
+            <div className='p-6 '>
+              {Array.isArray(profileUser.friends) && profileUser.friends.length > 0 ? (
+                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+                  {profileUser.friends.map((friend: any) => (
+                    <UserCard
+                      key={friend._id}
+                      user={friend}
+                      relationship={currentUser?._id === friend._id ? 'self' : 'friend'}
+                      onAddFriend={() => {}}
+                      onMessage={() => router.push(`/chat?friend=${friend._id}`)}
+                      onCardClick={() => router.push(`/profile/${friend._id}`)}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className='text-gray-500 dark:text-gray-400 text-center py-8'>
+                  No friends yet.
+                </div>
+              )}
+            </div>
+          )}
         </motion.div>
       </div>
       <AvatarModal
         isOpen={showAvatarModal}
         onClose={() => setShowAvatarModal(false)}
-        avatarUrl={isCurrentUser ? profileUser?.avatar || '' : ''}
-        userName={isCurrentUser ? profileUser?.name || '' : ''}
+        avatarUrl={profileUser?.avatar || ''}
+        userName={profileUser?.name || ''}
       />
       <EditProfileModal
         isOpen={showEditModal}

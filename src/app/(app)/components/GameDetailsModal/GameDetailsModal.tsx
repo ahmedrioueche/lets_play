@@ -12,7 +12,7 @@ interface GameDetailsModalProps {
   onClose: () => void;
   userLocation: { lat: number; lng: number } | null;
   onRegister?: (gameId: string, user: UserType) => Promise<void>;
-  onCancelRegistration?: (gameId: string, userId: string) => Promise<void>;
+  onCancelRegistration?: (gameId: string) => void;
   onCancelGame?: () => void;
   isRegistered?: boolean;
   mode?: 'explore' | 'games'; // 'explore' for registration, 'games' for management

@@ -12,9 +12,11 @@ const GameInfoSection: React.FC<GameInfoSectionProps> = ({ game }) => (
         <Users className='w-5 h-5 text-light-primary dark:text-dark-primary' />
       </div>
       <div>
-        <p className='text-sm text-light-text-secondary dark:text-dark-text-secondary'>Players</p>
+        <p className='text-sm text-light-text-secondary dark:text-dark-text-secondary'>
+          Participants
+        </p>
         <p className='font-medium text-light-text-primary dark:text-dark-text-primary'>
-          {game.currentPlayers}/{game.maxPlayers}
+          {game.participants.length}/{game.maxParticipants}
         </p>
       </div>
     </div>

@@ -57,9 +57,7 @@ export async function POST(req: NextRequest) {
     if (!gameData.time) {
       missingFields.push('time');
     }
-    if (!gameData.maxPlayers) {
-      missingFields.push('maxPlayers');
-    }
+
     if (!gameData.sport) {
       missingFields.push('sport');
     }
@@ -123,7 +121,7 @@ export async function POST(req: NextRequest) {
         message: `${gameData.title} (${gameData.sport}) at ${gameData.location || 'a nearby location'} on ${gameData.date} ${gameData.time}`,
         data: {
           gameId: newGameId,
-          route: `/game/${newGameId}`,
+          route: `/games/${newGameId}`,
           fromUserId: organizerId,
         },
         isRead: false,

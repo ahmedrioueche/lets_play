@@ -3,10 +3,13 @@
 import WarningModal from '@/app/(app)/(pages)/games/components/WarningModal';
 import MapSection from '@/app/(app)/components/GameDetailsModal/MapSection';
 import ParticipantsList from '@/app/(app)/components/GameDetailsModal/ParticipantsList';
+import ErrorSection from '@/components/ui/ErrorSection';
 import Loading from '@/components/ui/Loading';
+import NotFound from '@/components/ui/NotFound';
 import UserAvatar from '@/components/ui/UserAvatar';
 import { useAuth } from '@/context/AuthContext';
 import { Game } from '@/types/game';
+import { User } from '@/types/user';
 import { AlertTriangle, Calendar, MapPin, Users } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -83,7 +86,13 @@ const RegisterGamePage = () => {
       if (!res.ok) throw new Error(data.message || 'Cancellation failed');
       toast.success('Registration cancelled!');
       setGame(data.game);
-      setAlreadyRegistered(false);
+      setAlreadyRegistered(
+        data.game.participants && Array.isArray(data.game.participants)
+          ? data.game.participants.some(
+              (p: any) => (typeof p === 'object' ? p._id : p) === user._id
+            )
+          : false
+      );
     } catch (err: any) {
       toast.error(err.message || 'Cancellation failed');
     } finally {
@@ -93,8 +102,21 @@ const RegisterGamePage = () => {
   };
 
   if (loading) return <Loading />;
-  if (error || !game)
-    return <div className='p-8 text-center text-red-500'>{error || 'Game not found.'}</div>;
+  if (error)
+    return (
+      <div className='min-h-screen flex items-center justify-center'>
+        <ErrorSection text={error} />
+      </div>
+    );
+  if (!game)
+    return (
+      <div className='min-h-screen flex items-center justify-center'>
+        <NotFound
+          text='Game not found'
+          subtext='The game you are looking for does not exist or may have been removed.'
+        />
+      </div>
+    );
 
   return (
     <div className='container mx-auto  p-2'>
@@ -106,7 +128,8 @@ const RegisterGamePage = () => {
         </h1>
         <p className='text-light-text-secondary dark:text-dark-text-secondary flex items-center gap-2'>
           <Users className='w-5 h-5' />
-          {game.currentPlayers}/{game.maxPlayers} players &bull; {game.date} {game.time}
+          Participants: {game.participants.length}/{game.maxParticipants} &bull; {game.date}{' '}
+          {game.time}
         </p>
       </div>
       {/* Game Summary */}
@@ -151,9 +174,16 @@ const RegisterGamePage = () => {
       {/* Participants List */}
       <div className='bg-light-card dark:bg-dark-card rounded-2xl p-6 mb-4 border border-light-border dark:border-dark-border'>
         <h3 className='text-lg font-semibold text-light-text-primary dark:text-dark-text-primary mb-2'>
-          Participants
+          Participants ({game.participants.length}/{game.maxParticipants})
         </h3>
-        <ParticipantsList participants={game.participants || []} />
+        {game && typeof game.organizer === 'object' && (
+          <ParticipantsList
+            participants={
+              (game.participants || []).filter((p: any) => typeof p === 'object') as User[]
+            }
+            organizer={game.organizer}
+          />
+        )}
       </div>
       {alreadyRegistered && !isLoading ? (
         <div className='mb-4'>

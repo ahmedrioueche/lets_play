@@ -19,7 +19,7 @@ export const MyGameCard: React.FC<MyGameCardProps> = ({ game, isOrganizer }) => 
     <div className='bg-white dark:bg-dark-card rounded-2xl shadow-lg p-6 flex flex-col gap-4 border border-light-border/30 dark:border-dark-border/30 hover:shadow-2xl transition'>
       <div className='flex items-center gap-4'>
         <img
-          src={sportIcons[game.sport]}
+          src={sportIcons[game.sport as SportType]}
           alt={game.sport}
           className='w-12 h-12 object-contain rounded-full border border-gray-200 dark:border-gray-700 bg-light-hover/30 dark:bg-dark-hover/30'
         />
@@ -53,17 +53,27 @@ export const MyGameCard: React.FC<MyGameCardProps> = ({ game, isOrganizer }) => 
         </span>
         <span>
           <i className='fa-regular fa-users mr-1' />
-          {game.currentPlayers}/{game.maxPlayers} players
+          {game.participants.length}/{game.maxParticipants} participants
         </span>
       </div>
       <div className='flex items-center gap-3 mt-2'>
         <img
-          src={game.organizer.avatar || '/images/avatars/default.jpg'}
-          alt={game.organizer.name}
+          src={
+            typeof game.organizer === 'object' && 'avatar' in game.organizer
+              ? game.organizer.avatar || '/images/avatars/default.jpg'
+              : '/images/avatars/default.jpg'
+          }
+          alt={
+            typeof game.organizer === 'object' && 'name' in game.organizer
+              ? game.organizer.name
+              : 'Organizer'
+          }
           className='w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700'
         />
         <span className='text-sm text-light-text-primary dark:text-dark-text-primary font-medium'>
-          {game.organizer.name}
+          {typeof game.organizer === 'object' && 'name' in game.organizer
+            ? game.organizer.name
+            : 'Organizer'}
         </span>
       </div>
     </div>

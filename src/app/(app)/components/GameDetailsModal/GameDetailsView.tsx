@@ -15,7 +15,7 @@ interface GameDetailsViewProps {
   isRegistered: boolean;
   onClose: () => void;
   onRegister: () => void;
-  onCancelRegistration?: (gameId: string, userId: string) => Promise<void>;
+  onCancelRegistration?: (gameId: string) => void;
   onCancelGame?: () => void;
 }
 
@@ -57,25 +57,36 @@ const GameDetailsView: React.FC<GameDetailsViewProps> = ({
 
       <div className='p-6 py-2 space-y-6'>
         <GameInfoSection game={game} />
+        <OrganizerSection game={game} organizer={organizer} />
+
+        {/* Description */}
+        {game.description && (
+          <div>
+            <h3 className='text-lg font-semibold text-light-text-primary dark:text-dark-text-primary mb-2'>
+              About
+            </h3>
+            <p className='text-light-text-secondary dark:text-dark-text-secondary leading-relaxed'>
+              {game.description}
+            </p>
+          </div>
+        )}
+
+        <MapSection game={game} userLocation={userLocation} />
+
         {/* Participants List */}
         <div>
           <h3 className='text-lg font-semibold text-light-text-primary dark:text-dark-text-primary mb-2'>
             Participants
           </h3>
-          <ParticipantsList participants={participants} />
+          {organizer && (
+            <ParticipantsList
+              participants={participants.filter(
+                (p): p is User => typeof p === 'object' && '_id' in p
+              )}
+              organizer={organizer}
+            />
+          )}
         </div>
-        {/* Description */}
-        <div>
-          <h3 className='text-lg font-semibold text-light-text-primary dark:text-dark-text-primary mb-2'>
-            About
-          </h3>
-          <p className='text-light-text-secondary dark:text-dark-text-secondary leading-relaxed'>
-            {game.description}
-          </p>
-        </div>
-
-        <MapSection game={game} userLocation={userLocation} />
-        <OrganizerSection game={game} organizer={organizer} />
 
         <ActionButtons
           game={game}

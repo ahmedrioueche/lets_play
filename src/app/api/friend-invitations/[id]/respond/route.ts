@@ -1,9 +1,9 @@
 import dbConnect from '@/config/db';
 import { pusherServer } from '@/lib/api/notificationsApi';
 import FriendInvitationModel from '@/models/FriendInvitation';
-import NotificationModel from '@/models/Notification';
 import UserProfileModel from '@/models/UserProfile';
 import UserSocialModel from '@/models/UserSocial';
+import { sendNotification } from '@/utils/notifications';
 import { ObjectId } from 'mongodb';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -66,24 +66,14 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         ? `${toUser.name} accepted your friend invitation`
         : `${toUser.name} declined your friend invitation`;
 
-    const notification = await NotificationModel.create({
-      userId: fromUser._id,
-      type: action === 'accept' ? 'friend_accepted' : 'friend_declined',
-      title: action === 'accept' ? 'Friend Invitation Accepted' : 'Friend Invitation Declined',
+    await sendNotification({
+      userIds: [fromUser._id],
+      type: 'friend_response',
+      event: 'friend-response',
+      title: 'Friend Invitation Response',
       message: notificationMessage,
-      data: {
-        friendInvitationId: invitation._id,
-        toUserId: toUser._id,
-      },
+      data: { toUserId: toUser._id, accepted: action === 'accept' },
     });
-
-    // Send real-time notification via Pusher (only once per event)
-    try {
-      await pusherServer.trigger(`user-${fromUser._id}`, 'friend-response', notification);
-    } catch (error) {
-      console.error('Pusher error:', error);
-      // Don't fail the request if Pusher fails
-    }
 
     if (action === 'accept') {
       // Add each other as friends

@@ -6,7 +6,12 @@ export async function POST(request: NextRequest) {
   try {
     await dbConnect();
 
-    const { userId, isOnline } = await request.json();
+    let userId, isOnline;
+    try {
+      ({ userId, isOnline } = await request.json());
+    } catch (err) {
+      return NextResponse.json({ message: 'Invalid JSON body' }, { status: 400 });
+    }
 
     if (!userId) {
       return NextResponse.json({ message: 'User ID is required' }, { status: 400 });

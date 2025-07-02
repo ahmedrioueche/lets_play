@@ -1,7 +1,9 @@
 // Simple test script to verify APIs are working
+const BASE_URL = process.env.DOMAIN || 'http://localhost:3000';
+
 const testSignup = async () => {
   try {
-    const response = await fetch('http://localhost:3000/api/auth/signup', {
+    const response = await fetch(`${BASE_URL}/api/auth/signup`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -31,7 +33,7 @@ const testSignup = async () => {
 
 const testUserProfile = async (userId) => {
   try {
-    const response = await fetch(`http://localhost:3000/api/users/${userId}`);
+    const response = await fetch(`${BASE_URL}/api/users/${userId}`);
     const data = await response.json();
     console.log('User profile response:', data);
 
@@ -51,7 +53,7 @@ const testUserProfile = async (userId) => {
 const testOnboarding = async (userId) => {
   try {
     // Test user update (age, location)
-    const userResponse = await fetch(`http://localhost:3000/api/users/${userId}`, {
+    const userResponse = await fetch(`${BASE_URL}/api/users/${userId}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -72,7 +74,7 @@ const testOnboarding = async (userId) => {
     }
 
     // Test user profile update (favoriteSports)
-    const profileResponse = await fetch(`http://localhost:3000/api/users/${userId}/user-profile`, {
+    const profileResponse = await fetch(`${BASE_URL}/api/users/${userId}/user-profile`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',

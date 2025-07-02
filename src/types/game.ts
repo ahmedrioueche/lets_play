@@ -6,27 +6,27 @@ export type ViewMode = 'map' | 'grid' | 'calendar';
 export type GameStatus = 'open' | 'full' | 'cancelled' | 'completed';
 
 export interface Game {
-  id: string;
+  _id: string;
+  id?: string;
   title: string;
-  description: string;
   location: string;
+  date: string;
+  time: string;
+  sport: string;
+  skillLevel: string;
+  ageMin?: number;
+  ageMax?: number;
+  description?: string;
+  organizer: string | User;
+  participants: (string | User)[];
+  maxParticipants: number;
   coordinates: {
     lat: number;
     lng: number;
   };
-  date: string;
-  time: string;
-  currentPlayers: number;
-  maxPlayers: number;
-  ageMin?: number;
-  ageMax?: number;
   status: GameStatus;
-  sport: SportType;
-  skillLevel: SkillLevel;
-  organizer: User;
   price: number;
   image?: string;
-  participants?: User[];
 }
 
 export interface FilterOptions {

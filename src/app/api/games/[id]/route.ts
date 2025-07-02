@@ -1,5 +1,6 @@
 import dbConnect from '@/config/db';
 import GameModel from '@/models/Game';
+import { sendNotification } from '@/utils/notifications';
 import mongoose from 'mongoose';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -46,37 +47,34 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (participants.map((id) => id.toString()).includes(userId)) {
       return NextResponse.json({ message: 'Already registered' }, { status: 400 });
     }
-    if (game.currentPlayers >= game.maxPlayers) {
+    if (participants.length >= game.maxParticipants) {
       return NextResponse.json({ message: 'Game is full' }, { status: 400 });
     }
-    game.participants = participants;
-    game.participants.push(userObjectId);
-    game.currentPlayers += 1;
+    // Ensure we only push the ObjectId, not a User object
+    game.participants = participants.map((p: any) => {
+      if (typeof p === 'string' || p instanceof mongoose.Types.ObjectId) {
+        return new mongoose.Types.ObjectId(p);
+      } else if (p && p._id) {
+        return new mongoose.Types.ObjectId(p._id);
+      }
+      return p;
+    });
+
+    game.participants.push(userObjectId as any);
     await game.save();
 
     // Notify organizer and participants (except the new user)
-    const NotificationModel = (await import('@/models/Notification')).default;
-    const { pusherServer } = await import('@/lib/pusherServer');
     const organizerId = game.organizer.toString();
-    const notifyUserIds = [
-      organizerId,
-      ...game.participants.map((id: any) => id.toString()),
-    ].filter((id, idx, arr) => id !== userId && arr.indexOf(id) === idx);
-    const notificationPromises = notifyUserIds.map(async (targetId) => {
-      const notification = await NotificationModel.create({
-        userId: targetId,
-        type: 'game_invitation',
-        title: 'New participant joined!',
-        message: `A new user has registered for the game: ${game.title}`,
-        data: { gameId: game._id, newUserId: userId },
-        isRead: false,
-      });
-      try {
-        await pusherServer.trigger(`user-${targetId}`, 'game_registration', notification);
-      } catch (e) {}
-      return notification;
+    const notifyUserIds = [organizerId, ...game.participants.map((id: any) => id.toString())];
+    await sendNotification({
+      userIds: notifyUserIds,
+      excludeUserIds: [userId],
+      type: 'game_invitation',
+      event: 'game_registration',
+      title: 'New participant joined!',
+      message: `A new user has registered for the game: ${game.title}`,
+      data: { gameId: game._id, newUserId: userId },
     });
-    await Promise.all(notificationPromises);
 
     // Transform game to include 'id' field
     const gameObj = game.toObject();
@@ -96,7 +94,11 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   await dbConnect();
   try {
     const { id } = await params;
+    console.log('CANCEL REGISTRATION');
+    console.log('id', id);
     const { userId } = await req.json();
+    console.log('userId', userId);
+
     if (!userId) {
       return NextResponse.json({ message: 'User ID is required' }, { status: 400 });
     }
@@ -107,39 +109,45 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
       return NextResponse.json({ message: 'Game not found' }, { status: 404 });
     }
     const participants = Array.isArray(game.participants) ? game.participants : [];
-    if (!participants.map((id) => id.toString()).includes(userId)) {
+    console.log('participants', participants);
+
+    // Build notification list BEFORE removing the user
+    const allParticipantIds = [
+      game.organizer.toString(),
+      ...participants.map((p: any) =>
+        typeof p === 'object' && p !== null && '_id' in p ? p._id.toString() : p.toString()
+      ),
+    ];
+    // Notify all previous participants and organizer (except the user who cancelled)
+    await sendNotification({
+      userIds: allParticipantIds,
+      excludeUserIds: [userId],
+      type: 'game_reminder',
+      event: 'game_cancellation',
+      title: 'Participant cancelled registration',
+      message: `A user has cancelled their registration for the game: ${game.title}`,
+      data: { gameId: game._id, cancelledUserId: userId },
+    });
+    // Now remove the user from participants
+    if (
+      !participants
+        .map((p) =>
+          typeof p === 'object' && p !== null && '_id' in p ? p._id.toString() : p.toString()
+        )
+        .includes(userId)
+    ) {
       return NextResponse.json(
         { message: 'You are not registered for this game' },
         { status: 400 }
       );
     }
-    game.participants = participants.filter((id) => id.toString() !== userId);
-    game.currentPlayers = Math.max(0, game.currentPlayers - 1);
-    await game.save();
-
-    // Notify organizer and participants (except the user)
-    const NotificationModel = (await import('@/models/Notification')).default;
-    const { pusherServer } = await import('@/lib/pusherServer');
-    const organizerId = game.organizer.toString();
-    const notifyUserIds = [
-      organizerId,
-      ...game.participants.map((id: any) => id.toString()),
-    ].filter((id, idx, arr) => id !== userId && arr.indexOf(id) === idx);
-    const notificationPromises = notifyUserIds.map(async (targetId) => {
-      const notification = await NotificationModel.create({
-        userId: targetId,
-        type: 'game_reminder',
-        title: 'Participant cancelled registration',
-        message: `A user has cancelled their registration for the game: ${game.title}`,
-        data: { gameId: game._id, cancelledUserId: userId },
-        isRead: false,
-      });
-      try {
-        await pusherServer.trigger(`user-${targetId}`, 'game_cancellation', notification);
-      } catch (e) {}
-      return notification;
+    game.participants = participants.filter((p: any) => {
+      if (typeof p === 'object' && p !== null && '_id' in p) {
+        return p._id.toString() !== userId;
+      }
+      return p.toString() !== userId;
     });
-    await Promise.all(notificationPromises);
+    await game.save();
 
     // Transform game to include 'id' field
     const gameObj = game.toObject();

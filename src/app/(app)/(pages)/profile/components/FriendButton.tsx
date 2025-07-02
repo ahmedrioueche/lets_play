@@ -1,9 +1,12 @@
+import WarningModal from '@/app/(app)/(pages)/games/components/WarningModal';
 import { useAuth } from '@/context/AuthContext';
 import { useFriendInvitations } from '@/hooks/useFriendInvitations';
 import useTranslator from '@/hooks/useTranslator';
 import { friendsApi } from '@/lib/api/friendsApi';
 import { UserProfile } from '@/types/user';
-import { useState } from 'react';
+import { capitalize } from '@/utils/helper';
+import { Check, Loader2, Send, Trash, UserCheck, UserPlus, X } from 'lucide-react';
+import { useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 
 interface FriendButtonProps {
@@ -20,6 +23,10 @@ const FriendButton: React.FC<FriendButtonProps> = ({
   const { user: currentUser } = useAuth();
   const text = useTranslator();
   const [isLoading, setIsLoading] = useState(false);
+  const [showRemove, setShowRemove] = useState(false);
+  const [showWarning, setShowWarning] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const {
     getInvitationStatus,
@@ -41,13 +48,6 @@ const FriendButton: React.FC<FriendButtonProps> = ({
 
   // Get current invitation status
   const invitationStatus = getInvitationStatus(targetUserId);
-
-  console.log('FriendButton render:', {
-    targetUserId,
-    currentUserId: currentUser?._id,
-    invitationStatus,
-    loading,
-  });
 
   // Don't show button if data is still loading
   if (loading) {
@@ -148,12 +148,13 @@ const FriendButton: React.FC<FriendButtonProps> = ({
       await friendsApi.removeFriend(currentUser._id, targetUserId);
       clearCache(); // Clear the cache to force fresh data
       onStatusChange?.('none');
-      toast.success(`Removed ${targetUser.name} from friends`);
+      toast.success(`Removed ${capitalize(targetUser.name!)} from friends`);
     } catch (error) {
       console.error('Error removing friend:', error);
       toast.error('Failed to remove friend');
     } finally {
       setIsLoading(false);
+      setShowRemove(false);
     }
   };
 
@@ -163,20 +164,40 @@ const FriendButton: React.FC<FriendButtonProps> = ({
   switch (invitationStatus) {
     case 'friends':
       return (
-        <div className='flex gap-2'>
-          <button
-            className={`${baseClasses} bg-green-100 dark:bg-green-700 text-green-600 dark:text-green-300 ${className}`}
-            disabled={isLoading}
+        <div className='flex items-center' ref={containerRef}>
+          <div className='relative flex items-center'>
+            <button
+              className={`${baseClasses} bg-blue-600 text-white hover:bg-blue-700 flex items-center gap-2 shadow ${className}`}
+              disabled={isLoading}
+              onClick={() => setShowRemove(!showRemove)}
+              type='button'
+              style={{ minWidth: 100 }}
+              ref={buttonRef}
+            >
+              <UserCheck className='w-5 h-5' /> Friends
+            </button>
+          </div>
+
+          {/* Remove button that slides in */}
+          <div
+            className={`overflow-hidden transition-all duration-300 ease-in-out ${showRemove ? 'w-32 opacity-100 ml-2' : 'w-0 opacity-0'}`}
           >
-            Friends
-          </button>
-          <button
-            onClick={handleRemoveFriend}
-            className={`${baseClasses} bg-red-500 text-white hover:bg-red-600 ${className}`}
-            disabled={isLoading}
-          >
-            {isLoading ? 'Loading...' : 'Remove'}
-          </button>
+            <button
+              onClick={() => setShowWarning(true)}
+              className={`${baseClasses} bg-red-500 text-white hover:bg-red-600 whitespace-nowrap rounded-xl flex items-center gap-2`}
+              disabled={isLoading}
+              style={{ minWidth: 120 }}
+            >
+              <Trash className='w-5 h-5' /> Remove
+            </button>
+            <WarningModal
+              isOpen={showWarning}
+              onConfirm={handleRemoveFriend}
+              onCancel={() => setShowWarning(false)}
+              message={`Are you sure you want to remove ${capitalize(targetUser.name!)} from your friends?`}
+              warning={'Remove Friend'}
+            />
+          </div>
         </div>
       );
 
@@ -184,17 +205,22 @@ const FriendButton: React.FC<FriendButtonProps> = ({
       return (
         <div className='flex gap-2'>
           <button
-            className={`${baseClasses} bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 ${className}`}
+            className={`${baseClasses} bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 flex items-center gap-2 ${className}`}
             disabled={isLoading}
           >
+            {isLoading ? (
+              <Loader2 className='w-4 h-4 animate-spin' />
+            ) : (
+              <Send className='w-4 h-4' />
+            )}
             {isLoading ? 'Loading...' : 'Invitation Sent'}
           </button>
           <button
             onClick={handleCancelInvitation}
-            className={`${baseClasses} bg-red-500 text-white hover:bg-red-600 ${className}`}
+            className={`${baseClasses} bg-red-500 text-white hover:bg-red-600 flex items-center gap-2 ${className}`}
             disabled={isLoading}
           >
-            Cancel
+            <X className='w-4 h-4' /> Cancel
           </button>
         </div>
       );
@@ -204,17 +230,22 @@ const FriendButton: React.FC<FriendButtonProps> = ({
         <div className='flex gap-2'>
           <button
             onClick={handleAcceptInvitation}
-            className={`${baseClasses} bg-green-500 text-white hover:bg-green-600 ${className}`}
+            className={`${baseClasses} bg-green-500 text-white hover:bg-green-600 flex items-center gap-2 ${className}`}
             disabled={isLoading}
           >
+            {isLoading ? (
+              <Loader2 className='w-4 h-4 animate-spin' />
+            ) : (
+              <Check className='w-4 h-4' />
+            )}
             {isLoading ? 'Loading...' : 'Accept'}
           </button>
           <button
             onClick={handleDeclineInvitation}
-            className={`${baseClasses} bg-red-500 text-white hover:bg-red-600 ${className}`}
+            className={`${baseClasses} bg-red-500 text-white hover:bg-red-600 flex items-center gap-2 ${className}`}
             disabled={isLoading}
           >
-            {isLoading ? 'Loading...' : 'Decline'}
+            <X className='w-4 h-4' /> Decline
           </button>
         </div>
       );
@@ -223,9 +254,14 @@ const FriendButton: React.FC<FriendButtonProps> = ({
       return (
         <button
           onClick={handleSendInvitation}
-          className={`${baseClasses} bg-blue-500 text-white hover:bg-blue-600 ${className}`}
+          className={`${baseClasses} bg-blue-500 text-white hover:bg-blue-600 flex items-center gap-2 ${className}`}
           disabled={isLoading}
         >
+          {isLoading ? (
+            <Loader2 className='w-4 h-4 animate-spin' />
+          ) : (
+            <UserPlus className='w-4 h-4' />
+          )}
           {isLoading ? 'Loading...' : 'Add Friend'}
         </button>
       );

@@ -2,11 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-const REDIRECT_URI =
-  process.env.GOOGLE_REDIRECT_URI ||
-  (process.env.NODE_ENV === 'production'
-    ? 'https://yourdomain.com/api/auth/google/callback'
-    : 'http://localhost:3000/api/auth/google/callback');
+const BASE_URL = process.env.DOMAIN || 'http://localhost:3000';
+const REDIRECT_URI = `${BASE_URL}/api/auth/google/callback`;
 
 export async function GET(request: NextRequest) {
   try {

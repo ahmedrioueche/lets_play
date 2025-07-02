@@ -30,13 +30,14 @@ export const MapSection = React.memo(
         coordinates: formData.coordinates,
         date: formData.date,
         time: formData.time,
-        currentPlayers: 0,
-        maxPlayers: formData.maxPlayers,
         skillLevel: formData.skillLevel as SkillLevel,
         location: formData.location,
         status: 'open' as GameStatus,
         organizer: user!,
         price: formData.price,
+        _id: '',
+        participants: [],
+        maxParticipants: formData.maxParticipants,
       };
 
       return formData.coordinates.lat !== 0 || formData.coordinates.lng !== 0 ? [tempGame] : [];

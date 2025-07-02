@@ -15,8 +15,6 @@ const GameSchema: Schema = new Schema(
     },
     date: { type: String, required: true }, // Store as string (ISO date) for simplicity with HTML date input
     time: { type: String, required: true }, // Store as string for simplicity with HTML time input
-    currentPlayers: { type: Number, required: true, default: 0 },
-    maxPlayers: { type: Number, required: true },
     ageMin: { type: Number, required: false, min: 13, max: 100 },
     ageMax: { type: Number, required: false, min: 13, max: 100 },
     status: {
@@ -38,6 +36,7 @@ const GameSchema: Schema = new Schema(
     price: { type: Number, default: 0 },
     image: { type: String },
     participants: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    maxParticipants: { type: Number, required: true },
   },
   { timestamps: true }
 );

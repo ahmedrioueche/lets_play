@@ -242,5 +242,9 @@ export const dict = {
       high_contrast: 'High Contrast',
       large_text: 'Large Text',
     },
+    onboarding: {
+      welcome: 'Welcome',
+      complete_profile: 'Complete Profile',
+    },
   },
 } as const;

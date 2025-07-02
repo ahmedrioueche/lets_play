@@ -1,7 +1,6 @@
 import { useAuth } from '@/context/AuthContext';
 import { gamesApi } from '@/lib/api/gamesApi';
 import { Game } from '@/types/game';
-import { User } from '@/types/user';
 import { getDistanceFromLatLonInKm } from '@/utils/helper';
 import { useEffect, useState } from 'react';
 
@@ -23,6 +22,7 @@ interface UseMyGamesReturn {
   handleCancelRegistration: () => void;
   handleCancelGame: () => void;
   confirmCancel: () => void;
+  refetchGames: () => Promise<void>;
 }
 
 export const useMyGames = (): UseMyGamesReturn => {
@@ -52,58 +52,66 @@ export const useMyGames = (): UseMyGamesReturn => {
   }, []);
 
   // Fetch and filter games
-  useEffect(() => {
-    async function fetchGames() {
-      try {
-        setIsLoading(true);
-        const allGames = await gamesApi.getGames();
-
-        // Filter games created by the current user
-        let userCreatedGames = allGames.filter((g: Game) => {
-          return g.organizer._id === user?._id;
+  const fetchGames = async () => {
+    try {
+      setIsLoading(true);
+      const allGames = await gamesApi.getGames();
+      // Filter games created by the current user
+      let userCreatedGames = allGames.filter((g: Game) => {
+        const organizerId =
+          typeof g.organizer === 'object' && g.organizer !== null && '_id' in g.organizer
+            ? g.organizer._id
+            : g.organizer;
+        return organizerId === user?._id;
+      });
+      // Filter games the user has signed up for (participants)
+      let userSignedUpGames = allGames.filter(
+        (g: Game) =>
+          Array.isArray(g.participants) &&
+          g.participants.some(
+            (participant: any) =>
+              typeof participant === 'object' &&
+              participant !== null &&
+              '_id' in participant &&
+              participant._id === user?._id
+          ) &&
+          (typeof g.organizer === 'object' && g.organizer !== null && '_id' in g.organizer
+            ? g.organizer._id
+            : g.organizer) !== user?._id
+      );
+      // Filter by location if available
+      if (userLocation) {
+        userCreatedGames = userCreatedGames.filter((g: Game) => {
+          if (!g.coordinates) return false;
+          const dist = getDistanceFromLatLonInKm(
+            userLocation.lat,
+            userLocation.lng,
+            g.coordinates.lat,
+            g.coordinates.lng
+          );
+          return dist <= 50;
         });
-
-        // Filter games the user has signed up for (participants)
-        let userSignedUpGames = allGames.filter(
-          (g: Game) =>
-            g.participants?.some((participant: User) => participant._id === user?._id) &&
-            g.organizer._id !== user?._id
-        );
-
-        // Filter by location if available
-        if (userLocation) {
-          userCreatedGames = userCreatedGames.filter((g: Game) => {
-            if (!g.coordinates) return false;
-            const dist = getDistanceFromLatLonInKm(
-              userLocation.lat,
-              userLocation.lng,
-              g.coordinates.lat,
-              g.coordinates.lng
-            );
-            return dist <= 50;
-          });
-
-          userSignedUpGames = userSignedUpGames.filter((g: Game) => {
-            if (!g.coordinates) return false;
-            const dist = getDistanceFromLatLonInKm(
-              userLocation.lat,
-              userLocation.lng,
-              g.coordinates.lat,
-              g.coordinates.lng
-            );
-            return dist <= 50;
-          });
-        }
-
-        setCreatedGames(userCreatedGames);
-        setSignedUpGames(userSignedUpGames);
-      } catch (error) {
-        console.error('Error fetching games:', error);
-      } finally {
-        setIsLoading(false);
+        userSignedUpGames = userSignedUpGames.filter((g: Game) => {
+          if (!g.coordinates) return false;
+          const dist = getDistanceFromLatLonInKm(
+            userLocation.lat,
+            userLocation.lng,
+            g.coordinates.lat,
+            g.coordinates.lng
+          );
+          return dist <= 50;
+        });
       }
+      setCreatedGames(userCreatedGames);
+      setSignedUpGames(userSignedUpGames);
+    } catch (error) {
+      console.error('Error fetching games:', error);
+    } finally {
+      setIsLoading(false);
     }
+  };
 
+  useEffect(() => {
     if (user?._id) {
       fetchGames();
     }
@@ -155,5 +163,6 @@ export const useMyGames = (): UseMyGamesReturn => {
     handleCancelRegistration,
     handleCancelGame,
     confirmCancel,
+    refetchGames: fetchGames,
   };
 };

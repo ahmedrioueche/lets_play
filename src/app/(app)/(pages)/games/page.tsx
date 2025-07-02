@@ -33,6 +33,7 @@ export default function MyGamesPage() {
     handleCancelRegistration,
     handleCancelGame,
     confirmCancel,
+    refetchGames,
   } = useMyGames();
 
   const handleCreateGame = () => {
@@ -52,6 +53,11 @@ export default function MyGamesPage() {
 
   const handleCancelRegistrationWrapper = async (gameId: string, userId: string) => {
     handleCancelRegistration();
+  };
+
+  // Refetch games after registration/cancellation
+  const handleGameChange = async () => {
+    await refetchGames();
   };
 
   return (
@@ -99,8 +105,12 @@ export default function MyGamesPage() {
           isOpen={modalOpen}
           onClose={() => setModalOpen(false)}
           userLocation={userLocation}
-          onRegister={handleRegister}
-          onCancelRegistration={handleCancelRegistrationWrapper}
+          onRegister={async (...args) => {
+            await handleGameChange();
+          }}
+          onCancelRegistration={async (...args) => {
+            await handleGameChange();
+          }}
           onCancelGame={
             createdGames.some((g) => g.id === selectedGame.id) ? handleCancelGame : undefined
           }

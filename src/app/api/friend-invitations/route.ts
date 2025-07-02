@@ -1,10 +1,9 @@
 import dbConnect from '@/config/db';
-import { pusherServer } from '@/lib/api/notificationsApi';
 import FriendInvitationModel from '@/models/FriendInvitation';
-import NotificationModel from '@/models/Notification';
 import UserModel from '@/models/User';
 import UserProfileModel from '@/models/UserProfile';
 import UserSocialModel from '@/models/UserSocial';
+import { sendNotification } from '@/utils/notifications';
 import { ObjectId } from 'mongodb';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -260,24 +259,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Create notification for recipient
-    const notification = await NotificationModel.create({
-      userId: toUserId,
+    await sendNotification({
+      userIds: [toUserId],
       type: 'friend_invitation',
+      event: 'friend-invitation',
       title: 'New Friend Invitation',
-      message: `${fromUser.name} sent you a friend invitation`,
-      data: {
-        friendInvitationId: invitation._id,
-        fromUserId,
-      },
+      message: `${fromUser.name} sent you a friend invitation!`,
+      data: { fromUserId: fromUser._id },
     });
-
-    // Send real-time notification via Pusher
-    try {
-      await pusherServer.trigger(`user-${toUserId}`, 'friend-invitation', notification);
-    } catch (error) {
-      console.error('Pusher error:', error);
-      // Don't fail the request if Pusher fails
-    }
 
     // Update social stats
     try {

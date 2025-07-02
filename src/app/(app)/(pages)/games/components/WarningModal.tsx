@@ -1,6 +1,6 @@
 import Button from '@/components/ui/Button';
 import useTranslator from '@/hooks/useTranslator';
-import React from 'react';
+import React, { useState } from 'react';
 
 interface WarningModalProps {
   isOpen: boolean;
@@ -18,11 +18,17 @@ const WarningModal: React.FC<WarningModalProps> = ({
   warning,
 }) => {
   const text = useTranslator();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onCancel();
     }
+  };
+
+  const handleConfirm = () => {
+    setIsLoading(true);
+    onConfirm();
   };
 
   if (!isOpen) return null;
@@ -41,7 +47,7 @@ const WarningModal: React.FC<WarningModalProps> = ({
           <Button variant='ghost' onClick={onCancel}>
             {text.my_games.warning_cancel}
           </Button>
-          <Button variant='danger' onClick={onConfirm}>
+          <Button disabled={isLoading} variant='danger' onClick={handleConfirm}>
             {text.my_games.warning_confirm}
           </Button>
         </div>

@@ -36,12 +36,13 @@ export const usersApi = {
     try {
       const result = await usersApi.deleteUser(userId);
 
-      // Clear auth cookie and redirect to login
+      // Call logout endpoint to clear auth cookie
+      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+
+      // Clear any local storage or session storage
       if (typeof window !== 'undefined') {
-        // Clear any local storage or session storage
         localStorage.clear();
         sessionStorage.clear();
-
         // Redirect to login page
         window.location.href = '/auth/login';
       }

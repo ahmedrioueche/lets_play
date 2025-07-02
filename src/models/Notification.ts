@@ -20,6 +20,7 @@ const NotificationSchema: Schema = new Schema(
         'game_reminder',
         'game_registration',
         'game_cancellation',
+        'friend_response',
       ],
       required: true,
     },

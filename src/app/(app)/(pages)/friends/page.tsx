@@ -1,4 +1,5 @@
 'use client';
+import ErrorSection from '@/components/ui/ErrorSection';
 import Loading from '@/components/ui/Loading';
 import SearchBar from '@/components/ui/SearchBar';
 import { useAuth } from '@/context/AuthContext';
@@ -331,11 +332,11 @@ export default function FriendsPage() {
       <div className='container mx-auto'>
         <FriendsPageHeader />
         <div className='flex items-center justify-center py-20'>
-          <div className='text-center'>
-            <p className='text-red-500 mb-4'>{error}</p>
+          <div className='min-h-[40vh] flex flex-col items-center justify-center w-full'>
+            <ErrorSection text={error} />
             <button
               onClick={loadFriends}
-              className='px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600'
+              className='mt-6 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600'
             >
               Try Again
             </button>

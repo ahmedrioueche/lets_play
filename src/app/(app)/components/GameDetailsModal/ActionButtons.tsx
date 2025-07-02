@@ -7,7 +7,7 @@ interface ActionButtonsProps {
   mode: 'explore' | 'games';
   isRegistered: boolean;
   onRegister: () => void;
-  onCancelRegistration?: (gameId: string, userId: string) => Promise<void>;
+  onCancelRegistration?: (gameId: string) => void;
   onCancelGame?: () => void;
 }
 
@@ -22,7 +22,10 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   const { user } = useAuth();
   const router = useRouter();
 
-  const isOrganizer = user?._id === game.organizer._id;
+  // Support both string and User object for user
+  const userId = typeof user === 'string' ? user : user?._id;
+  const organizerId = typeof game.organizer === 'string' ? game.organizer : game.organizer?._id;
+  const isOrganizer = userId === organizerId;
 
   if (mode === 'games') {
     // Games mode - user is managing their games
@@ -64,7 +67,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                   console.error('Game ID not found in ActionButtons');
                   return;
                 }
-                onCancelRegistration(gameId, user?._id || '');
+                onCancelRegistration(gameId);
               }}
               className='w-full bg-red-500 hover:bg-red-600 text-white rounded-xl py-3 font-medium transition-colors'
             >
@@ -102,7 +105,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                   console.error('Game ID not found in ActionButtons');
                   return;
                 }
-                onCancelRegistration(gameId, user?._id || '');
+                onCancelRegistration(gameId);
               }}
               className='w-full bg-red-500 hover:bg-red-600 text-white rounded-xl py-3 font-medium transition-colors'
             >
@@ -116,10 +119,10 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         <div className='pt-4 space-y-3'>
           <button
             onClick={onRegister}
-            disabled={game.currentPlayers >= game.maxPlayers}
+            disabled={game.participants.length >= game.maxParticipants}
             className='w-full bg-light-primary dark:bg-dark-primary hover:opacity-90 text-white rounded-xl py-3 font-medium transition-opacity disabled:opacity-50'
           >
-            {game.currentPlayers >= game.maxPlayers ? 'Game Full' : 'Register for Game'}
+            {game.participants.length >= game.maxParticipants ? 'Game Full' : 'Register for Game'}
           </button>
         </div>
       );

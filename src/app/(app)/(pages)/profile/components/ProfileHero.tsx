@@ -1,14 +1,10 @@
 import { useAuth } from '@/context/AuthContext';
+import { UserStats } from '@/types/user';
 import { motion } from 'framer-motion';
 import { BadgeCheck, Camera, Edit3, MapPin, Settings, Star, Trophy, User } from 'lucide-react';
 
 interface ProfileHeroProps {
-  stats: {
-    rank: string;
-    level: number;
-    experience: number;
-    location: string;
-  };
+  stats: UserStats;
 }
 
 const ProfileHero: React.FC<ProfileHeroProps> = ({ stats }) => {
@@ -54,7 +50,7 @@ const ProfileHero: React.FC<ProfileHeroProps> = ({ stats }) => {
               <div className='flex flex-wrap items-center justify-center lg:justify-start gap-4 mb-6 text-sm text-gray-600 dark:text-gray-300'>
                 <div className='flex items-center gap-2'>
                   <MapPin className='w-4 h-4' />
-                  <span>{stats.location}</span>
+                  <span>{user?.location?.address || 'No location'}</span>
                 </div>
                 <div className='flex items-center gap-2'>
                   <Trophy className='w-4 h-4' />

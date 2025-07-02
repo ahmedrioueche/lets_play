@@ -1,5 +1,11 @@
 import dbConnect from '@/config/db';
 import UserModel from '@/models/User';
+import UserAchievementsModel from '@/models/UserAchievements';
+import UserAnalyticsModel from '@/models/UserAnalytics';
+import UserGameHistoryModel from '@/models/UserGameHistory';
+import UserProfileModel from '@/models/UserProfile';
+import UserSocialModel from '@/models/UserSocial';
+import UserStatsModel from '@/models/UserStats';
 import jwt from 'jsonwebtoken';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -79,11 +85,57 @@ export async function GET(request: NextRequest) {
       };
 
       user = await UserModel.create(newUser);
+
+      // Create empty stats, social, history, achievements, analytics
+      const stats = await UserStatsModel.create({});
+      const social = await UserSocialModel.create({});
+      const history = await UserGameHistoryModel.create({ userId: user._id, registeredGames: [] });
+      const achievements = await UserAchievementsModel.create({
+        userId: user._id,
+        achievements: [],
+      });
+      const analytics = await UserAnalyticsModel.create({ userId: user._id, activityLog: [] });
+
+      // Create user profile
+      await UserProfileModel.create({
+        userId: user._id,
+        favoriteSports: [],
+        stats: stats._id,
+        social: social._id,
+        history: history._id,
+        achievements: achievements._id,
+        analytics: analytics._id,
+      });
     } else {
       // Update existing user's online status and ensure isVerified is true
       user.isOnline = true;
       if (!user.isVerified) user.isVerified = true;
       await user.save();
+
+      // Ensure user has a UserProfile
+      let userProfile = await UserProfileModel.findOne({ userId: user._id });
+      if (!userProfile) {
+        const stats = await UserStatsModel.create({});
+        const social = await UserSocialModel.create({});
+        const history = await UserGameHistoryModel.create({
+          userId: user._id,
+          registeredGames: [],
+        });
+        const achievements = await UserAchievementsModel.create({
+          userId: user._id,
+          achievements: [],
+        });
+        const analytics = await UserAnalyticsModel.create({ userId: user._id, activityLog: [] });
+        await UserProfileModel.create({
+          userId: user._id,
+          favoriteSports: [],
+          stats: stats._id,
+          social: social._id,
+          history: history._id,
+          achievements: achievements._id,
+          analytics: analytics._id,
+        });
+      }
     }
 
     // Create JWT token

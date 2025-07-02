@@ -275,7 +275,10 @@ export default function ProfilePage() {
                         <Edit3 className='w-4 h-4' />
                         Edit Profile
                       </button>
-                      <button className='px-6 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-xl font-medium transition-colors flex items-center gap-2'>
+                      <button
+                        onClick={() => router.push('/settings')}
+                        className='px-6 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-xl font-medium transition-colors flex items-center gap-2'
+                      >
                         <Settings className='w-4 h-4' />
                         Settings
                       </button>

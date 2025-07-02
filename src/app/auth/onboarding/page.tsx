@@ -39,6 +39,11 @@ const OnboardingPage: React.FC = () => {
           router.replace('/auth/login');
           return;
         }
+        const user = await res.json();
+        if (user && user.hasCompletedOnboarding) {
+          router.replace('/');
+          return;
+        }
       } catch {
         router.replace('/auth/login');
         return;

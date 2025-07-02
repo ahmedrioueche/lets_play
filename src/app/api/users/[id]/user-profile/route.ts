@@ -104,10 +104,19 @@ export async function PATCH(request: NextRequest, context: { params: { id: strin
       console.log('Created new UserProfile:', userProfile._id);
     }
 
+    // Flatten settings if present
+    let updateObj = update;
+    if (update.settings) {
+      updateObj = {};
+      for (const [key, value] of Object.entries(update.settings)) {
+        updateObj[`settings.${key}`] = value;
+      }
+    }
+
     // Now update the user profile
     const updatedUserProfile = await UserProfileModel.findOneAndUpdate(
       { userId: userId },
-      { $set: update },
+      { $set: updateObj },
       { new: true }
     );
 

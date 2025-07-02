@@ -1,3 +1,4 @@
+import Checkbox from '@/components/ui/Checkbox';
 import useTranslator from '@/hooks/useTranslator';
 import React from 'react';
 
@@ -25,47 +26,22 @@ const NotificationsSection: React.FC<NotificationsSectionProps> = ({
         </h3>
       </div>
       <div className='p-4 sm:p-6 space-y-3 sm:space-y-4'>
-        <div className='flex items-center justify-between p-3 sm:p-4 rounded-xl bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600'>
-          <div>
-            <label
-              htmlFor='pushNotifications'
-              className='text-gray-900 dark:text-gray-100 font-medium cursor-pointer'
-            >
-              {text.settings.push_notifications || 'Push Notifications'}
-            </label>
-            <p className='text-sm text-gray-600 dark:text-gray-400 mt-1'>
-              Receive notifications about new games
-            </p>
-          </div>
-          <input
-            id='pushNotifications'
-            type='checkbox'
-            checked={pushNotifications}
-            onChange={(e) => onPushNotificationsChange(e.target.checked)}
-            className='accent-green-500 w-5 h-5 rounded focus:ring-2 focus:ring-green-500 transition-all'
-          />
-        </div>
-
-        <div className='flex items-center justify-between p-3 sm:p-4 rounded-xl bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600'>
-          <div>
-            <label
-              htmlFor='emailNotifications'
-              className='text-gray-900 dark:text-gray-100 font-medium cursor-pointer'
-            >
-              {text.settings.email_notifications || 'Email Notifications'}
-            </label>
-            <p className='text-sm text-gray-600 dark:text-gray-400 mt-1'>
-              Receive email updates about activities
-            </p>
-          </div>
-          <input
-            id='emailNotifications'
-            type='checkbox'
-            checked={emailNotifications}
-            onChange={(e) => onEmailNotificationsChange(e.target.checked)}
-            className='accent-green-500 w-5 h-5 rounded focus:ring-2 focus:ring-green-500 transition-all'
-          />
-        </div>
+        <Checkbox
+          id='pushNotifications'
+          checked={pushNotifications}
+          onChange={onPushNotificationsChange}
+          label={text.settings.push_notifications || 'Push Notifications'}
+          description='Receive notifications about new games'
+          accentColor='green'
+        />
+        <Checkbox
+          id='emailNotifications'
+          checked={emailNotifications}
+          onChange={onEmailNotificationsChange}
+          label={text.settings.email_notifications || 'Email Notifications'}
+          description='Receive email updates about activities'
+          accentColor='green'
+        />
       </div>
     </div>
   );

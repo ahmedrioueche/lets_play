@@ -1,5 +1,5 @@
 import { Game } from './game';
-import { LocationI } from './general';
+import { Language, LocationI } from './general';
 
 // Core user data (essential for authentication/identification)
 export interface User {
@@ -29,6 +29,7 @@ export interface UserProfile {
   history: UserGameHistory;
   analytics: UserAnalytics;
   achievements: UserAchievements;
+  settings: Settings;
   // Core user fields that are included in the profile response
   name?: string;
   email?: string;
@@ -172,3 +173,17 @@ export interface Notification {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export type Settings = {
+  language: Language;
+  theme: string;
+  pushNotifications: boolean;
+  emailNotifications: boolean;
+  privacy: string;
+  profileVisibility: string;
+  maxDistanceForVisibleGames: number;
+  alertWhenGameStarts: boolean;
+  alertBeforeGameStarts: boolean;
+  alertTimeBeforeGame: number;
+  alertOnStart: boolean;
+};

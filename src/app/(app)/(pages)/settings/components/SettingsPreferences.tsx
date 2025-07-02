@@ -1,42 +1,47 @@
-import useTranslator from '@/hooks/useTranslator';
-import React, { useState } from 'react';
-import toast from 'react-hot-toast';
-import AccessibilitySection from './AccessibilitySection';
+import { useSettings } from '@/context/SettingsContext';
+import { Language } from '@/types/general';
+import { useTheme } from 'next-themes';
+import React from 'react';
 import DisplayLanguageSection from './DisplayLanguageSection';
 import NotificationsSection from './NotificationsSection';
+import PreferencesSection from './PreferencesSection';
 import PrivacySecuritySection from './PrivacySecuritySection';
 
 const SettingsPreferences: React.FC = () => {
-  const text = useTranslator();
-  const [language, setLanguage] = useState('en');
-  const [theme, setTheme] = useState('system');
-  const [notifications, setNotifications] = useState(true);
-  const [emailNotifications, setEmailNotifications] = useState(true);
-  const [pushNotifications, setPushNotifications] = useState(true);
-  const [privacy, setPrivacy] = useState('friends');
-  const [profileVisibility, setProfileVisibility] = useState('public');
-  const [accessibility, setAccessibility] = useState(false);
-  const [highContrast, setHighContrast] = useState(false);
-  const [largeText, setLargeText] = useState(false);
+  const settingsContext = useSettings();
+  const { theme, setTheme } = useTheme();
 
+  // Handlers that update context and persist immediately
   const handleLanguageChange = (value: string) => {
-    setLanguage(value);
-    toast.success(`Language changed to ${value === 'en' ? 'English' : 'العربية'}`);
+    settingsContext.setSettings({ language: value as Language });
   };
-
   const handleThemeChange = (value: string) => {
     setTheme(value);
-    toast.success(`Theme changed to ${value}`);
+    settingsContext.setSettings({ theme: value });
   };
-
+  const handlePushNotificationsChange = (value: boolean) => {
+    settingsContext.setSettings({ pushNotifications: value });
+  };
+  const handleEmailNotificationsChange = (value: boolean) => {
+    settingsContext.setSettings({ emailNotifications: value });
+  };
   const handlePrivacyChange = (value: string) => {
-    setPrivacy(value);
-    toast.success(`Privacy set to ${value}`);
+    settingsContext.setSettings({ privacy: value });
   };
-
   const handleProfileVisibilityChange = (value: string) => {
-    setProfileVisibility(value);
-    toast.success(`Profile visibility set to ${value}`);
+    settingsContext.setSettings({ profileVisibility: value });
+  };
+  const handleMaxDistanceChange = (value: number) => {
+    settingsContext.setSettings({ maxDistanceForVisibleGames: value });
+  };
+  const handleAlertBeforeChange = (value: boolean) => {
+    settingsContext.setSettings({ alertBeforeGameStarts: value });
+  };
+  const handleAlertTimeChange = (value: number) => {
+    settingsContext.setSettings({ alertTimeBeforeGame: value });
+  };
+  const handleAlertOnStartChange = (value: boolean) => {
+    settingsContext.setSettings({ alertOnStart: value });
   };
 
   return (
@@ -44,33 +49,35 @@ const SettingsPreferences: React.FC = () => {
       {/* Settings Grid */}
       <div className='grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8'>
         <DisplayLanguageSection
-          language={language}
-          theme={theme}
+          language={settingsContext.language as Language}
+          theme={theme || settingsContext.theme || 'light'}
           onLanguageChange={handleLanguageChange}
           onThemeChange={handleThemeChange}
         />
 
         <NotificationsSection
-          pushNotifications={pushNotifications}
-          emailNotifications={emailNotifications}
-          onPushNotificationsChange={setPushNotifications}
-          onEmailNotificationsChange={setEmailNotifications}
+          pushNotifications={settingsContext.pushNotifications}
+          emailNotifications={settingsContext.emailNotifications}
+          onPushNotificationsChange={handlePushNotificationsChange}
+          onEmailNotificationsChange={handleEmailNotificationsChange}
         />
 
         <PrivacySecuritySection
-          privacy={privacy}
-          profileVisibility={profileVisibility}
+          privacy={settingsContext.privacy}
+          profileVisibility={settingsContext.profileVisibility}
           onPrivacyChange={handlePrivacyChange}
           onProfileVisibilityChange={handleProfileVisibilityChange}
         />
 
-        <AccessibilitySection
-          accessibility={accessibility}
-          highContrast={highContrast}
-          largeText={largeText}
-          onAccessibilityChange={setAccessibility}
-          onHighContrastChange={setHighContrast}
-          onLargeTextChange={setLargeText}
+        <PreferencesSection
+          maxDistance={settingsContext.maxDistanceForVisibleGames}
+          setMaxDistance={handleMaxDistanceChange}
+          alertBefore={settingsContext.alertBeforeGameStarts}
+          setAlertBefore={handleAlertBeforeChange}
+          alertTime={settingsContext.alertTimeBeforeGame}
+          setAlertTime={handleAlertTimeChange}
+          alertOnStart={settingsContext.alertOnStart}
+          setAlertOnStart={handleAlertOnStartChange}
         />
       </div>
     </div>

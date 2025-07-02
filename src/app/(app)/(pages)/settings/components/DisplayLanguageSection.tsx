@@ -1,11 +1,12 @@
 import CustomSelect from '@/components/ui/CustomSelect';
 import useTranslator from '@/hooks/useTranslator';
+import { Language } from '@/types/general';
 import React from 'react';
 
 interface DisplayLanguageSectionProps {
   language: string;
   theme: string;
-  onLanguageChange: (value: string) => void;
+  onLanguageChange: (value: Language) => void;
   onThemeChange: (value: string) => void;
 }
 
@@ -28,16 +29,12 @@ const DisplayLanguageSection: React.FC<DisplayLanguageSectionProps> = ({
       <div className='p-4 sm:p-6 space-y-3 sm:space-y-4'>
         <CustomSelect
           title={text.settings.language}
-          selectedOption={language}
+          selectedOption={language as Language}
           onChange={onLanguageChange}
           options={[
             { value: 'en', label: 'English' },
             { value: 'ar', label: 'العربية' },
-            { value: 'es', label: 'Español' },
             { value: 'fr', label: 'Français' },
-            { value: 'de', label: 'Deutsch' },
-            { value: 'de', label: 'Deutsch' },
-            { value: 'de', label: 'Deutsch' },
           ]}
           className='w-full'
         />

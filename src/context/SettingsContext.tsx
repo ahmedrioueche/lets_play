@@ -1,33 +1,93 @@
 'use client';
 
-import { Language } from '@/types/general';
+import { Settings } from '@/types/user';
 import { createContext, useContext, useEffect, useState } from 'react';
+import { useAuth } from './AuthContext';
 
-type SettingsContextType = {
-  language: Language;
-  setLanguage: (lang: Language) => void;
+type SettingsContextType = Settings & {
+  setSettings: (settings: Partial<Settings>) => void;
+  saveSettings: (settings: Partial<Settings>) => void;
+};
+
+const defaultSettings: Settings = {
+  language: 'en',
+  theme: 'system',
+  pushNotifications: true,
+  emailNotifications: true,
+  privacy: 'friends',
+  profileVisibility: 'public',
+  maxDistanceForVisibleGames: 100,
+  alertBeforeGameStarts: true,
+  alertTimeBeforeGame: 30,
+  alertOnStart: true,
+  alertWhenGameStarts: true,
 };
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguage] = useState<Language>('en'); // Default language
+  const { user } = useAuth();
+  const [settings, setSettingsState] = useState<Settings>(defaultSettings);
 
-  // Load settings from localStorage on mount
+  // Load settings from backend or localStorage on mount
   useEffect(() => {
-    const savedLanguage = localStorage.getItem('appLanguage');
-    if (savedLanguage) {
-      setLanguage(savedLanguage as Language);
+    async function loadSettings() {
+      if (user?._id) {
+        try {
+          const res = await fetch(`/api/users/${user._id}/user-profile`);
+          const data = await res.json();
+          if (data?.userProfile?.settings) {
+            setSettingsState({ ...defaultSettings, ...data.userProfile.settings });
+            localStorage.setItem('appSettings', JSON.stringify(data.userProfile.settings));
+            return;
+          }
+        } catch (e) {
+          // fallback to localStorage
+        }
+      }
+      // fallback to localStorage
+      const saved = localStorage.getItem('appSettings');
+      if (saved) {
+        setSettingsState({ ...defaultSettings, ...JSON.parse(saved) });
+      }
     }
-  }, []);
+    loadSettings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?._id]);
 
-  // Save to localStorage when language changes
+  // Save to backend and localStorage when settings change
   useEffect(() => {
-    localStorage.setItem('appLanguage', language);
-  }, [language]);
+    if (user?._id) {
+      fetch(`/api/users/${user._id}/user-profile`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ settings }),
+      });
+    }
+    localStorage.setItem('appSettings', JSON.stringify(settings));
+  }, [settings, user?._id]);
+
+  const setSettings = (newSettings: Partial<Settings>) => {
+    setSettingsState((prev) => ({ ...prev, ...newSettings }));
+  };
+
+  const saveSettings = (newSettings: Partial<Settings>) => {
+    setSettingsState((prev) => {
+      const updated = { ...prev, ...newSettings };
+      if (user?._id) {
+        fetch(`/api/users/${user._id}/user-profile`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ settings: updated }),
+        });
+      }
+      localStorage.setItem('appSettings', JSON.stringify(updated));
+      return updated;
+    });
+  };
 
   return (
-    <SettingsContext.Provider value={{ language, setLanguage }}>
+    <SettingsContext.Provider value={{ ...settings, setSettings, saveSettings }}>
       {children}
     </SettingsContext.Provider>
   );

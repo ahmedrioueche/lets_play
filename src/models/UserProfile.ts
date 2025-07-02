@@ -16,6 +16,18 @@ const UserProfileSchema: Schema = new Schema(
     // Online status fields
     isOnline: { type: Boolean, default: false },
     lastSeen: { type: Date, default: Date.now },
+    settings: {
+      language: { type: String, default: 'en' },
+      theme: { type: String, default: 'system' },
+      pushNotifications: { type: Boolean, default: true },
+      emailNotifications: { type: Boolean, default: true },
+      privacy: { type: String, default: 'friends' },
+      profileVisibility: { type: String, default: 'public' },
+      maxDistanceForVisibleGames: { type: Number, default: 10 },
+      alertBeforeGameStarts: { type: Boolean, default: true },
+      alertTimeBeforeGame: { type: Number, default: 30 },
+      alertOnStart: { type: Boolean, default: true },
+    },
   },
   {
     timestamps: true,

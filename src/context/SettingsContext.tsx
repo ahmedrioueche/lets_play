@@ -74,19 +74,20 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   };
 
   const saveSettings = (newSettings: Partial<Settings>) => {
-    setSettingsState((prev) => {
-      const updated = { ...prev, ...newSettings };
-      if (user?._id) {
-        fetch(`/api/users/${user._id}/user-profile`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ settings: updated }),
-        });
-      }
+    const updated = { ...settings, ...newSettings };
+    setSettingsState(updated);
+
+    if (user?._id) {
+      fetch(`/api/users/${user._id}/user-profile`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ settings: updated }),
+      });
+
       localStorage.setItem('appSettings', JSON.stringify(updated));
 
       return updated;
-    });
+    }
   };
 
   return (

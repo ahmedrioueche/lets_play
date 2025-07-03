@@ -1,5 +1,6 @@
 'use client';
 import Loading from '@/components/ui/Loading';
+import NoData from '@/components/ui/NoData';
 import { useAuth } from '@/context/AuthContext';
 import { useRealTimeChat } from '@/hooks/useRealTimeChat';
 import { chatApi } from '@/lib/api/chatApi';
@@ -440,15 +441,7 @@ function ChatPage() {
   }
 
   if (!chatList || chatList.length === 0) {
-    return (
-      <div className='w-full flex-1 flex items-center justify-center mt-20'>
-        <div className='text-center text-gray-500 dark:text-gray-400'>
-          No chats yet.
-          <br />
-          Your conversations will appear here.
-        </div>
-      </div>
-    );
+    return <NoData />;
   }
 
   // Always render chat window if there is at least one chat

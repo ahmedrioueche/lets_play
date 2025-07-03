@@ -22,6 +22,8 @@ export const dict = {
       organizer: 'Organizer',
       loading: 'Loading...',
       cancel: 'Cancel',
+      noData: 'No data available',
+      noDataDescription: 'There is nothing to show here yet.',
     },
     auth: {
       welcome_back: 'Welcome Back',
@@ -290,6 +292,8 @@ export const dict = {
       organizer: 'Organizer',
       loading: 'Loading...',
       cancel: 'Cancel',
+      noData: 'Aucune donnée disponible',
+      noDataDescription: "Il n'y a encore rien à afficher ici.",
     },
     auth: {
       welcome_back: 'Welcome Back',
@@ -559,6 +563,8 @@ export const dict = {
       organizer: 'Organizer',
       loading: 'Loading...',
       cancel: 'Cancel',
+      noData: 'No data available',
+      noDataDescription: 'There is nothing to show here yet.',
     },
     auth: {
       welcome_back: 'Welcome Back',

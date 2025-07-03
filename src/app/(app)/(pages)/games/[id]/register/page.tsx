@@ -57,15 +57,28 @@ const RegisterGamePage = () => {
     }
     setIsLoading(true);
     try {
-      const res = await fetch(`/api/games/${id}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user._id }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Registration failed');
-      toast.success('Registered successfully!');
-      router.push(`/games`);
+      let res, data;
+      if (game.joinPermission) {
+        res = await fetch(`/api/games/${id}/join-request`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: user._id }),
+        });
+        data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Request failed');
+        toast.success('Join request sent!');
+        router.push(`/games`);
+      } else {
+        res = await fetch(`/api/games/${id}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: user._id }),
+        });
+        data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Registration failed');
+        toast.success('Registered successfully!');
+        router.push(`/games`);
+      }
     } catch (err: any) {
       toast.error(err.message || 'Registration failed');
     } finally {
@@ -233,13 +246,24 @@ const RegisterGamePage = () => {
             />
           </>
         ) : (
-          <button
-            onClick={handleRegister}
-            disabled={isLoading || alreadyRegistered}
-            className='w-full bg-light-primary dark:bg-dark-primary hover:opacity-90 text-white rounded-xl py-3 font-medium transition-opacity disabled:opacity-50'
-          >
-            {isLoading ? 'Registering...' : 'Confirm Registration'}
-          </button>
+          <>
+            {game.joinPermission && (
+              <div className='text-center mb-2 text-light-text-secondary dark:text-dark-text-secondary text-sm'>
+                This game requires organizer approval to join.
+              </div>
+            )}
+            <button
+              onClick={handleRegister}
+              disabled={isLoading || alreadyRegistered}
+              className='w-full bg-light-primary dark:bg-dark-primary hover:opacity-90 text-white rounded-xl py-3 font-medium transition-opacity disabled:opacity-50'
+            >
+              {alreadyRegistered
+                ? 'Already Registered'
+                : isLoading
+                  ? `${game.joinPermission ? 'Loading...' : 'Joining...'}`
+                  : `Confirm ${game.joinPermission ? 'Request' : 'Join'} `}
+            </button>
+          </>
         )}
       </div>
     </div>

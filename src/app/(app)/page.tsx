@@ -30,7 +30,7 @@ const HomePage: React.FC = () => {
   } = useHome();
 
   const handleGameSelect = (game: Game) => {
-    router.push(`/explore?game=${game.id}`);
+    router.push(`/games/${game._id}`);
   };
 
   // Show error section if there's an error

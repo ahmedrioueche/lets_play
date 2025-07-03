@@ -45,11 +45,9 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
 
     try {
       await onSave(formData);
-      toast.success('Profile updated successfully!');
       onClose();
     } catch (error) {
       console.error('Error updating profile:', error);
-      toast.error('Failed to update profile');
     } finally {
       setIsSaving(false);
     }

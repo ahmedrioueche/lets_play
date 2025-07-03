@@ -148,9 +148,20 @@ export default function ProfilePage() {
           bio: updatedData.bio,
           location: updatedData.location,
           phone: updatedData.phone,
+          name: updatedData.name,
         }),
       });
       if (!res.ok) throw new Error('Failed to update profile');
+
+      // Update UserProfile fields (especially name)
+      const resProfile = await fetch(`/api/users/${userId}/user-profile`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: updatedData.name,
+        }),
+      });
+      if (!resProfile.ok) throw new Error('Failed to update user profile');
 
       // Update AuthContext user state and refresh profile data
       await checkAuth();

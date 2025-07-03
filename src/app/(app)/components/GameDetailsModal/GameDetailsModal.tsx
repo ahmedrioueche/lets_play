@@ -1,21 +1,24 @@
 'use client';
+import { useAuth } from '@/context/AuthContext';
+import useTranslator from '@/hooks/useTranslator';
 import { Game } from '@/types/game';
-import { User as UserType } from '@/types/user';
+import { User } from '@/types/user';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
+import toast from 'react-hot-toast';
 import GameDetailsView from './GameDetailsView';
 import RegisterView from './RegisterView';
 
 interface GameDetailsModalProps {
-  game: Game;
+  game: Game | null;
   isOpen: boolean;
   onClose: () => void;
-  userLocation: { lat: number; lng: number } | null;
-  onRegister?: (gameId: string, user: UserType) => Promise<void>;
+  mode: 'explore' | 'games';
+  isRegistered: boolean;
+  hasJoinRequest?: boolean;
+  onRegister?: (gameId: string, user: User) => Promise<void>;
   onCancelRegistration?: (gameId: string) => void;
   onCancelGame?: () => void;
-  isRegistered?: boolean;
-  mode?: 'explore' | 'games'; // 'explore' for registration, 'games' for management
 }
 
 type ModalView = 'details' | 'register';
@@ -24,15 +27,25 @@ const GameDetailsModal: React.FC<GameDetailsModalProps> = ({
   game,
   isOpen,
   onClose,
-  userLocation,
+  mode,
+  isRegistered,
+  hasJoinRequest = false,
   onRegister,
   onCancelRegistration,
   onCancelGame,
-  isRegistered = false,
-  mode = 'explore',
 }) => {
   const [currentView, setCurrentView] = useState<ModalView>('details');
   const modalRef = useRef<HTMLDivElement>(null);
+  const { user } = useAuth();
+  const text = useTranslator();
+
+  // Determine if the user has already sent a join request
+  const hasJoinRequestState = !!(
+    user &&
+    game &&
+    Array.isArray(game.joinRequests) &&
+    game.joinRequests.includes(user._id)
+  );
 
   // Handle click outside
   useEffect(() => {
@@ -53,6 +66,30 @@ const GameDetailsModal: React.FC<GameDetailsModalProps> = ({
 
   const handleBackToDetails = () => {
     setCurrentView('details');
+  };
+
+  const handleJoinRequest = async (reason?: string) => {
+    if (!user) {
+      toast.error('You must be logged in to request to join a game');
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/games/${game?._id}/join-request`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user._id, reason }),
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || 'Failed to send join request');
+      }
+
+      toast.success(text.game.join_request_sent);
+    } catch (error: any) {
+      toast.error(error.message || text.game.join_request_failed);
+    }
   };
 
   return (
@@ -88,10 +125,10 @@ const GameDetailsModal: React.FC<GameDetailsModalProps> = ({
                 >
                   {currentView === 'details' ? (
                     <GameDetailsView
-                      game={game}
-                      userLocation={userLocation}
+                      game={game!}
                       mode={mode}
                       isRegistered={isRegistered}
+                      hasJoinRequest={hasJoinRequestState}
                       onClose={onClose}
                       onRegister={() => setCurrentView('register')}
                       onCancelRegistration={onCancelRegistration}
@@ -99,7 +136,7 @@ const GameDetailsModal: React.FC<GameDetailsModalProps> = ({
                     />
                   ) : (
                     <RegisterView
-                      game={game}
+                      game={game!}
                       onBack={handleBackToDetails}
                       onClose={onClose}
                       onRegister={onRegister}

@@ -1,6 +1,7 @@
 'use client';
 
 import Button from '@/components/ui/Button';
+import Checkbox from '@/components/ui/Checkbox';
 import InputField from '@/components/ui/InputField';
 import { useAuth } from '@/context/AuthContext';
 import { gamesApi } from '@/lib/api/gamesApi';
@@ -17,6 +18,9 @@ export default function CreateGamePage() {
     Omit<Game, 'id' | 'status' | 'organizer' | 'participants' | 'createdAt' | 'updatedAt'> & {
       ageMin?: number;
       ageMax?: number;
+      joinPermission: boolean;
+      blockedUsers: string[];
+      presentUsers: string[];
     }
   >({
     _id: '',
@@ -32,6 +36,9 @@ export default function CreateGamePage() {
     sport: 'football',
     skillLevel: 'beginner',
     price: 0,
+    joinPermission: false,
+    blockedUsers: [],
+    presentUsers: [],
   });
 
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(null);
@@ -83,6 +90,11 @@ export default function CreateGamePage() {
       }
       return { ...prev, [name]: value };
     });
+    setErrors((prev) => ({ ...prev, [name]: '' }));
+  }, []);
+
+  const handleCheckboxChange = useCallback((name: string, checked: boolean) => {
+    setFormData((prev) => ({ ...prev, [name]: checked }));
     setErrors((prev) => ({ ...prev, [name]: '' }));
   }, []);
 
@@ -143,6 +155,8 @@ export default function CreateGamePage() {
           status: 'open',
           organizer: user?._id,
           participants: [user?._id],
+          blockedUsers: [],
+          presentUsers: [],
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
@@ -177,6 +191,16 @@ export default function CreateGamePage() {
                   handleInputChange={handleInputChange}
                   handleSelectChange={handleSelectChange}
                 />
+                {/* Join Permission Checkbox */}
+                <Checkbox
+                  id='joinPermission'
+                  checked={formData.joinPermission}
+                  onChange={(checked) => handleCheckboxChange('joinPermission', checked)}
+                  label='Require organizer approval to join'
+                  description='Participants will need your approval before they can join the game'
+                  accentColor='blue'
+                  className='bg-light-background dark:bg-dark-accent'
+                />
               </div>
 
               {/* Right Column - Map */}
@@ -189,7 +213,7 @@ export default function CreateGamePage() {
                 />
 
                 {/* Location Input */}
-                <div className='space-y-2'>
+                <div className='space-y-4'>
                   <InputField
                     label='Location Name'
                     name='location'

@@ -42,10 +42,14 @@ export class ChatService {
       throw new Error('Invalid user ID');
     }
 
-    // Check if users are friends
+    // Check if users are friends or recipient allows messages from non-friends
     const userProfile = await UserProfileModel.findOne({ userId: senderId });
-    if (!userProfile || !userProfile.friends.includes(receiverId)) {
-      throw new Error('Users are not friends');
+    const recipientProfile = await UserProfileModel.findOne({ userId: receiverId });
+    const areFriends = userProfile && userProfile.friends.includes(receiverId);
+    const allowNonFriends =
+      recipientProfile && recipientProfile.settings?.allowMessagesFromNonFriends !== false;
+    if (!areFriends && !allowNonFriends) {
+      throw new Error('User only allows messages from friends');
     }
 
     // Generate conversation key for encryption
@@ -119,10 +123,14 @@ export class ChatService {
       throw new Error('Invalid user ID');
     }
 
-    // Check if users are friends
+    // Check if users are friends or recipient allows messages from non-friends
     const userProfile = await UserProfileModel.findOne({ userId: userId1 });
-    if (!userProfile || !userProfile.friends.includes(userId2)) {
-      throw new Error('Users are not friends');
+    const recipientProfile = await UserProfileModel.findOne({ userId: userId2 });
+    const areFriends = userProfile && userProfile.friends.includes(userId2);
+    const allowNonFriends =
+      recipientProfile && recipientProfile.settings?.allowMessagesFromNonFriends !== false;
+    if (!areFriends && !allowNonFriends) {
+      throw new Error('User only allows messages from friends');
     }
 
     const messages = await MessageModel.findConversation(userId1, userId2, page, limit);

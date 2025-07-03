@@ -37,6 +37,10 @@ const GameSchema: Schema = new Schema(
     image: { type: String },
     participants: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     maxParticipants: { type: Number, required: true },
+    blockedUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    presentUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    joinPermission: { type: Boolean, default: false },
+    joinRequests: [{ type: String, ref: 'User', default: [] }],
   },
   { timestamps: true }
 );

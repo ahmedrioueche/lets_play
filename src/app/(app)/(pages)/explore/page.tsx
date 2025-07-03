@@ -6,6 +6,7 @@ import GamesMap from '@/components/games/GamesMap';
 import NotFound from '@/components/ui/NotFound';
 import { useAuth } from '@/context/AuthContext';
 import { useExplore } from '@/hooks/useExplore';
+import useTranslator from '@/hooks/useTranslator';
 import { Game } from '@/types/game';
 import { User } from '@/types/user';
 import { useEffect, useState } from 'react';
@@ -18,7 +19,7 @@ import SearchSection from './components/SearchSection';
 export default function ExplorePage() {
   const { state, setViewMode, setFilters, setSearchQuery, setUserLocation, setSelectedGame } =
     useExplore();
-
+  const text = useTranslator();
   const { user } = useAuth();
 
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
@@ -61,6 +62,21 @@ export default function ExplorePage() {
     }
   }, [setUserLocation, hasMounted]);
 
+  // Listen for joinRequestCancelled event to update selectedGame
+  useEffect(() => {
+    const handleCancel = (e: any) => {
+      if (!e.detail || !state.selectedGame) return;
+      if (e.detail.gameId === state.selectedGame._id && user) {
+        setSelectedGame({
+          ...state.selectedGame,
+          joinRequests: (state.selectedGame.joinRequests || []).filter((id) => id !== user._id),
+        });
+      }
+    };
+    window.addEventListener('joinRequestCancelled', handleCancel);
+    return () => window.removeEventListener('joinRequestCancelled', handleCancel);
+  }, [state.selectedGame, user, setSelectedGame]);
+
   const handleGameClick = (game: Game) => {
     setSelectedGame(game);
     setIsDetailsModalOpen(true);
@@ -68,17 +84,44 @@ export default function ExplorePage() {
 
   const handleRegister = async (gameId: string, userObj: User) => {
     if (!userObj) return;
+
+    // Find the game to check if it requires join permission
+    const game = state.filteredGames.find((g) => g._id === gameId || g.id === gameId);
+
     try {
-      const res = await fetch(`/api/games/${gameId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: userObj._id }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Registration failed');
-      const updatedRes = await fetch(`/api/games/${gameId}`);
-      const updatedGame = await updatedRes.json();
-      setSelectedGame(updatedGame);
+      if (game?.joinPermission) {
+        // Send join request instead of direct registration
+        const res = await fetch(`/api/games/${gameId}/join-request`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: userObj._id }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Join request failed');
+        toast.success('Join request sent!');
+        // Immediate reactivity: update selectedGame.joinRequests
+        if (state.selectedGame) {
+          setSelectedGame({
+            ...state.selectedGame,
+            joinRequests: Array.isArray(state.selectedGame.joinRequests)
+              ? [...state.selectedGame.joinRequests, userObj._id]
+              : [userObj._id],
+          });
+        }
+      } else {
+        // Direct registration
+        const res = await fetch(`/api/games/${gameId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: userObj._id }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Registration failed');
+        const updatedRes = await fetch(`/api/games/${gameId}`);
+        const updatedGame = await updatedRes.json();
+        setSelectedGame(updatedGame);
+        toast.success(text.messages.success.game_registration);
+      }
     } catch (err: any) {
       toast.error(err.message || 'Registration failed');
     }
@@ -202,8 +245,7 @@ export default function ExplorePage() {
             setIsDetailsModalOpen(false);
             setSelectedGame(null);
           }}
-          userLocation={state.userLocation}
-          onRegister={handleRegister}
+          onRegister={(gameId, user) => handleRegister(gameId, user)}
           onCancelRegistration={(gameId) => setGameToCancel(gameId)}
           isRegistered={
             user

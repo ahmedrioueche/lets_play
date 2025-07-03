@@ -1,3 +1,4 @@
+import Checkbox from '@/components/ui/Checkbox';
 import CustomSelect from '@/components/ui/CustomSelect';
 import useTranslator from '@/hooks/useTranslator';
 import React from 'react';
@@ -7,6 +8,10 @@ interface PrivacySecuritySectionProps {
   profileVisibility: string;
   onPrivacyChange: (value: string) => void;
   onProfileVisibilityChange: (value: string) => void;
+  allowDirectGameInvites: boolean;
+  setAllowDirectGameInvites: (value: boolean) => void;
+  allowMessagesFromNonFriends: boolean;
+  setAllowMessagesFromNonFriends: (value: boolean) => void;
 }
 
 const PrivacySecuritySection: React.FC<PrivacySecuritySectionProps> = ({
@@ -14,6 +19,10 @@ const PrivacySecuritySection: React.FC<PrivacySecuritySectionProps> = ({
   profileVisibility,
   onPrivacyChange,
   onProfileVisibilityChange,
+  allowDirectGameInvites,
+  setAllowDirectGameInvites,
+  allowMessagesFromNonFriends,
+  setAllowMessagesFromNonFriends,
 }) => {
   const text = useTranslator();
 
@@ -48,6 +57,29 @@ const PrivacySecuritySection: React.FC<PrivacySecuritySectionProps> = ({
             { value: 'private', label: text.settings.private || 'Private' },
           ]}
           className='w-full'
+        />
+
+        <Checkbox
+          id='allowDirectGameInvites'
+          checked={allowDirectGameInvites}
+          onChange={setAllowDirectGameInvites}
+          label={text.settings.allow_direct_game_invites || 'Allow Direct Game Invites'}
+          description={
+            text.settings.allow_direct_game_invites_desc ||
+            'Allow users to invite you to games directly, even if they are not your friends.'
+          }
+          accentColor='indigo'
+        />
+        <Checkbox
+          id='allowMessagesFromNonFriends'
+          checked={allowMessagesFromNonFriends}
+          onChange={setAllowMessagesFromNonFriends}
+          label={text.settings.allow_messages_from_non_friends || 'Allow Messages from Non-Friends'}
+          description={
+            text.settings.allow_messages_from_non_friends_desc ||
+            'Allow users who are not your friends to message you.'
+          }
+          accentColor='indigo'
         />
       </div>
     </div>

@@ -1,26 +1,28 @@
+import { useSettings } from '@/context/SettingsContext';
 import { gamesApi } from '@/lib/api/gamesApi';
-import { ExploreState, FilterOptions, Game, ViewMode } from '@/types/game';
+import { ExploreState, FilterOptions, Game, SkillLevel, SportType, ViewMode } from '@/types/game';
 import { getDistanceFromLatLonInKm } from '@/utils/helper';
 import { useCallback, useEffect, useState } from 'react';
 
-const initialState: ExploreState = {
-  viewMode: 'map',
-  filters: {
-    sports: [],
-    skillLevels: [],
-    date: null,
-    maxDistance: 300,
-  },
-  searchQuery: '',
-  userLocation: null,
-  selectedGame: null,
-  filteredGames: [],
-  games: [],
-};
-
 export const useExplore = () => {
-  const [state, setState] = useState<ExploreState>(initialState);
   const [hasMounted, setHasMounted] = useState(false);
+  const settings = useSettings();
+
+  const initialState: ExploreState = {
+    viewMode: 'map',
+    filters: {
+      sports: [],
+      skillLevels: [],
+      date: null,
+      maxDistance: 300,
+    },
+    searchQuery: '',
+    userLocation: null,
+    selectedGame: null,
+    filteredGames: [],
+    games: [],
+  };
+  const [state, setState] = useState<ExploreState>(initialState);
 
   // Ensure we're on the client side before making API calls
   useEffect(() => {
@@ -67,12 +69,14 @@ export const useExplore = () => {
 
     // Sport filter
     if (state.filters.sports.length > 0) {
-      filtered = filtered.filter((game) => state.filters.sports.includes(game.sport));
+      filtered = filtered.filter((game) => state.filters.sports.includes(game.sport as SportType));
     }
 
     // Skill level filter
     if (state.filters.skillLevels.length > 0) {
-      filtered = filtered.filter((game) => state.filters.skillLevels.includes(game.skillLevel));
+      filtered = filtered.filter((game) =>
+        state.filters.skillLevels.includes(game.skillLevel as SkillLevel)
+      );
     }
 
     // Date filter
@@ -80,8 +84,8 @@ export const useExplore = () => {
       filtered = filtered.filter((game) => game.date === state.filters.date);
     }
 
-    // Distance filter
-    if (state.userLocation && state.filters.maxDistance > 0) {
+    const maxDistance = settings.maxDistanceForVisibleGames ?? 300;
+    if (state.userLocation && maxDistance > 0) {
       filtered = filtered.filter((game) => {
         const distance = getDistanceFromLatLonInKm(
           state.userLocation!.lat,
@@ -89,12 +93,18 @@ export const useExplore = () => {
           game.coordinates.lat,
           game.coordinates.lng
         );
-        return distance <= state.filters.maxDistance;
+        return distance <= maxDistance;
       });
     }
 
     setState((prev) => ({ ...prev, filteredGames: filtered }));
-  }, [state.games, state.searchQuery, state.filters, state.userLocation]);
+  }, [
+    state.games,
+    state.searchQuery,
+    state.filters,
+    state.userLocation,
+    settings.maxDistanceForVisibleGames,
+  ]);
 
   const setViewMode = useCallback((viewMode: ViewMode) => {
     setState((prev) => ({ ...prev, viewMode }));

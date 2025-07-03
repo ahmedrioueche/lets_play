@@ -11,7 +11,7 @@ import NotFound from '@/components/ui/NotFound';
 import { useAuth } from '@/context/AuthContext';
 import { Game } from '@/types/game';
 import { User } from '@/types/user';
-import { Calendar, Users } from 'lucide-react';
+import { Calendar, Settings, Users } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -62,16 +62,31 @@ const GameDetailsPage = () => {
   return (
     <div className='container mx-auto p-2'>
       {/* Page Header */}
-      <div className='mb-8'>
-        <h1 className='text-3xl font-dancing font-bold text-light-text-primary dark:text-dark-text-primary mb-2 flex items-center gap-2'>
-          <Calendar className='w-7 h-7 text-light-primary dark:text-dark-primary' />
-          {game.title}
-        </h1>
-        <p className='text-light-text-secondary dark:text-dark-text-secondary flex items-center gap-2'>
-          <Users className='w-5 h-5' />
-          {game.participants.length}/{game.maxParticipants} Participants &bull; {game.date}{' '}
-          {game.time}
-        </p>
+      <div className='mb-8 flex items-center justify-between'>
+        <div>
+          <h1 className='text-3xl font-dancing font-bold text-light-text-primary dark:text-dark-text-primary mb-2 flex items-center gap-2'>
+            <Calendar className='w-7 h-7 text-light-primary dark:text-dark-primary' />
+            {game.title}
+          </h1>
+          <p className='text-light-text-secondary dark:text-dark-text-secondary flex items-center gap-2'>
+            <Users className='w-5 h-5' />
+            {game.participants.length}/{game.maxParticipants} Participants &bull; {game.date}{' '}
+            {game.time}
+          </p>
+        </div>
+        {/* Manage Game button for organizer */}
+        {user &&
+          (typeof game.organizer === 'object' ? game.organizer._id : game.organizer) ===
+            user._id && (
+            <button
+              onClick={() => router.push(`/games/${game.id || game._id}/audit`)}
+              className='flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl px-4 py-2 font-medium transition-colors'
+              title='Manage Game'
+            >
+              <Settings className='w-5 h-5' />
+              Manage Game
+            </button>
+          )}
       </div>
 
       {/* Info Grid */}
@@ -124,6 +139,9 @@ const GameDetailsPage = () => {
           isRegistered={
             !!user &&
             game.participants.some((p: any) => (typeof p === 'object' ? p._id : p) === user._id)
+          }
+          hasJoinRequest={
+            !!(user && Array.isArray(game.joinRequests) && game.joinRequests.includes(user._id))
           }
           onRegister={() => router.push(`/games/${game._id}/register`)}
           onCancelRegistration={() => {}}

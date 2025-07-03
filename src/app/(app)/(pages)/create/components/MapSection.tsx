@@ -38,6 +38,7 @@ export const MapSection = React.memo(
         _id: '',
         participants: [],
         maxParticipants: formData.maxParticipants,
+        joinPermission: false,
       };
 
       return formData.coordinates.lat !== 0 || formData.coordinates.lng !== 0 ? [tempGame] : [];

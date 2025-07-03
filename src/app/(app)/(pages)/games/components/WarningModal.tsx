@@ -1,13 +1,19 @@
 import Button from '@/components/ui/Button';
+import InputField from '@/components/ui/InputField';
 import useTranslator from '@/hooks/useTranslator';
 import React, { useState } from 'react';
 
 interface WarningModalProps {
   isOpen: boolean;
-  onConfirm: () => void;
+  onConfirm: (inputValue?: string) => void;
   onCancel: () => void;
   message: string;
   warning?: string;
+  showInput?: boolean;
+  inputLabel?: string;
+  inputPlaceholder?: string;
+  inputValue?: string;
+  onInputChange?: (value: string) => void;
 }
 
 const WarningModal: React.FC<WarningModalProps> = ({
@@ -16,6 +22,11 @@ const WarningModal: React.FC<WarningModalProps> = ({
   onCancel,
   message,
   warning,
+  showInput = false,
+  inputLabel,
+  inputPlaceholder,
+  inputValue,
+  onInputChange,
 }) => {
   const text = useTranslator();
   const [isLoading, setIsLoading] = useState(false);
@@ -28,7 +39,8 @@ const WarningModal: React.FC<WarningModalProps> = ({
 
   const handleConfirm = () => {
     setIsLoading(true);
-    onConfirm();
+    onConfirm(showInput ? inputValue : undefined);
+    setIsLoading(false);
   };
 
   if (!isOpen) return null;
@@ -43,6 +55,17 @@ const WarningModal: React.FC<WarningModalProps> = ({
           {warning || text.my_games.warning_title}
         </h2>
         <p className='mb-6 text-light-text-primary dark:text-dark-text-primary'>{message}</p>
+        {showInput && (
+          <div className='mb-6'>
+            <InputField
+              label={inputLabel}
+              placeholder={inputPlaceholder}
+              value={inputValue}
+              onChange={(e) => onInputChange && onInputChange(e.target.value)}
+              maxLength={100}
+            />
+          </div>
+        )}
         <div className='flex justify-end gap-4'>
           <Button variant='ghost' onClick={onCancel}>
             {text.my_games.warning_cancel}

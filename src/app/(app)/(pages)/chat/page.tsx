@@ -3,6 +3,7 @@ import Loading from '@/components/ui/Loading';
 import { useAuth } from '@/context/AuthContext';
 import { useRealTimeChat } from '@/hooks/useRealTimeChat';
 import { chatApi } from '@/lib/api/chatApi';
+import { usersApi } from '@/lib/api/usersApi';
 import { Message } from '@/types/chat';
 import { User } from '@/types/user';
 import { useSearchParams } from 'next/navigation';
@@ -36,11 +37,19 @@ function ChatPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMoreMessages, setHasMoreMessages] = useState(true);
   const [loadingOlderMessages, setLoadingOlderMessages] = useState(false);
+  // State for target user (if ?user= is present and not a friend)
+  const [targetUser, setTargetUser] = useState<User | null>(null);
 
-  // Get friend ID from search params
+  // Get user ID from search params (for messaging any user)
+  const userIdFromParams = searchParams.get('user');
   const friendIdFromParams = searchParams.get('friend');
 
-  const selectedFriend = friends.find((f) => f._id === selectedFriendId) || null;
+  // Determine selected user (friend or any user)
+  const selectedUserId = userIdFromParams || friendIdFromParams || selectedFriendId;
+
+  const selectedUser =
+    friends.find((f) => f._id === selectedUserId) ||
+    (targetUser && targetUser._id === selectedUserId ? targetUser : null);
 
   // Real-time chat hook
   const {
@@ -52,7 +61,7 @@ function ChatPage() {
     deleteMessage,
     markAsRead,
   } = useRealTimeChat({
-    selectedFriend,
+    selectedFriend: selectedUser,
     onMessageReceived: (message) => {
       console.log('ChatPage: onMessageReceived called with:', message);
       // Add real-time messages to the beginning (since DB returns newest first)
@@ -112,7 +121,7 @@ function ChatPage() {
 
   const loadMessages = useCallback(
     async (page: number = 1, append: boolean = false) => {
-      if (!selectedFriendId || !currentUser?._id) return;
+      if (!selectedUserId || !currentUser?._id) return;
 
       if (page === 1) {
         setLoadingMessages(true);
@@ -122,7 +131,7 @@ function ChatPage() {
       setErrorMessages(null);
 
       try {
-        const messages = await chatApi.getMessages(selectedFriendId, currentUser._id, page);
+        const messages = await chatApi.getMessages(selectedUserId, currentUser._id, page);
 
         if (append) {
           // Append older messages to the end
@@ -150,7 +159,7 @@ function ChatPage() {
         setLoadingOlderMessages(false);
       }
     },
-    [selectedFriendId, currentUser?._id, markAsRead]
+    [selectedUserId, currentUser?._id, markAsRead]
   );
 
   // Load friends on component mount
@@ -160,10 +169,9 @@ function ChatPage() {
     }
   }, [currentUser?._id, loadFriends]);
 
-  // Load messages when friend is selected
+  // Load messages when user is selected
   useEffect(() => {
-    if (selectedFriendId && currentUser?._id) {
-      // Reset pagination when switching friends
+    if (selectedUserId && currentUser?._id) {
       setCurrentPage(1);
       setHasMoreMessages(true);
       loadMessages(1, false);
@@ -172,7 +180,7 @@ function ChatPage() {
       setCurrentPage(1);
       setHasMoreMessages(true);
     }
-  }, [selectedFriendId, currentUser?._id, loadMessages]);
+  }, [selectedUserId, currentUser?._id, loadMessages]);
 
   // Load older messages
   const handleLoadOlderMessages = useCallback(async () => {
@@ -185,7 +193,9 @@ function ChatPage() {
 
   // Handle URL parameter changes
   useEffect(() => {
-    if (friendIdFromParams && friends.length > 0) {
+    if (userIdFromParams) {
+      setSelectedFriendId(userIdFromParams);
+    } else if (friendIdFromParams && friends.length > 0) {
       const friendExists = friends.find((f) => f._id === friendIdFromParams);
       if (friendExists) {
         setSelectedFriendId(friendIdFromParams);
@@ -193,11 +203,12 @@ function ChatPage() {
         toast.error('Friend not found in your friends list');
       }
     }
-  }, [friendIdFromParams, friends]);
+  }, [userIdFromParams, friendIdFromParams, friends]);
 
   const handleSendMessage = useCallback(
     async (msg: string) => {
-      if (!selectedFriendId || !currentUser?._id || !msg.trim()) return;
+      const receiverId = selectedUser?._id;
+      if (!receiverId || !currentUser?._id || !msg.trim()) return;
 
       const messageContent = msg.trim();
       setInputValue('');
@@ -206,7 +217,7 @@ function ChatPage() {
       const optimisticMessage: OptimisticMessage = {
         _id: `optimistic-${Date.now()}`,
         senderId: currentUser._id,
-        receiverId: selectedFriendId,
+        receiverId,
         content: messageContent,
         messageType: 'text',
         isRead: false,
@@ -245,7 +256,7 @@ function ChatPage() {
         toast.error('Failed to send message');
       }
     },
-    [selectedFriendId, currentUser?._id, sendMessage]
+    [selectedUser, currentUser?._id, sendMessage]
   );
 
   // Retry sending a failed message
@@ -362,6 +373,51 @@ function ChatPage() {
     f.name.toLowerCase().includes(search.toLowerCase())
   );
 
+  useEffect(() => {
+    const fetchTargetUser = async () => {
+      if (userIdFromParams && !friends.some((f) => f._id === userIdFromParams)) {
+        try {
+          const user = await usersApi.getUserById(userIdFromParams);
+          setTargetUser(user);
+        } catch {
+          setTargetUser({
+            _id: userIdFromParams,
+            name: 'User',
+            avatar: '',
+            email: '',
+            phone: '',
+            createdAt: '',
+            updatedAt: '',
+          });
+        }
+      } else {
+        setTargetUser(null);
+      }
+    };
+    fetchTargetUser();
+  }, [userIdFromParams, friends]);
+
+  // Build chat list
+  let chatList: User[] = friends;
+  if (userIdFromParams) {
+    const alreadyInList = friends.some((f) => f._id === userIdFromParams);
+    if (!alreadyInList && targetUser) {
+      chatList = [targetUser, ...friends];
+    } else if (alreadyInList) {
+      chatList = [
+        ...friends.filter((f) => f._id === userIdFromParams),
+        ...friends.filter((f) => f._id !== userIdFromParams),
+      ];
+    }
+  }
+
+  // Ensure selectedFriendId is always set to the first chat if not set
+  useEffect(() => {
+    if (!selectedFriendId && chatList.length > 0) {
+      setSelectedFriendId(chatList[0]._id);
+    }
+  }, [selectedFriendId, chatList]);
+
   // Handle empty state
   if (loadingFriends) {
     return <Loading />;
@@ -383,43 +439,19 @@ function ChatPage() {
     );
   }
 
-  if (!friends || friends.length === 0) {
+  if (!chatList || chatList.length === 0) {
     return (
       <div className='w-full flex-1 flex items-center justify-center mt-20'>
-        <div className='text-center max-w-md'>
-          <div className='w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/20 dark:to-blue-800/20 rounded-full flex items-center justify-center'>
-            <svg
-              className='w-12 h-12 text-blue-500 dark:text-blue-400'
-              fill='none'
-              stroke='currentColor'
-              viewBox='0 0 24 24'
-            >
-              <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                strokeWidth={2}
-                d='M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z'
-              />
-            </svg>
-          </div>
-          <h3 className='text-2xl font-bold text-light-text-primary dark:text-dark-text-primary mb-3'>
-            No Friends Yet
-          </h3>
-          <p className='text-light-text-secondary dark:text-dark-text-secondary mb-6'>
-            Add some friends to start chatting! You can find people to connect with in the Friends
-            section.
-          </p>
-          <button
-            onClick={() => (window.location.href = '/friends')}
-            className='px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors'
-          >
-            Find Friends
-          </button>
+        <div className='text-center text-gray-500 dark:text-gray-400'>
+          No chats yet.
+          <br />
+          Your conversations will appear here.
         </div>
       </div>
     );
   }
 
+  // Always render chat window if there is at least one chat
   return (
     <div className='w-full flex-1 flex h-full overflow-hidden'>
       <div className='flex flex-col md:flex-row h-full w-full relative'>
@@ -447,6 +479,7 @@ function ChatPage() {
               onMobileClose={() => setMobileFriendsOpen(false)}
               onRemoveFriend={handleRemoveFriend}
               onBlockUser={handleBlockUser}
+              targetUser={targetUser}
             />
           </div>
         </div>
@@ -463,13 +496,14 @@ function ChatPage() {
             onSearchChange={setSearch}
             onRemoveFriend={handleRemoveFriend}
             onBlockUser={handleBlockUser}
+            targetUser={targetUser}
           />
         </div>
 
-        {/* Chat Window */}
+        {/* Chat Window - always render if chatList has at least one chat */}
         <div className='flex-1 h-full bg-transparent overflow-auto'>
           <ChatWindow
-            friend={selectedFriend}
+            friend={selectedUser}
             messages={messages}
             loading={loadingMessages}
             error={errorMessages}

@@ -1,4 +1,5 @@
 import { useAuth } from '@/context/AuthContext';
+import useTranslator from '@/hooks/useTranslator';
 import { Game } from '@/types/game';
 import { useRouter } from 'next/navigation';
 
@@ -6,6 +7,7 @@ interface ActionButtonsProps {
   game: Game;
   mode: 'explore' | 'games';
   isRegistered: boolean;
+  hasJoinRequest?: boolean;
   onRegister: () => void;
   onCancelRegistration?: (gameId: string) => void;
   onCancelGame?: () => void;
@@ -15,12 +17,14 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   game,
   mode,
   isRegistered,
+  hasJoinRequest = false,
   onRegister,
   onCancelRegistration,
   onCancelGame,
 }) => {
   const { user } = useAuth();
   const router = useRouter();
+  const text = useTranslator();
 
   // Support both string and User object for user
   const userId = typeof user === 'string' ? user : user?._id;
@@ -36,7 +40,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
             You're the organizer of this game.
           </div>
           <button
-            onClick={() => router.push(`/games`)}
+            onClick={() => router.push(`/games/${game._id}/audit`)}
             className='w-full bg-blue-500 hover:bg-blue-600 text-white rounded-xl py-3 font-medium transition-colors'
           >
             Manage Game
@@ -86,7 +90,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
             You're the organizer of this game.
           </div>
           <button
-            onClick={() => router.push(`/games`)}
+            onClick={() => router.push(`/games/${game._id}/audit`)}
             className='w-full bg-blue-500 hover:bg-blue-600 text-white rounded-xl py-3 font-medium transition-colors'
           >
             Manage Game
@@ -117,13 +121,63 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
     } else {
       return (
         <div className='pt-4 space-y-3'>
-          <button
-            onClick={onRegister}
-            disabled={game.participants.length >= game.maxParticipants}
-            className='w-full bg-light-primary dark:bg-dark-primary hover:opacity-90 text-white rounded-xl py-3 font-medium transition-opacity disabled:opacity-50'
-          >
-            {game.participants.length >= game.maxParticipants ? 'Game Full' : 'Register for Game'}
-          </button>
+          {/* Join Permission Notice */}
+          {game.joinPermission && (
+            <div className='text-center py-2 text-light-text-secondary dark:text-dark-text-secondary text-sm'>
+              {text.game.join_permission_required}
+            </div>
+          )}
+
+          {/* Join Request Status */}
+          {hasJoinRequest && (
+            <div className='text-center py-2 text-blue-600 dark:text-blue-400 text-sm'>
+              {text.game.join_request_pending}
+            </div>
+          )}
+
+          {hasJoinRequest ? (
+            <button
+              onClick={async () => {
+                if (!userId) return;
+                try {
+                  const res = await fetch(`/api/games/${game._id}/join-request`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId }),
+                  });
+                  if (!res.ok) {
+                    const error = await res.json();
+                    throw new Error(error.message || 'Failed to cancel join request');
+                  }
+                  // Remove userId from joinRequests in local state (handled by parent)
+                  if (typeof window !== 'undefined') {
+                    window.dispatchEvent(
+                      new CustomEvent('joinRequestCancelled', {
+                        detail: { gameId: game._id, userId },
+                      })
+                    );
+                  }
+                } catch (error: any) {
+                  alert(error.message || 'Failed to cancel join request');
+                }
+              }}
+              className='w-full bg-red-500 hover:bg-red-600 text-white rounded-xl py-3 font-medium transition-colors'
+            >
+              {text.game.cancel_join_request || 'Cancel Request'}
+            </button>
+          ) : (
+            <button
+              onClick={onRegister}
+              disabled={game.participants.length >= game.maxParticipants}
+              className='w-full bg-light-primary dark:bg-dark-primary hover:opacity-90 text-white rounded-xl py-3 font-medium transition-opacity disabled:opacity-50'
+            >
+              {game.participants.length >= game.maxParticipants
+                ? 'Game Full'
+                : game.joinPermission
+                  ? text.game.join_request
+                  : text.game.join}
+            </button>
+          )}
         </div>
       );
     }

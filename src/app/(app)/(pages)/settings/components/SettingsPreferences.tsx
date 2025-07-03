@@ -43,6 +43,12 @@ const SettingsPreferences: React.FC = () => {
   const handleAlertOnStartChange = (value: boolean) => {
     settingsContext.setSettings({ alertOnStart: value });
   };
+  const handleAllowDirectGameInvitesChange = (value: boolean) => {
+    settingsContext.setSettings({ allowDirectGameInvites: value });
+  };
+  const handleAllowMessagesFromNonFriendsChange = (value: boolean) => {
+    settingsContext.setSettings({ allowMessagesFromNonFriends: value });
+  };
 
   return (
     <div className='space-y-4 sm:space-y-6 lg:space-y-8'>
@@ -67,6 +73,10 @@ const SettingsPreferences: React.FC = () => {
           profileVisibility={settingsContext.profileVisibility}
           onPrivacyChange={handlePrivacyChange}
           onProfileVisibilityChange={handleProfileVisibilityChange}
+          allowDirectGameInvites={settingsContext.allowDirectGameInvites}
+          setAllowDirectGameInvites={handleAllowDirectGameInvitesChange}
+          allowMessagesFromNonFriends={settingsContext.allowMessagesFromNonFriends}
+          setAllowMessagesFromNonFriends={handleAllowMessagesFromNonFriendsChange}
         />
 
         <PreferencesSection

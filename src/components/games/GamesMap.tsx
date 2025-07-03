@@ -17,7 +17,7 @@ interface GamesMapProps {
   games: Game[];
   selectedGame: Game | null;
   onGameSelect: (game: Game) => void;
-  userLocation: { lat: number; lng: number } | null;
+  userLocation?: { lat: number; lng: number } | null;
   onMapClick?: (lat: number, lng: number) => void;
   allowMapClick?: boolean;
 }

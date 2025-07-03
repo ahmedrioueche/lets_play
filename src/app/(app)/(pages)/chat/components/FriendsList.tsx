@@ -16,6 +16,7 @@ interface FriendsListProps {
   onMobileClose?: () => void;
   onRemoveFriend?: (friendId: string) => void;
   onBlockUser?: (friendId: string) => void;
+  targetUser?: User | null;
 }
 
 const FriendsList: React.FC<FriendsListProps> = ({
@@ -30,9 +31,14 @@ const FriendsList: React.FC<FriendsListProps> = ({
   onMobileClose,
   onRemoveFriend,
   onBlockUser,
+  targetUser,
 }) => {
-  const onlineFriends = friends.filter((f) => f.isOnline);
-  const offlineFriends = friends.filter((f) => !f.isOnline);
+  let displayFriends = friends;
+  if (targetUser && !friends.some((f) => f._id === targetUser._id)) {
+    displayFriends = [targetUser, ...friends];
+  }
+  const onlineFriends = displayFriends.filter((f) => f.isOnline);
+  const offlineFriends = displayFriends.filter((f) => !f.isOnline);
 
   return (
     <div
@@ -107,15 +113,15 @@ const FriendsList: React.FC<FriendsListProps> = ({
               </p>
             </div>
           </div>
-        ) : friends.length === 0 ? (
+        ) : displayFriends.length === 0 ? (
           <div className='flex flex-col items-center justify-center h-full text-light-text-muted dark:text-dark-text-muted p-8'>
             <div className='w-20 h-20 bg-light-primary/10 dark:bg-dark-primary/20 rounded-full flex items-center justify-center mb-4'>
               <Users className='w-10 h-10 opacity-50' />
             </div>
             <p className='text-lg font-semibold text-light-text-primary dark:text-dark-text-primary mb-2'>
-              No conversations yet
+              No chats yet.
             </p>
-            <p className='text-sm text-center'>Start a conversation to see your friends here</p>
+            <p className='text-sm text-center'>Your conversations will appear here.</p>
           </div>
         ) : (
           <div className='p-4 space-y-6'>

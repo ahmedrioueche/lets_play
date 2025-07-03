@@ -3,7 +3,7 @@ import { Game } from '@/types/game';
 
 interface MapSectionProps {
   game: Game;
-  userLocation: { lat: number; lng: number } | null;
+  userLocation?: { lat: number; lng: number } | null;
 }
 
 const MapSection: React.FC<MapSectionProps> = ({ game, userLocation }) => (

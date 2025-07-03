@@ -84,7 +84,7 @@ export default function ProfilePage() {
   }
 
   const handleMessage = () => {
-    router.push(`/chat?friend=${userId}`);
+    router.push(`/chat?user=${userId}`);
   };
 
   const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -489,7 +489,7 @@ export default function ProfilePage() {
                       user={friend}
                       relationship={currentUser?._id === friend._id ? 'self' : 'friend'}
                       onAddFriend={() => {}}
-                      onMessage={() => router.push(`/chat?friend=${friend._id}`)}
+                      onMessage={() => router.push(`/chat?user=${friend._id}`)}
                       onCardClick={() => router.push(`/profile/${friend._id}`)}
                     />
                   ))}

@@ -10,9 +10,9 @@ import ParticipantsList from './ParticipantsList';
 
 interface GameDetailsViewProps {
   game: Game;
-  userLocation: { lat: number; lng: number } | null;
   mode: 'explore' | 'games';
   isRegistered: boolean;
+  hasJoinRequest?: boolean;
   onClose: () => void;
   onRegister: () => void;
   onCancelRegistration?: (gameId: string) => void;
@@ -21,9 +21,9 @@ interface GameDetailsViewProps {
 
 const GameDetailsView: React.FC<GameDetailsViewProps> = ({
   game,
-  userLocation,
   mode,
   isRegistered,
+  hasJoinRequest = false,
   onClose,
   onRegister,
   onCancelRegistration,
@@ -71,7 +71,7 @@ const GameDetailsView: React.FC<GameDetailsViewProps> = ({
           </div>
         )}
 
-        <MapSection game={game} userLocation={userLocation} />
+        <MapSection game={game} />
 
         {/* Participants List */}
         <div>
@@ -92,6 +92,7 @@ const GameDetailsView: React.FC<GameDetailsViewProps> = ({
           game={game}
           mode={mode}
           isRegistered={isRegistered}
+          hasJoinRequest={hasJoinRequest}
           onRegister={onRegister}
           onCancelRegistration={onCancelRegistration}
           onCancelGame={onCancelGame}

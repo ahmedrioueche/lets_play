@@ -3,9 +3,9 @@ import GameModel from '@/models/Game';
 import { sendNotification } from '@/utils/notifications';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   await dbConnect();
-  const { id } = params;
+  const { id } = await params;
   const { userIds, organizerId } = await req.json();
   if (!Array.isArray(userIds) || !organizerId) {
     return NextResponse.json({ message: 'userIds and organizerId required' }, { status: 400 });

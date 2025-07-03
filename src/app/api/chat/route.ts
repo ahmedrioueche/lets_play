@@ -39,8 +39,10 @@ async function canUsersChat(senderId: string, receiverId: string) {
     (friendId: any) => friendId.toString() === receiverId
   );
 
-  if (!areFriends) {
-    return { canChat: false, reason: 'Users are not friends' };
+  // Check if receiver allows messages from non-friends
+  const allowNonFriends = receiverProfile.settings?.allowMessagesFromNonFriends !== false;
+  if (!areFriends && !allowNonFriends) {
+    return { canChat: false, reason: 'User only allows messages from friends' };
   }
 
   // Check if sender is blocked by receiver

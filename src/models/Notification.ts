@@ -20,6 +20,8 @@ const NotificationSchema: Schema = new Schema(
         'game_reminder',
         'game_registration',
         'game_cancellation',
+        'game_kick',
+        'game_join_request',
         'friend_response',
       ],
       required: true,
@@ -36,10 +38,14 @@ const NotificationSchema: Schema = new Schema(
 NotificationSchema.index({ userId: 1, isRead: 1 });
 NotificationSchema.index({ userId: 1, createdAt: -1 });
 
-const NotificationModel = (mongoose.models.Notification ||
-  mongoose.model<INotification>(
-    'Notification',
-    NotificationSchema
-  )) as mongoose.Model<INotification>;
+// Force schema refresh by deleting existing model if it exists
+if (mongoose.models.Notification) {
+  delete mongoose.models.Notification;
+}
+
+const NotificationModel = mongoose.model<INotification>(
+  'Notification',
+  NotificationSchema
+) as mongoose.Model<INotification>;
 
 export default NotificationModel;

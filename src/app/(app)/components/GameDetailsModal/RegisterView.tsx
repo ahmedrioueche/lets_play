@@ -44,7 +44,6 @@ const RegisterView: React.FC<RegisterViewProps> = ({ game, onBack, onClose, onRe
         throw new Error('Game ID not found');
       }
       await onRegister(gameId, user as UserType);
-      toast.success(text.messages.success.game_registration);
       onClose();
     } catch (error) {
       console.error('Failed to register:', error);
@@ -99,12 +98,16 @@ const RegisterView: React.FC<RegisterViewProps> = ({ game, onBack, onClose, onRe
                 </p>
               </div>
             </div>
-            <div className='grid grid-cols-2 gap-3 text-sm'>
-              <div>
-                <p className='text-light-text-secondary dark:text-dark-text-secondary'>Phone</p>
-                <p className='text-light-text-primary dark:text-dark-text-primary'>{user?.phone}</p>
+            {user?.phone && (
+              <div className='grid grid-cols-2 gap-3 text-sm'>
+                <div>
+                  <p className='text-light-text-secondary dark:text-dark-text-secondary'>Phone</p>
+                  <p className='text-light-text-primary dark:text-dark-text-primary'>
+                    {user?.phone}
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
 
@@ -123,7 +126,14 @@ const RegisterView: React.FC<RegisterViewProps> = ({ game, onBack, onClose, onRe
         </div>
 
         {/* Action Button */}
-        <div className='pt-4'>
+        <div className='pt-2'>
+          {/* Join Permission Notice */}
+          {game.joinPermission && (
+            <div className='text-center mb-2 text-light-text-secondary dark:text-dark-text-secondary text-sm'>
+              {text.game.join_permission_required}
+            </div>
+          )}
+
           <button
             onClick={handleRegister}
             disabled={isLoading || alreadyRegistered}
@@ -132,8 +142,8 @@ const RegisterView: React.FC<RegisterViewProps> = ({ game, onBack, onClose, onRe
             {alreadyRegistered
               ? 'Already Registered'
               : isLoading
-                ? 'Registering...'
-                : 'Confirm Registration'}
+                ? `${game.joinPermission ? 'Loading...' : 'Joining...'}`
+                : `Confirm ${game.joinPermission ? 'Request' : 'Join'} `}
           </button>
           {alreadyRegistered && (
             <div className='text-center text-green-600 dark:text-green-400 mt-2'>

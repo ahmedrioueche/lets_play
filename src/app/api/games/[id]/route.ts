@@ -50,6 +50,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (participants.length >= game.maxParticipants) {
       return NextResponse.json({ message: 'Game is full' }, { status: 400 });
     }
+    if (Array.isArray(game.blockedUsers) && game.blockedUsers.includes(userId)) {
+      return NextResponse.json(
+        { message: 'You are blocked from joining this game' },
+        { status: 403 }
+      );
+    }
     // Ensure we only push the ObjectId, not a User object
     game.participants = participants.map((p: any) => {
       if (typeof p === 'string' || p instanceof mongoose.Types.ObjectId) {

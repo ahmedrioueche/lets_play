@@ -21,6 +21,8 @@ const defaultSettings: Settings = {
   alertTimeBeforeGame: 30,
   alertOnStart: true,
   alertWhenGameStarts: true,
+  allowDirectGameInvites: true,
+  allowMessagesFromNonFriends: true,
 };
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
@@ -82,6 +84,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
         });
       }
       localStorage.setItem('appSettings', JSON.stringify(updated));
+
       return updated;
     });
   };

@@ -160,6 +160,8 @@ export interface Notification {
     | 'game_reminder'
     | 'game_registration'
     | 'game_cancellation'
+    | 'game_kick'
+    | 'game_join_request'
     | 'system';
   title: string;
   message: string;
@@ -167,6 +169,10 @@ export interface Notification {
     friendInvitationId?: string;
     gameId?: string;
     fromUserId?: string;
+    kickedUserId?: string;
+    reason?: string;
+    requestingUserId?: string;
+    type?: string;
     [key: string]: any;
   };
   isRead: boolean;
@@ -186,4 +192,6 @@ export type Settings = {
   alertBeforeGameStarts: boolean;
   alertTimeBeforeGame: number;
   alertOnStart: boolean;
+  allowDirectGameInvites: boolean;
+  allowMessagesFromNonFriends: boolean;
 };

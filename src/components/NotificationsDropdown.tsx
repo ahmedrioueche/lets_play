@@ -79,6 +79,15 @@ const NotificationsDropdown = ({
           router.push(`/games/${notification.data?.gameId}`);
         }
         break;
+      case 'game_join_request':
+        if (
+          notification.data?.gameId &&
+          (notification.data?.type === 'join_request' ||
+            notification.data?.type === 'join_request_cancel')
+        ) {
+          router.push(`/games/${notification.data.gameId}/audit`);
+        }
+        break;
       default:
         // For other notifications, just mark as read
         break;

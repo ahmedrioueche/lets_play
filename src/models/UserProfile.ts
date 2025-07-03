@@ -27,6 +27,8 @@ const UserProfileSchema: Schema = new Schema(
       alertBeforeGameStarts: { type: Boolean, default: true },
       alertTimeBeforeGame: { type: Number, default: 30 },
       alertOnStart: { type: Boolean, default: true },
+      allowDirectGameInvites: { type: Boolean, default: true },
+      allowMessagesFromNonFriends: { type: Boolean, default: true },
     },
   },
   {

@@ -27,6 +27,10 @@ export interface Game {
   status: GameStatus;
   price: number;
   image?: string;
+  blockedUsers?: (string | User)[];
+  presentUsers?: (string | User)[];
+  joinPermission: boolean;
+  joinRequests?: string[];
 }
 
 export interface FilterOptions {

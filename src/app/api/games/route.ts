@@ -1,6 +1,5 @@
 import dbConnect from '@/config/db';
-import { GAME_NOTIFICATION_DISTANCE_KM } from '@/constants/general';
-import GameModel from '@/models/Game'; // Assuming you'll create this model
+import GameModel from '@/models/Game';
 import NotificationModel from '@/models/Notification';
 import UserModel from '@/models/User';
 import UserProfileModel from '@/models/UserProfile';
@@ -80,6 +79,11 @@ export async function POST(req: NextRequest) {
       gameData.organizer = gameData.organizer._id;
     }
 
+    // Remove _id if present (prevent invalid ObjectId error)
+    if ('_id' in gameData) {
+      delete gameData._id;
+    }
+
     const newGame = await GameModel.create(gameData);
     const newGameId = newGame._id?.toString ? newGame._id.toString() : String(newGame._id);
 
@@ -92,17 +96,24 @@ export async function POST(req: NextRequest) {
     // 2. Get all users (excluding organizer)
     const allUsers = await UserModel.find({ _id: { $ne: organizerId } }).lean();
 
-    // 3. Find users within distance
+    // 3. Find users within their own maxDistance setting
+    const userProfiles = await UserProfileModel.find({
+      userId: { $in: allUsers.map((u) => u._id.toString()) },
+    }).lean();
+    const userProfileMap = new Map(userProfiles.map((p) => [p.userId.toString(), p]));
+
     const nearbyUserIds = allUsers
       .filter((user) => {
         if (!user.location || !user.location.cords) return false;
+        const profile = userProfileMap.get(user._id.toString());
+        const maxDistance = profile?.settings?.maxDistanceForVisibleGames ?? 20; // fallback to 10 if not set
         const dist = getDistanceFromLatLonInKm(
           gameData.coordinates.lat,
           gameData.coordinates.lng,
           user.location.cords.lat,
           user.location.cords.lng
         );
-        return dist <= GAME_NOTIFICATION_DISTANCE_KM;
+        return dist <= maxDistance;
       })
       .map((user) => user._id.toString());
 

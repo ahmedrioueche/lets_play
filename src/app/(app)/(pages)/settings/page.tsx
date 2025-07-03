@@ -1,27 +1,11 @@
 'use client';
 
-import Button from '@/components/ui/Button';
 import useTranslator from '@/hooks/useTranslator';
-import React, { useState } from 'react';
-import toast from 'react-hot-toast';
+import React from 'react';
 import SettingsPreferences from './components/SettingsPreferences';
 
 const SettingsPage: React.FC = () => {
   const text = useTranslator();
-  const [loading, setLoading] = useState(false);
-
-  const handleSave = async () => {
-    setLoading(true);
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      toast.success(text.settings.saved || 'Settings saved successfully!');
-    } catch (err) {
-      toast.error('Failed to save settings');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className='space-y-6 sm:space-y-8 p-2 sm:p-4 md:p-2'>
@@ -37,22 +21,6 @@ const SettingsPage: React.FC = () => {
             </p>
           </div>
         </div>
-
-        <Button
-          onClick={handleSave}
-          variant='primary'
-          className='px-6 sm:px-8 py-2 sm:py-3 font-semibold shadow-lg hover:shadow-xl transition-all duration-200'
-          disabled={loading}
-        >
-          {loading ? (
-            <div className='flex items-center gap-2'>
-              <div className='w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin' />
-              Saving...
-            </div>
-          ) : (
-            text.settings.save || 'Save Preferences'
-          )}
-        </Button>
       </div>
 
       {/* Settings Content */}

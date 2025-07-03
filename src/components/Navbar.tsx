@@ -245,7 +245,7 @@ const Navbar = () => {
                 className='ml-2'
                 aria-label='Profile'
               >
-                {user ? <UserAvatar avatar={user.avatar} /> : <UserAvatar />}
+                <UserAvatar avatar={user?.avatar} />
               </button>
             </div>
 

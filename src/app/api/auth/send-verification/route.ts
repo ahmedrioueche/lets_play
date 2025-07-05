@@ -1,6 +1,6 @@
+import { transporter } from '@/lib/nodemailer';
 import OtpModel from '@/models/Otp';
 import UserModel from '@/models/User';
-import { transporter } from '@/utils/nodemailer';
 import jwt from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';
 import { NextRequest, NextResponse } from 'next/server';

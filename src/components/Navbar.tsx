@@ -62,7 +62,7 @@ const Navbar = () => {
   //}, [user?._id]);
 
   const handleSettingsClick = () => {
-    router.push('/settings');
+    router.push('/dashboard/settings');
   };
 
   const handleLogout = async () => {

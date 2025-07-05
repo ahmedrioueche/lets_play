@@ -56,7 +56,7 @@ const OnboardingPage: React.FC = () => {
   useEffect(() => {
     if (success) {
       const timeout = setTimeout(() => {
-        router.push('/');
+        router.push('/dashboard');
       }, 1500);
       return () => clearTimeout(timeout);
     }

@@ -41,7 +41,7 @@ const ProfileDropdown = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
       icon: <Settings className='h-5 w-5' />,
       label: 'Settings',
       onClick: () => {
-        router.push('/settings');
+        router.push('/dashboard/settings');
         onClose();
       },
     },

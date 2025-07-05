@@ -1,7 +1,7 @@
 import { pusherServer } from '@/lib/pusherServer';
 import NotificationModel from '@/models/Notification';
 import UserProfileModel from '@/models/UserProfile';
-import { transporter } from './nodemailer';
+import { transporter } from '../lib/nodemailer';
 
 interface SendNotificationOptions {
   userIds: string[]; // Array of user IDs to notify

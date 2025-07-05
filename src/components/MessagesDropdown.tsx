@@ -89,7 +89,7 @@ const MessagesDropdown: React.FC<MessagesDropdownProps> = ({
       }
     }
 
-    router.push(`/chat?user=${friendId}`);
+    router.push('/dashboard/chat');
     onClose();
   };
 

@@ -268,6 +268,44 @@ export const dict = {
       welcome: 'Welcome',
       complete_profile: 'Complete Profile',
     },
+    landing: {
+      hero_title: 'Connect. Play. Repeat.',
+      hero_subtitle:
+        'The ultimate platform to find, join, and organize games with friends and new players.',
+      cta: 'Get Started',
+      features_title: 'Why Choose Us?',
+      feature_fast_title: 'Fast & Easy',
+      feature_fast_desc: 'Find and join games in seconds with our intuitive interface.',
+      feature_community_title: 'Vibrant Community',
+      feature_community_desc: 'Connect with players nearby and build lasting friendships.',
+      feature_secure_title: 'Secure & Private',
+      feature_secure_desc: 'Your data and privacy are protected with industry best practices.',
+      feature_chat_title: 'Real-time Chat',
+      feature_chat_desc: 'Chat with friends and teammates instantly, right in the app.',
+      how_title: 'How It Works',
+      step_signup_title: 'Sign Up',
+      step_signup_desc: 'Create your free account in just a few clicks.',
+      step_connect_title: 'Connect',
+      step_connect_desc: 'Find games, join teams, and make new friends.',
+      step_play_title: 'Play!',
+      step_play_desc: 'Join games, compete, and have fun!',
+      testimonials_title: 'What Our Users Say',
+      testimonial_alex:
+        'This platform made it so easy to find games and meet new friends! Highly recommended.',
+      testimonial_samira:
+        'I love the community and the seamless experience. Organizing games has never been easier!',
+      testimonial_jordan:
+        "The real-time chat and notifications keep me connected. It's my go-to for sports!",
+      cta_title: 'Ready to get started?',
+      scroll_down: 'Scroll Down',
+      faq_title: 'Frequently Asked Questions',
+      faq_subtitle:
+        "Everything you need to know about Let's Play. Can't find what you're looking for? Contact our support team!",
+      faq_contact_support: 'Contact Support',
+      faq_still_have_questions: 'Still have questions?',
+      faq_support_description:
+        "Our support team is here to help you get the most out of Let's Play. We're available 24/7 to answer any questions you might have.",
+    },
   },
   fr: {
     app: {
@@ -539,6 +577,47 @@ export const dict = {
       welcome: 'Welcome',
       complete_profile: 'Complete Profile',
     },
+    landing: {
+      hero_title: 'Connectez. Jouez. Répétez.',
+      hero_subtitle:
+        'La plateforme ultime pour trouver, rejoindre et organiser des parties avec des amis et de nouveaux joueurs.',
+      cta: 'Commencer',
+      features_title: 'Pourquoi nous choisir ?',
+      feature_fast_title: 'Rapide & Facile',
+      feature_fast_desc:
+        'Trouvez et rejoignez des parties en quelques secondes grâce à notre interface intuitive.',
+      feature_community_title: 'Communauté dynamique',
+      feature_community_desc:
+        'Connectez-vous avec des joueurs à proximité et créez des amitiés durables.',
+      feature_secure_title: 'Sécurisé & Privé',
+      feature_secure_desc:
+        'Vos données et votre vie privée sont protégées avec les meilleures pratiques du secteur.',
+      feature_chat_title: 'Chat en temps réel',
+      feature_chat_desc:
+        "Discutez instantanément avec vos amis et coéquipiers, directement dans l'application.",
+      how_title: 'Comment ça marche',
+      step_signup_title: 'Inscrivez-vous',
+      step_signup_desc: 'Créez votre compte gratuit en quelques clics.',
+      step_connect_title: 'Connectez-vous',
+      step_connect_desc: 'Trouvez des parties, rejoignez des équipes et faites de nouveaux amis.',
+      step_play_title: 'Jouez !',
+      step_play_desc: "Participez à des parties, affrontez d'autres joueurs et amusez-vous !",
+      testimonials_title: 'Ce que disent nos utilisateurs',
+      testimonial_alex:
+        "Cette plateforme m'a permis de trouver facilement des parties et de nouveaux amis ! Je recommande.",
+      testimonial_samira:
+        "J'adore la communauté et l'expérience fluide. Organiser des parties n'a jamais été aussi simple !",
+      testimonial_jordan:
+        "Le chat en temps réel et les notifications me gardent connecté. C'est mon application sportive préférée !",
+      cta_title: 'Prêt à commencer ?',
+      faq_title: 'Questions Fréquemment Posées',
+      faq_subtitle:
+        "Tout ce que vous devez savoir sur Let's Play. Vous ne trouvez pas ce que vous cherchez ? Contactez notre équipe de support !",
+      faq_contact_support: 'Contacter le Support',
+      faq_still_have_questions: 'Vous avez encore des questions ?',
+      faq_support_description:
+        "Notre équipe de support est là pour vous aider à tirer le meilleur parti de Let's Play. Nous sommes disponibles 24h/24 et 7j/7 pour répondre à toutes vos questions.",
+    },
   },
   ar: {
     app: {
@@ -808,6 +887,43 @@ export const dict = {
     onboarding: {
       welcome: 'Welcome',
       complete_profile: 'Complete Profile',
+    },
+    landing: {
+      hero_title: 'Connect. Play. Repeat.',
+      hero_subtitle:
+        'The ultimate platform to find, join, and organize games with friends and new players.',
+      cta: 'Get Started',
+      features_title: 'Why Choose Us?',
+      feature_fast_title: 'Fast & Easy',
+      feature_fast_desc: 'Find and join games in seconds with our intuitive interface.',
+      feature_community_title: 'Vibrant Community',
+      feature_community_desc: 'Connect with players nearby and build lasting friendships.',
+      feature_secure_title: 'Secure & Private',
+      feature_secure_desc: 'Your data and privacy are protected with industry best practices.',
+      feature_chat_title: 'Real-time Chat',
+      feature_chat_desc: 'Chat with friends and teammates instantly, right in the app.',
+      how_title: 'How It Works',
+      step_signup_title: 'Sign Up',
+      step_signup_desc: 'Create your free account in just a few clicks.',
+      step_connect_title: 'Connect',
+      step_connect_desc: 'Find games, join teams, and make new friends.',
+      step_play_title: 'Play!',
+      step_play_desc: 'Join games, compete, and have fun!',
+      testimonials_title: 'What Our Users Say',
+      testimonial_alex:
+        'This platform made it so easy to find games and meet new friends! Highly recommended.',
+      testimonial_samira:
+        'I love the community and the seamless experience. Organizing games has never been easier!',
+      testimonial_jordan:
+        "The real-time chat and notifications keep me connected. It's my go-to for sports!",
+      cta_title: 'Ready to get started?',
+      faq_title: 'Frequently Asked Questions',
+      faq_subtitle:
+        "Everything you need to know about Let's Play. Can't find what you're looking for? Contact our support team!",
+      faq_contact_support: 'Contact Support',
+      faq_still_have_questions: 'Still have questions?',
+      faq_support_description:
+        "Our support team is here to help you get the most out of Let's Play. We're available 24/7 to answer any questions you might have.",
     },
   },
 } as const;

@@ -77,8 +77,12 @@ const SideBar: React.FC<NavigationBarProps> = ({}) => {
 
   useEffect(() => {
     if (pathname) {
-      const path = pathname.split('/')[1] || 'home';
-      setActiveItem(path);
+      const segments = pathname.split('/');
+      if (segments[1] === 'dashboard') {
+        setActiveItem(segments[2] || 'home');
+      } else {
+        setActiveItem('home');
+      }
     }
   }, [pathname]);
 
@@ -110,7 +114,7 @@ const SideBar: React.FC<NavigationBarProps> = ({}) => {
   const menuItems: MenuItem[] = [
     {
       id: 'home',
-      link: '/',
+      link: 'dashboard',
       title: text.menu.sidebar.home,
       icon: <Home />,
       color: 'text-light-primary dark:text-dark-primary',
@@ -118,7 +122,7 @@ const SideBar: React.FC<NavigationBarProps> = ({}) => {
     },
     {
       id: 'explore',
-      link: 'explore',
+      link: 'dashboard/explore',
       title: text.menu.sidebar.explore,
       icon: <MapPin />,
       badge: badges.explore > 0 ? badges.explore : undefined,
@@ -127,7 +131,7 @@ const SideBar: React.FC<NavigationBarProps> = ({}) => {
     },
     {
       id: 'games',
-      link: 'games',
+      link: 'dashboard/games',
       title: text.menu.sidebar.my_games,
       icon: <Calendar />,
       badge: badges.games > 0 ? badges.games : undefined,
@@ -136,7 +140,7 @@ const SideBar: React.FC<NavigationBarProps> = ({}) => {
     },
     {
       id: 'create',
-      link: 'create',
+      link: 'dashboard/create',
       title: text.menu.sidebar.create,
       icon: <Plus />,
       color: 'text-light-primary dark:text-dark-primary',
@@ -144,7 +148,7 @@ const SideBar: React.FC<NavigationBarProps> = ({}) => {
     },
     {
       id: 'friends',
-      link: 'friends',
+      link: 'dashboard/friends',
       title: text.menu.sidebar.friends,
       icon: <Users />,
       badge: badges.friends > 0 ? badges.friends : undefined,
@@ -153,7 +157,7 @@ const SideBar: React.FC<NavigationBarProps> = ({}) => {
     },
     {
       id: 'chat',
-      link: 'chat',
+      link: 'dashboard/chat',
       title: text.menu.sidebar.messages,
       icon: <MessageCircle />,
       badge: badges.chat > 0 ? badges.chat : undefined,

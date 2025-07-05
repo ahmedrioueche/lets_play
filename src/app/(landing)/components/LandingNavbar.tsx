@@ -1,5 +1,4 @@
 import useTranslator from '@/hooks/useTranslator';
-import { motion } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -21,12 +20,7 @@ const LandingNavbar = () => {
   ];
 
   return (
-    <motion.nav
-      initial={{ y: -60, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.7 }}
-      className='fixed top-0 left-0 w-full z-50 bg-white/60 dark:bg-gray-900/60 backdrop-blur-lg shadow-lg border-b border-blue-100 dark:border-blue-900'
-    >
+    <nav className='fixed top-0 left-0 w-full z-50 bg-white/60 dark:bg-gray-900/60 backdrop-blur-lg shadow-lg border-b border-blue-100 dark:border-blue-900 animate-fade-in-down'>
       <div className='max-w-7xl mx-auto flex items-center justify-between px-2 py-4'>
         <div onClick={() => router.push('/')} className='flex items-center gap-3 cursor-pointer'>
           <Image src='/images/logo.svg' alt='Logo' width={40} height={40} className='h-10 w-auto' />
@@ -36,13 +30,12 @@ const LandingNavbar = () => {
         </div>
         <div className='hidden lg:flex items-center gap-8'>
           {navLinks.map((link) => (
-            <motion.a
+            <a
               key={link.id}
               href={link.href}
-              className='relative text-lg font-medium text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors focus:outline-none'
+              className='relative text-lg font-medium text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200 hover:scale-105 focus:outline-none'
               tabIndex={0}
               aria-label={link.label}
-              whileHover={{ scale: 1.08 }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   window.location.assign(link.href);
@@ -50,7 +43,7 @@ const LandingNavbar = () => {
               }}
             >
               {link.label}
-            </motion.a>
+            </a>
           ))}
         </div>
         <div className='hidden lg:flex items-center gap-4'>
@@ -77,12 +70,7 @@ const LandingNavbar = () => {
       </div>
       {/* Mobile Menu */}
       {open && (
-        <motion.div
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: -20, opacity: 0 }}
-          className='lg:hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg shadow-lg border-t border-blue-100 dark:border-blue-900 px-6 py-4 flex flex-col gap-4 animate-fade-in-down'
-        >
+        <div className='lg:hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg shadow-lg border-t border-blue-100 dark:border-blue-900 px-6 py-4 flex flex-col gap-4 animate-fade-in-down'>
           {navLinks.map((link) => (
             <a
               key={link.id}
@@ -114,9 +102,26 @@ const LandingNavbar = () => {
           >
             {t.landing?.navbar_login}
           </Link>
-        </motion.div>
+        </div>
       )}
-    </motion.nav>
+
+      <style jsx>{`
+        @keyframes fadeInDown {
+          from {
+            opacity: 0;
+            transform: translateY(-60px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .animate-fade-in-down {
+          animation: fadeInDown 0.7s ease-out;
+        }
+      `}</style>
+    </nav>
   );
 };
 

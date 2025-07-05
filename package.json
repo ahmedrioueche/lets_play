@@ -27,7 +27,7 @@
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "dotenv": "^16.4.7",
-    "framer-motion": "^12.18.1",
+    "framer-motion": "^12.23.0",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.468.0",
     "mongodb": "^6.17.0",

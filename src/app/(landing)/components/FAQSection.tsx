@@ -1,5 +1,4 @@
 import useTranslator from '@/hooks/useTranslator';
-import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, HelpCircle, MapPin, Shield, Users, Zap } from 'lucide-react';
 import { useState } from 'react';
 import ContactSupportModal from './ContactSupportModal';
@@ -78,77 +77,37 @@ const FAQSection = () => {
     <>
       <section id='faq' className='relative py-32 px-4 overflow-hidden'>
         {/* Animated Background */}
-        <motion.div
-          className='absolute inset-0 opacity-20'
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 0.2 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1 }}
-        >
-          <motion.div
-            className='absolute -top-16 left-1/4 w-40 h-40 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur-2xl'
-            animate={{
-              scale: [1, 1.3, 1],
-              rotate: [0, 180, 360],
-            }}
-            transition={{ repeat: Infinity, duration: 20 }}
+        <div className='absolute inset-0 opacity-20 animate-fade-in'>
+          <div className='absolute -top-16 left-1/4 w-40 h-40 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur-2xl animate-pulse' />
+          <div
+            className='absolute -bottom-20 right-10 w-56 h-56 bg-gradient-to-r from-blue-400 to-green-400 rounded-full blur-2xl animate-pulse'
+            style={{ animationDelay: '1s' }}
           />
-          <motion.div
-            className='absolute -bottom-20 right-10 w-56 h-56 bg-gradient-to-r from-blue-400 to-green-400 rounded-full blur-2xl'
-            animate={{
-              scale: [1.3, 1, 1.3],
-              rotate: [360, 180, 0],
-            }}
-            transition={{ repeat: Infinity, duration: 25 }}
+          <div
+            className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full blur-3xl opacity-30 animate-pulse'
+            style={{ animationDelay: '2s' }}
           />
-          <motion.div
-            className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full blur-3xl opacity-30'
-            animate={{
-              scale: [1, 1.5, 1],
-            }}
-            transition={{ repeat: Infinity, duration: 30 }}
-          />
-        </motion.div>
+        </div>
 
         {/* Floating Particles */}
-        <motion.div
-          className='absolute inset-0 pointer-events-none'
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1 }}
-        >
+        <div className='absolute inset-0 pointer-events-none animate-fade-in'>
           {[...Array(25)].map((_, i) => (
-            <motion.div
+            <div
               key={i}
-              className='absolute w-2 h-2 bg-white/20 rounded-full'
+              className='absolute w-2 h-2 bg-white/20 rounded-full animate-float'
               style={{
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
-              }}
-              animate={{
-                y: [0, -25, 0],
-                x: [0, Math.random() * 15 - 7.5, 0],
-                opacity: [0.2, 0.6, 0.2],
-              }}
-              transition={{
-                duration: 3 + Math.random() * 2,
-                repeat: Infinity,
-                delay: Math.random() * 2,
+                animationDelay: `${Math.random() * 2}s`,
+                animationDuration: `${3 + Math.random() * 2}s`,
               }}
             />
           ))}
-        </motion.div>
+        </div>
 
         <div className='max-w-6xl mx-auto relative z-10'>
           {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className='text-center mb-16'
-          >
+          <div className='text-center mb-16 animate-fade-in-up'>
             <h2 className='text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent'>
               {t.landing?.faq_title || 'Frequently Asked Questions'}
             </h2>
@@ -156,27 +115,23 @@ const FAQSection = () => {
               {t.landing?.faq_subtitle ||
                 "Everything you need to know about Let's Play. Can't find what you're looking for? Contact our support team!"}
             </p>
-          </motion.div>
+          </div>
 
           {/* FAQ Grid */}
           <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
             {faqs.map((faq, index) => {
               const Icon = faq.icon;
               return (
-                <motion.div
+                <div
                   key={faq.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1, duration: 0.6 }}
-                  className='relative group'
+                  className='relative group animate-fade-in-up'
+                  style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   {/* FAQ Card */}
-                  <motion.div
-                    className={`relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/50 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer overflow-hidden ${
+                  <div
+                    className={`relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/50 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer overflow-hidden hover:-translate-y-1 ${
                       openId === faq.id ? 'ring-2 ring-purple-400/50' : ''
                     }`}
-                    whileHover={{ y: -5 }}
                     onClick={() => toggleFAQ(faq.id)}
                   >
                     {/* Glowing Background */}
@@ -197,17 +152,13 @@ const FAQSection = () => {
                     <div className='p-6'>
                       <div className='flex items-start gap-4'>
                         {/* Icon */}
-                        <motion.div
-                          className={`w-12 h-12 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center shadow-lg ${
-                            openId === faq.id ? 'scale-110' : ''
+                        <div
+                          className={`w-12 h-12 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center shadow-lg transition-all duration-500 ${
+                            openId === faq.id ? 'scale-110 rotate-360' : ''
                           }`}
-                          animate={{
-                            rotate: openId === faq.id ? 360 : 0,
-                          }}
-                          transition={{ duration: 0.5 }}
                         >
                           <Icon className='w-6 h-6 text-white' />
-                        </motion.div>
+                        </div>
 
                         {/* Question and Answer */}
                         <div className='flex-1'>
@@ -215,80 +166,46 @@ const FAQSection = () => {
                             {faq.question}
                           </h3>
 
-                          <AnimatePresence>
-                            {openId === faq.id && (
-                              <motion.div
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: 'auto' }}
-                                exit={{ opacity: 0, height: 0 }}
-                                transition={{ duration: 0.3 }}
-                                className='overflow-hidden'
-                              >
-                                <p className='text-gray-600 dark:text-gray-300 leading-relaxed'>
-                                  {faq.answer}
-                                </p>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
+                          <div
+                            className={`overflow-hidden transition-all duration-300 ${openId === faq.id ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
+                          >
+                            <p className='text-gray-600 dark:text-gray-300 leading-relaxed'>
+                              {faq.answer}
+                            </p>
+                          </div>
                         </div>
 
                         {/* Chevron Icon */}
-                        <motion.div
-                          className={`w-6 h-6 text-gray-400 transition-colors duration-300 ${
-                            openId === faq.id ? 'text-purple-500' : ''
+                        <div
+                          className={`w-6 h-6 text-gray-400 transition-all duration-300 ${
+                            openId === faq.id ? 'text-purple-500 rotate-180' : ''
                           }`}
-                          animate={{
-                            rotate: openId === faq.id ? 180 : 0,
-                          }}
-                          transition={{ duration: 0.3 }}
                         >
                           <ChevronDown className='w-full h-full' />
-                        </motion.div>
+                        </div>
                       </div>
                     </div>
 
                     {/* Hover Effect Overlay */}
                     <div className='absolute inset-0 rounded-2xl bg-gradient-to-br from-white/0 to-white/5 dark:from-gray-800/0 dark:to-gray-800/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500' />
-                  </motion.div>
+                  </div>
 
                   {/* Floating Elements */}
-                  <motion.div
-                    className='absolute -top-2 -left-2 w-4 h-4 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full opacity-30'
-                    animate={{
-                      y: [0, -8, 0],
-                      scale: [1, 1.2, 1],
-                    }}
-                    transition={{
-                      repeat: Infinity,
-                      duration: 3,
-                      delay: index * 0.2,
-                    }}
+                  <div
+                    className='absolute -top-2 -left-2 w-4 h-4 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full opacity-30 animate-float'
+                    style={{ animationDelay: `${index * 0.2}s` }}
                   />
-                  <motion.div
-                    className='absolute -bottom-2 -right-2 w-3 h-3 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-30'
-                    animate={{
-                      y: [0, 8, 0],
-                      scale: [1, 0.8, 1],
-                    }}
-                    transition={{
-                      repeat: Infinity,
-                      duration: 4,
-                      delay: index * 0.2 + 0.5,
-                    }}
+                  <div
+                    className='absolute -bottom-2 -right-2 w-3 h-3 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-30 animate-float-reverse'
+                    style={{ animationDelay: `${index * 0.2 + 0.5}s` }}
                   />
-                </motion.div>
+                </div>
               );
             })}
           </div>
 
           {/* Bottom CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.8, duration: 0.8 }}
-            className='text-center mt-16'
-          >
+          <div className='text-center mt-16 animate-fade-in-up delay-800'>
             <div className='bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20'>
               <HelpCircle className='w-16 h-16 text-purple-500 mx-auto mb-4' />
               <h3 className='text-2xl font-bold text-gray-800 dark:text-white mb-4'>
@@ -298,17 +215,15 @@ const FAQSection = () => {
                 {t.landing?.faq_support_description ||
                   "Our support team is here to help you get the most out of Let's Play. We're available 24/7 to answer any questions you might have."}
               </p>
-              <motion.button
+              <button
                 onClick={handleContactSupport}
-                className='inline-flex items-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold shadow-xl cursor-pointer'
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                className='inline-flex items-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold shadow-xl cursor-pointer transition-all duration-300 hover:scale-105 active:scale-95'
               >
                 <HelpCircle className='w-5 h-5' />
                 {t.landing?.faq_contact_support || 'Contact Support'}
-              </motion.button>
+              </button>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -317,6 +232,76 @@ const FAQSection = () => {
         isOpen={isContactModalOpen}
         onClose={() => setIsContactModalOpen(false)}
       />
+
+      <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(50px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes float {
+          0%,
+          100% {
+            transform: translateY(0);
+            opacity: 0.3;
+          }
+          50% {
+            transform: translateY(-8px);
+            opacity: 0.6;
+          }
+        }
+
+        @keyframes floatReverse {
+          0%,
+          100% {
+            transform: translateY(0);
+            opacity: 0.3;
+          }
+          50% {
+            transform: translateY(8px);
+            opacity: 0.6;
+          }
+        }
+
+        .animate-fade-in {
+          animation: fadeIn 1s ease-out;
+        }
+
+        .animate-fade-in-up {
+          animation: fadeInUp 0.8s ease-out;
+        }
+
+        .animate-float {
+          animation: float 3s ease-in-out infinite;
+        }
+
+        .animate-float-reverse {
+          animation: floatReverse 4s ease-in-out infinite;
+        }
+
+        .rotate-360 {
+          transform: rotate(360deg);
+        }
+
+        .delay-800 {
+          animation-delay: 0.8s;
+        }
+      `}</style>
     </>
   );
 };

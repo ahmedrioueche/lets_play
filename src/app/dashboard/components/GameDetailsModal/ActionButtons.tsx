@@ -40,7 +40,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
             {t.game_details.you_are_organizer}
           </div>
           <button
-            onClick={() => router.push(`/games/${game._id}/audit`)}
+            onClick={() => router.push(`/dashboard/games/${game._id}/audit`)}
             className='w-full bg-blue-500 hover:bg-blue-600 text-white rounded-xl py-3 font-medium transition-colors'
           >
             {t.game_details.manage_game}
@@ -90,7 +90,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
             {t.game_details.you_are_organizer}
           </div>
           <button
-            onClick={() => router.push(`/games/${game._id}/audit`)}
+            onClick={() => router.push(`/dashboard/games/${game._id}/audit`)}
             className='w-full bg-blue-500 hover:bg-blue-600 text-white rounded-xl py-3 font-medium transition-colors'
           >
             {t.game_details.manage_game}

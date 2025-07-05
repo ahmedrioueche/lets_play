@@ -67,7 +67,7 @@ const RegisterGamePage = () => {
         data = await res.json();
         if (!res.ok) throw new Error(data.message || 'Request failed');
         toast.success('Join request sent!');
-        router.push(`/games`);
+        router.push(`/dashboard/games`);
       } else {
         res = await fetch(`/api/games/${id}`, {
           method: 'POST',
@@ -77,7 +77,7 @@ const RegisterGamePage = () => {
         data = await res.json();
         if (!res.ok) throw new Error(data.message || 'Registration failed');
         toast.success('Registered successfully!');
-        router.push(`/games`);
+        router.push(`/dashboard/games`);
       }
     } catch (err: any) {
       toast.error(err.message || 'Registration failed');

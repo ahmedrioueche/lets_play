@@ -318,7 +318,7 @@ const AuditGamePage = () => {
             >
               <div
                 className='flex items-center gap-3 flex-1 min-w-0 cursor-pointer'
-                onClick={() => router.push(`/profile/${p._id}`)}
+                onClick={() => router.push(`/dashboard/profile/${p._id}`)}
                 tabIndex={0}
                 aria-label={`Go to profile of ${p.name}`}
               >
@@ -377,7 +377,7 @@ const AuditGamePage = () => {
               >
                 <div
                   className='flex items-center gap-3 flex-1 min-w-0 cursor-pointer'
-                  onClick={() => router.push(`/profile/${u._id}`)}
+                  onClick={() => router.push(`/dashboard/profile/${u._id}`)}
                   tabIndex={0}
                   aria-label={`Go to profile of ${u.name}`}
                 >

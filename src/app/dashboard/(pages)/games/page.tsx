@@ -51,12 +51,6 @@ export default function MyGamesPage() {
     setModalOpen(true);
   };
 
-  const handleRegister = async (gameId: string, user: User) => Promise.resolve();
-
-  const handleCancelRegistrationWrapper = async (gameId: string, userId: string) => {
-    handleCancelRegistration();
-  };
-
   // Refetch games after registration/cancellation
   const handleGameChange = async () => {
     await refetchGames();

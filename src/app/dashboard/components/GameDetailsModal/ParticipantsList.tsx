@@ -15,7 +15,7 @@ const ParticipantsList: React.FC<ParticipantsListProps> = ({ participants, organ
     <ul className='space-y-3'>
       {participants.map((participant) => (
         <li
-          onClick={() => router.push(`/profile/${participant._id}`)}
+          onClick={() => router.push(`/dashboard/profile/${participant._id}`)}
           key={participant._id}
           className='flex items-center gap-4 cursor-pointer'
         >

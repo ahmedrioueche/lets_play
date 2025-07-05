@@ -79,7 +79,7 @@ const GameDetailsPage = () => {
           (typeof game.organizer === 'object' ? game.organizer._id : game.organizer) ===
             user._id && (
             <button
-              onClick={() => router.push(`/games/${game.id || game._id}/audit`)}
+              onClick={() => router.push(`/dashboard/games/${game.id || game._id}/audit`)}
               className='flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl px-4 py-2 font-medium transition-colors'
               title='Manage Game'
             >
@@ -143,7 +143,7 @@ const GameDetailsPage = () => {
           hasJoinRequest={
             !!(user && Array.isArray(game.joinRequests) && game.joinRequests.includes(user._id))
           }
-          onRegister={() => router.push(`/games/${game._id}/register`)}
+          onRegister={() => router.push(`/dashboard/games/${game._id}/register`)}
           onCancelRegistration={() => {}}
         />
       </div>

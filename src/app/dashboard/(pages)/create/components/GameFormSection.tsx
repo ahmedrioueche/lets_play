@@ -40,7 +40,7 @@ export const GameFormSection = ({
           <CustomSelect
             title={t.create.sport_type}
             options={availableGames.map((game) => ({
-              value: game,
+              value: game.name,
               label: game.name.charAt(0).toUpperCase() + game.name.slice(1),
             }))}
             selectedOption={formData.sport}

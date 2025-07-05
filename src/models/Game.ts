@@ -1,3 +1,4 @@
+import { availableGames } from '@/constants/game';
 import { Game } from '@/types/game';
 import mongoose, { Document, Schema } from 'mongoose';
 
@@ -24,7 +25,7 @@ const GameSchema: Schema = new Schema(
     },
     sport: {
       type: String,
-      enum: Object.values(['football', 'basketball', 'tennis', 'volleyball', 'badminton']),
+      enum: availableGames.map((game) => game.name),
       required: true,
     },
     skillLevel: {

@@ -1,3 +1,4 @@
+import useTranslator from '@/hooks/useTranslator';
 import { Game } from '@/types/game';
 import { User } from '@/types/user';
 import { useEffect, useState } from 'react';
@@ -29,6 +30,7 @@ const GameDetailsView: React.FC<GameDetailsViewProps> = ({
   onCancelRegistration,
   onCancelGame,
 }) => {
+  const t = useTranslator();
   const [organizer, setOrganizer] = useState<User | null>(null);
   const [participants, setParticipants] = useState(game.participants || []);
 
@@ -63,7 +65,7 @@ const GameDetailsView: React.FC<GameDetailsViewProps> = ({
         {game.description && (
           <div>
             <h3 className='text-lg font-semibold text-light-text-primary dark:text-dark-text-primary mb-2'>
-              About
+              {t.game_details.about}
             </h3>
             <p className='text-light-text-secondary dark:text-dark-text-secondary leading-relaxed'>
               {game.description}
@@ -76,7 +78,7 @@ const GameDetailsView: React.FC<GameDetailsViewProps> = ({
         {/* Participants List */}
         <div>
           <h3 className='text-lg font-semibold text-light-text-primary dark:text-dark-text-primary mb-2'>
-            Participants
+            {t.game_details.participants}
           </h3>
           {organizer && (
             <ParticipantsList

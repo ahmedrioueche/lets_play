@@ -5,7 +5,6 @@ import { Game } from '@/types/game';
 import { User } from '@/types/user';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
-import toast from 'react-hot-toast';
 import GameDetailsView from './GameDetailsView';
 import RegisterView from './RegisterView';
 
@@ -29,7 +28,6 @@ const GameDetailsModal: React.FC<GameDetailsModalProps> = ({
   onClose,
   mode,
   isRegistered,
-  hasJoinRequest = false,
   onRegister,
   onCancelRegistration,
   onCancelGame,
@@ -37,7 +35,6 @@ const GameDetailsModal: React.FC<GameDetailsModalProps> = ({
   const [currentView, setCurrentView] = useState<ModalView>('details');
   const modalRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
-  const text = useTranslator();
 
   // Determine if the user has already sent a join request
   const hasJoinRequestState = !!(
@@ -66,30 +63,6 @@ const GameDetailsModal: React.FC<GameDetailsModalProps> = ({
 
   const handleBackToDetails = () => {
     setCurrentView('details');
-  };
-
-  const handleJoinRequest = async (reason?: string) => {
-    if (!user) {
-      toast.error('You must be logged in to request to join a game');
-      return;
-    }
-
-    try {
-      const res = await fetch(`/api/games/${game?._id}/join-request`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user._id, reason }),
-      });
-
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || 'Failed to send join request');
-      }
-
-      toast.success(text.game.join_request_sent);
-    } catch (error: any) {
-      toast.error(error.message || text.game.join_request_failed);
-    }
   };
 
   return (

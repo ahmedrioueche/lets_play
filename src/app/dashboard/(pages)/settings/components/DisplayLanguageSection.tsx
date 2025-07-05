@@ -33,8 +33,10 @@ const DisplayLanguageSection: React.FC<DisplayLanguageSectionProps> = ({
           onChange={onLanguageChange}
           options={[
             { value: 'en', label: 'English' },
-            { value: 'ar', label: 'العربية' },
             { value: 'fr', label: 'Français' },
+            { value: 'es', label: 'Espagnol' },
+            { value: 'de', label: 'German' },
+            { value: 'it', label: 'Italian' },
           ]}
           className='w-full'
         />

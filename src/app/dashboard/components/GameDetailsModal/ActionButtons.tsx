@@ -24,7 +24,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
 }) => {
   const { user } = useAuth();
   const router = useRouter();
-  const text = useTranslator();
+  const t = useTranslator();
 
   // Support both string and User object for user
   const userId = typeof user === 'string' ? user : user?._id;
@@ -37,20 +37,20 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
       return (
         <div className='pt-4 space-y-3'>
           <div className='text-center py-2 text-light-text-secondary dark:text-dark-text-secondary'>
-            You're the organizer of this game.
+            {t.game_details.you_are_organizer}
           </div>
           <button
             onClick={() => router.push(`/games/${game._id}/audit`)}
             className='w-full bg-blue-500 hover:bg-blue-600 text-white rounded-xl py-3 font-medium transition-colors'
           >
-            Manage Game
+            {t.game_details.manage_game}
           </button>
           {onCancelGame && (
             <button
               onClick={onCancelGame}
               className='w-full bg-red-500 hover:bg-red-600 text-white rounded-xl py-3 font-medium transition-colors'
             >
-              Cancel Game
+              {t.game_details.cancel_game}
             </button>
           )}
         </div>
@@ -60,7 +60,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
       return (
         <div className='pt-4 space-y-3'>
           <div className='text-center py-2 text-light-text-secondary dark:text-dark-text-secondary'>
-            You're registered for this game.
+            {t.game_details.you_are_registered}
           </div>
           {onCancelRegistration && (
             <button
@@ -75,7 +75,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
               }}
               className='w-full bg-red-500 hover:bg-red-600 text-white rounded-xl py-3 font-medium transition-colors'
             >
-              Cancel Registration
+              {t.game_details.cancel_registration}
             </button>
           )}
         </div>
@@ -87,13 +87,13 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
       return (
         <div className='pt-4 space-y-3'>
           <div className='text-center py-2 text-light-text-secondary dark:text-dark-text-secondary'>
-            You're the organizer of this game.
+            {t.game_details.you_are_organizer}
           </div>
           <button
             onClick={() => router.push(`/games/${game._id}/audit`)}
             className='w-full bg-blue-500 hover:bg-blue-600 text-white rounded-xl py-3 font-medium transition-colors'
           >
-            Manage Game
+            {t.game_details.manage_game}
           </button>
         </div>
       );
@@ -113,7 +113,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
               }}
               className='w-full bg-red-500 hover:bg-red-600 text-white rounded-xl py-3 font-medium transition-colors'
             >
-              Cancel Registration
+              {t.game_details.cancel_registration}
             </button>
           )}
         </div>
@@ -124,14 +124,14 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
           {/* Join Permission Notice */}
           {game.joinPermission && (
             <div className='text-center py-2 text-light-text-secondary dark:text-dark-text-secondary text-sm'>
-              {text.game.join_permission_required}
+              {t.game.join_permission_required}
             </div>
           )}
 
           {/* Join Request Status */}
           {hasJoinRequest && (
             <div className='text-center py-2 text-blue-600 dark:text-blue-400 text-sm'>
-              {text.game.join_request_pending}
+              {t.game.join_request_pending}
             </div>
           )}
 
@@ -163,7 +163,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
               }}
               className='w-full bg-red-500 hover:bg-red-600 text-white rounded-xl py-3 font-medium transition-colors'
             >
-              {text.game.cancel_join_request || 'Cancel Request'}
+              {t.game.cancel_join_request || 'Cancel Request'}
             </button>
           ) : (
             <button
@@ -172,10 +172,10 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
               className='w-full bg-light-primary dark:bg-dark-primary hover:opacity-90 text-white rounded-xl py-3 font-medium transition-opacity disabled:opacity-50'
             >
               {game.participants.length >= game.maxParticipants
-                ? 'Game Full'
+                ? t.game_details.game_full
                 : game.joinPermission
-                  ? text.game.join_request
-                  : text.game.join}
+                  ? t.game.join_request
+                  : t.game.join}
             </button>
           )}
         </div>

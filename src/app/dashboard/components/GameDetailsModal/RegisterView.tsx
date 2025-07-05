@@ -19,7 +19,7 @@ const RegisterView: React.FC<RegisterViewProps> = ({ game, onBack, onClose, onRe
   const [isLoading, setIsLoading] = useState(false);
   const [alreadyRegistered, setAlreadyRegistered] = useState(false);
   const { user } = useAuth();
-  const text = useTranslator();
+  const t = useTranslator();
 
   useEffect(() => {
     if (user && game.participants && Array.isArray(game.participants)) {
@@ -32,7 +32,7 @@ const RegisterView: React.FC<RegisterViewProps> = ({ game, onBack, onClose, onRe
   const handleRegister = async () => {
     if (!onRegister) return;
     if (alreadyRegistered) {
-      toast.error('You are already registered for this game.');
+      toast.error(t.game_details.already_registered_error);
       return;
     }
 
@@ -47,7 +47,7 @@ const RegisterView: React.FC<RegisterViewProps> = ({ game, onBack, onClose, onRe
       onClose();
     } catch (error) {
       console.error('Failed to register:', error);
-      toast.error(text.messages.error.game_registration);
+      toast.error(t.messages.error.game_registration);
     } finally {
       setIsLoading(false);
     }
@@ -60,7 +60,7 @@ const RegisterView: React.FC<RegisterViewProps> = ({ game, onBack, onClose, onRe
         onClose={onClose}
         showBackButton
         onBack={onBack}
-        title='Register for Game'
+        title={t.game_details.register_for_game}
       />
 
       <div className='p-6 space-y-6'>
@@ -78,7 +78,7 @@ const RegisterView: React.FC<RegisterViewProps> = ({ game, onBack, onClose, onRe
         {/* User Info Summary */}
         <div className='p-4 bg-light-hover/50 dark:bg-dark-hover/50 rounded-xl'>
           <h3 className='font-medium text-light-text-primary dark:text-dark-text-primary mb-3'>
-            Your Information
+            {t.game_details.your_information}
           </h3>
           <div className='space-y-3'>
             <div className='flex items-center gap-3'>
@@ -101,7 +101,9 @@ const RegisterView: React.FC<RegisterViewProps> = ({ game, onBack, onClose, onRe
             {user?.phone && (
               <div className='grid grid-cols-2 gap-3 text-sm'>
                 <div>
-                  <p className='text-light-text-secondary dark:text-dark-text-secondary'>Phone</p>
+                  <p className='text-light-text-secondary dark:text-dark-text-secondary'>
+                    {t.game_details.phone}
+                  </p>
                   <p className='text-light-text-primary dark:text-dark-text-primary'>
                     {user?.phone}
                   </p>
@@ -116,10 +118,10 @@ const RegisterView: React.FC<RegisterViewProps> = ({ game, onBack, onClose, onRe
             <AlertTriangle className='w-5 h-5 mt-0.5 flex-shrink-0 text-light-danger dark:text-dark-danger' />
             <div>
               <h4 className='font-medium text-light-danger dark:text-dark-danger mb-1'>
-                Registration Commitment
+                {t.game_details.registration_commitment}
               </h4>
               <p className='text-sm text-light-danger dark:text-dark-danger/90'>
-                {text.messages.warning.game_registration}
+                {t.messages.warning.game_registration}
               </p>
             </div>
           </div>
@@ -130,7 +132,7 @@ const RegisterView: React.FC<RegisterViewProps> = ({ game, onBack, onClose, onRe
           {/* Join Permission Notice */}
           {game.joinPermission && (
             <div className='text-center mb-2 text-light-text-secondary dark:text-dark-text-secondary text-sm'>
-              {text.game.join_permission_required}
+              {t.game.join_permission_required}
             </div>
           )}
 
@@ -140,14 +142,14 @@ const RegisterView: React.FC<RegisterViewProps> = ({ game, onBack, onClose, onRe
             className='w-full bg-light-primary dark:bg-dark-primary hover:opacity-90 text-white rounded-xl py-3 font-medium transition-opacity disabled:opacity-50'
           >
             {alreadyRegistered
-              ? 'Already Registered'
+              ? t.game_details.already_registered
               : isLoading
-                ? `${game.joinPermission ? 'Loading...' : 'Joining...'}`
-                : `Confirm ${game.joinPermission ? 'Request' : 'Join'} `}
+                ? `${game.joinPermission ? t.game_details.loading : t.game_details.joining}`
+                : `${t.game_details.confirm} ${game.joinPermission ? t.game_details.request : t.game_details.join}`}
           </button>
           {alreadyRegistered && (
             <div className='text-center text-green-600 dark:text-green-400 mt-2'>
-              You are already registered for this game.
+              {t.game_details.already_registered_message}
             </div>
           )}
         </div>

@@ -1,3 +1,5 @@
+import { availableGames } from '@/constants/game';
+import useTranslator from '@/hooks/useTranslator';
 import { FilterOptions, SkillLevel, SportType } from '@/types/game';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
@@ -11,6 +13,8 @@ interface FilterModalProps {
 }
 
 const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, filters, onFilterChange }) => {
+  const t = useTranslator();
+
   const handleSportChange = (sport: string) => {
     onFilterChange({
       ...filters,
@@ -83,34 +87,32 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, filters, onF
                 {/* Sports */}
                 <div>
                   <h3 className='text-sm font-medium text-light-text-secondary dark:text-dark-text-secondary mb-3'>
-                    Sports
+                    {t.games}
                   </h3>
                   <div className='flex flex-wrap gap-2'>
-                    {['football', 'basketball', 'tennis', 'volleyball', 'badminton'].map(
-                      (sport) => (
-                        <button
-                          key={sport}
-                          onClick={() => handleSportChange(sport as SportType)}
-                          className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                            filters.sports.includes(sport as SportType)
-                              ? 'bg-light-primary dark:bg-dark-primary text-white'
-                              : 'bg-light-hover dark:bg-dark-hover text-light-text-primary dark:text-dark-text-primary'
-                          }`}
-                        >
-                          {sport.charAt(0).toUpperCase() + sport.slice(1)}
-                        </button>
-                      )
-                    )}
+                    {availableGames.map((sport) => (
+                      <button
+                        key={sport.name}
+                        onClick={() => handleSportChange(sport.name as SportType)}
+                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                          filters.sports.includes(sport.name as SportType)
+                            ? 'bg-light-primary dark:bg-dark-primary text-white'
+                            : 'bg-light-hover dark:bg-dark-hover text-light-text-primary dark:text-dark-text-primary'
+                        }`}
+                      >
+                        {sport.name.charAt(0).toUpperCase() + sport.name.slice(1)}
+                      </button>
+                    ))}
                   </div>
                 </div>
 
                 {/* Skill Levels */}
                 <div>
                   <h3 className='text-sm font-medium text-light-text-secondary dark:text-dark-text-secondary mb-3'>
-                    Skill Level
+                    {t.skillLevel}
                   </h3>
                   <div className='flex flex-wrap gap-2'>
-                    {['beginner', 'intermediate', 'advanced'].map((level) => (
+                    {[t.skill.beginner, t.skill.intermediate, t.skill.advanced].map((level) => (
                       <button
                         key={level}
                         onClick={() => handleSkillLevelChange(level as SkillLevel)}
@@ -129,32 +131,34 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, filters, onF
                 {/* Date */}
                 <div>
                   <h3 className='text-sm font-medium text-light-text-secondary dark:text-dark-text-secondary mb-3'>
-                    Date
+                    {t.date}
                   </h3>
                   <div className='flex flex-wrap gap-2'>
-                    {['today', 'tomorrow', 'this-week', 'this-month'].map((date) => (
-                      <button
-                        key={date}
-                        onClick={() => handleDateChange(date)}
-                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                          filters.date === date
-                            ? 'bg-light-primary dark:bg-dark-primary text-white'
-                            : 'bg-light-hover dark:bg-dark-hover text-light-text-primary dark:text-dark-text-primary'
-                        }`}
-                      >
-                        {date
-                          .split('-')
-                          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                          .join(' ')}
-                      </button>
-                    ))}
+                    {[t.time.today, t.time.tomorrow, t.time.this_week, t.time.this_month].map(
+                      (date) => (
+                        <button
+                          key={date}
+                          onClick={() => handleDateChange(date)}
+                          className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                            filters.date === date
+                              ? 'bg-light-primary dark:bg-dark-primary text-white'
+                              : 'bg-light-hover dark:bg-dark-hover text-light-text-primary dark:text-dark-text-primary'
+                          }`}
+                        >
+                          {date
+                            .split('-')
+                            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                            .join(' ')}
+                        </button>
+                      )
+                    )}
                   </div>
                 </div>
 
                 {/* Distance */}
                 <div>
                   <h3 className='text-sm font-medium text-light-text-secondary dark:text-dark-text-secondary mb-3'>
-                    Distance
+                    {t.distance}
                   </h3>
                   <div className='flex flex-wrap gap-2'>
                     {[5, 10, 25, 50, 100, 200, 300].map((distance) => (

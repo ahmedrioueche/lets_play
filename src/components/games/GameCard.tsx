@@ -1,3 +1,4 @@
+import { availableGames } from '@/constants/game';
 import { Game } from '@/types/game';
 import { capitalize } from '@/utils/helper';
 import { Calendar, Clock, MapPin, Users } from 'lucide-react';
@@ -10,21 +11,12 @@ interface GameCardProps {
   userLocation: { lat: number; lng: number } | null;
 }
 
-const availableSports = [
-  'football',
-  'american-football',
-  'basketball',
-  'tennis',
-  'volleyball',
-  'baseball',
-];
-
 const GameCard: React.FC<GameCardProps> = ({ game, onClick, userLocation }) => {
   // Check if the sport exists in our available list
-  const sportImageExists = availableSports.includes(game.sport.toLowerCase());
-  const imageSrc = sportImageExists
-    ? `/images/sports/${game.sport.toLowerCase()}.svg`
-    : '/images/fun.svg';
+  const sportData = availableGames.find((g) => g.name === game.sport.toLowerCase());
+  console.log('sportData', sportData);
+  const imageSrc = sportData?.image || '/images/fun.svg';
+  console.log('imageSrc', imageSrc);
 
   return (
     <div

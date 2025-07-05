@@ -63,7 +63,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   loadingOlderMessages = false,
   onLoadOlderMessages,
 }) => {
-  const text = useTranslator();
+  const t = useTranslator();
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -224,9 +224,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       <div className='flex flex-col items-center justify-center h-full bg-light-background dark:bg-dark-background text-light-text-secondary dark:text-dark-text-secondary'>
         <MessageCircle className='w-16 h-16 mb-4 text-light-text-muted dark:text-dark-text-muted opacity-50' />
         <h3 className='text-xl font-medium mb-2 text-light-text-primary dark:text-dark-text-primary'>
-          Select a conversation
+          {t.chat.select_conversation}
         </h3>
-        <p className='text-center max-w-md'>Choose a friend from the sidebar to start messaging</p>
+        <p className='text-center max-w-md'>{t.chat.choose_friend_to_start}</p>
       </div>
     );
   }
@@ -240,7 +240,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         >
           <div className='flex items-center gap-2'>
             <MessageCircle className='w-4 h-4' />
-            <span className='text-sm font-medium'>Chats</span>
+            <span className='text-sm font-medium'>{t.chat.chats}</span>
           </div>
         </button>
       )}
@@ -295,7 +295,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                 : 'text-light-text-muted dark:text-dark-text-muted'
             }`}
           >
-            {friend.isOnline ? 'Online' : 'Offline'}
+            {friend.isOnline ? t.chat.online : t.chat.offline}
           </div>
         </div>
         {/* Connection status indicator */}
@@ -317,7 +317,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
           >
             <MessageCircle className='w-4 h-4' />
             <span className='text-sm font-medium'>
-              {unreadMessageCount} new message{unreadMessageCount !== 1 ? 's' : ''}
+              {unreadMessageCount}{' '}
+              {unreadMessageCount === 1 ? t.chat.new_message : t.chat.new_messages}
             </span>
           </button>
         )}
@@ -334,15 +335,15 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 
         {loading ? (
           <div className='flex items-center justify-center h-full text-light-text-secondary dark:text-dark-text-secondary'>
-            Loading messages...
+            {t.chat.loading_messages}
           </div>
         ) : error ? (
           <div className='flex items-center justify-center h-full text-red-500'>
-            Failed to load messages
+            {t.chat.failed_to_load_messages}
           </div>
         ) : sortedMessages.length === 0 ? (
           <div className='flex items-center justify-center h-full text-light-text-secondary dark:text-dark-text-secondary'>
-            No messages yet
+            {t.chat.no_messages_yet}
           </div>
         ) : (
           <div className='space-y-3'>
@@ -360,7 +361,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                     <ChevronUp className='w-4 h-4' />
                   )}
                   <span className='text-sm'>
-                    {loadingOlderMessages ? 'Loading...' : 'Load Older Messages'}
+                    {loadingOlderMessages ? t.chat.loading : t.chat.load_older_messages}
                   </span>
                 </button>
               </div>
@@ -392,7 +393,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                         hour: '2-digit',
                         minute: '2-digit',
                       })}
-                      {msg.isOptimistic && ' • Sending...'}
+                      {msg.isOptimistic && ` • ${t.chat.sending}`}
                     </p>
                   </div>
 
@@ -407,7 +408,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                           className='flex items-center gap-1 text-blue-500 hover:text-blue-600 transition-colors'
                         >
                           <RefreshCw className='w-3 h-3' />
-                          Retry
+                          {t.chat.retry}
                         </button>
                       )}
                     </div>
@@ -422,7 +423,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       {/* Typing indicator */}
       {isTyping && (
         <div className='px-6 py-2 text-sm text-light-text-muted dark:text-dark-text-muted italic'>
-          {capitalize(friend.name)} is typing...
+          {capitalize(friend.name)} {t.chat.is_typing}
         </div>
       )}
 
@@ -431,7 +432,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
           <textarea
             value={inputValue}
             onChange={handleInputChange}
-            placeholder='Type a message...'
+            placeholder={t.chat.type_message}
             rows={1}
             className='w-full px-4 py-3 bg-light-background dark:bg-dark-background border border-light-border dark:border-dark-border rounded-lg text-light-text-primary dark:text-dark-text-primary placeholder:text-light-text-muted dark:placeholder:text-dark-text-muted focus:outline-none focus:ring-2 focus:ring-light-primary dark:focus:ring-dark-primary focus:border-transparent resize-none transition-all duration-200 scrollbar-hide'
             disabled={sending}

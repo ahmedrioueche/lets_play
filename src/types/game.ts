@@ -1,6 +1,39 @@
 import { User } from './user';
 
-export type SportType = 'football' | 'basketball' | 'tennis' | 'volleyball' | 'badminton';
+export type SportType =
+  | 'football'
+  | 'american-football'
+  | 'basketball'
+  | 'tennis'
+  | 'volleyball'
+  | 'beach-volleyball'
+  | 'baseball'
+  | 'cricket'
+  | 'rugby'
+  | 'handball'
+  | 'field-hockey'
+  | 'lacrosse'
+  | 'kickball'
+  | 'ultimate-frisbee'
+  | 'golf'
+  | 'frisbee-golf'
+  | 'capture-the-flag'
+  | 'paintball'
+  | 'airsoft'
+  | 'dodgeball'
+  | 'relay-race'
+  | 'tug-of-war'
+  | 'sack-race'
+  | 'egg-and-spoon-race'
+  | 'petanque'
+  | 'bocce'
+  | 'rounders'
+  | 'cornhole'
+  | 'horseshoes'
+  | 'chess'
+  | 'checkers'
+  | 'dominoes'
+  | 'cards';
 export type SkillLevel = 'beginner' | 'intermediate' | 'advanced';
 export type ViewMode = 'map' | 'grid' | 'calendar';
 export type GameStatus = 'open' | 'full' | 'cancelled' | 'completed';
@@ -66,4 +99,11 @@ export interface ExploreState {
   selectedGame: Game | null;
   filteredGames: Game[];
   games: Game[];
+}
+
+export interface IAvailableGame {
+  name: string;
+  groupSize: number;
+  type: string;
+  image: string;
 }

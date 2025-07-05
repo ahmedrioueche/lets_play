@@ -1,6 +1,7 @@
+import useTranslator from '@/hooks/useTranslator';
+import { ViewMode } from '@/types/game';
+import { Calendar, Grid, Map } from 'lucide-react';
 import React from 'react';
-import { Map, Grid, Calendar } from 'lucide-react';
-import { ViewMode } from '@/types/explore';
 
 interface ViewToggleProps {
   currentView: ViewMode;
@@ -8,14 +9,16 @@ interface ViewToggleProps {
 }
 
 const ViewToggle: React.FC<ViewToggleProps> = ({ currentView, onViewChange }) => {
+  const t = useTranslator();
+
   const views: { mode: ViewMode; icon: React.ReactNode; label: string }[] = [
-    { mode: 'map', icon: <Map className="w-5 h-5" />, label: 'Map' },
-    { mode: 'grid', icon: <Grid className="w-5 h-5" />, label: 'Grid' },
-    { mode: 'calendar', icon: <Calendar className="w-5 h-5" />, label: 'Calendar' },
+    { mode: 'map', icon: <Map className='w-5 h-5' />, label: t.map },
+    { mode: 'grid', icon: <Grid className='w-5 h-5' />, label: t.grid },
+    { mode: 'calendar', icon: <Calendar className='w-5 h-5' />, label: t.calendar },
   ];
 
   return (
-    <div className="flex items-center gap-2 bg-light-hover dark:bg-dark-hover rounded-lg p-1">
+    <div className='flex items-center gap-2 bg-light-hover dark:bg-dark-hover rounded-lg p-1'>
       {views.map(({ mode, icon, label }) => (
         <button
           key={mode}
@@ -27,11 +30,11 @@ const ViewToggle: React.FC<ViewToggleProps> = ({ currentView, onViewChange }) =>
           }`}
         >
           {icon}
-          <span className="text-sm font-medium">{label}</span>
+          <span className='text-sm font-medium'>{label}</span>
         </button>
       ))}
     </div>
   );
 };
 
-export default ViewToggle; 
+export default ViewToggle;

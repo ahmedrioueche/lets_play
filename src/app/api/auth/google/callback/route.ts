@@ -11,7 +11,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET || '';
 const BASE_URL = process.env.DOMAIN || 'http://localhost:3000';
 const REDIRECT_URI = `${BASE_URL}/api/auth/google/callback`;
 
@@ -144,7 +144,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Create response with redirect
-    const response = NextResponse.redirect(`${BASE_URL}/`);
+    const response = NextResponse.redirect(`${BASE_URL}/dashboard`);
 
     // Set HTTP-only cookie
     response.cookies.set('auth-token', token, {

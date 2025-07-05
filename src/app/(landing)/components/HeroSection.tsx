@@ -107,17 +107,17 @@ const HeroSection = () => {
             transition={{ delay: 0.2, duration: 0.8 }}
             className='space-y-4'
           >
-            <h1 className='text-5xl lg:text-7xl font-extrabold leading-tight'>
+            <h1 className='text-5xl lg:text-7xl font-extrabold leading-tight text-center md:text-left'>
               <span className='bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent'>
-                Connect.
+                {t.app.slogan.split('.')[0]}
               </span>
               <br />
               <span className='bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent'>
-                Play.
+                {t.app.slogan.split('.')[1]}
               </span>
               <br />
               <span className='bg-gradient-to-r from-pink-600 via-blue-600 to-purple-600 bg-clip-text text-transparent'>
-                Repeat.
+                {t.app.slogan.split('.')[2]}
               </span>
             </h1>
           </motion.div>
@@ -126,29 +126,28 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.8 }}
-            className='text-xl lg:text-2xl text-gray-700 dark:text-gray-200 leading-relaxed'
+            className='text-xl lg:text-2xl text-gray-700 dark:text-gray-200 leading-relaxed text-center md:text-left'
           >
-            The ultimate platform to find, join, and organize games with friends and new players
-            worldwide.
+            {t.landing?.hero_subtitle}
           </motion.p>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6, duration: 0.8 }}
-            className='flex flex-wrap gap-6 text-sm text-gray-600 dark:text-gray-300'
+            className='flex flex-wrap gap-6 text-sm text-gray-600 dark:text-gray-300 justify-center md:justify-start'
           >
             <div className='flex items-center gap-2'>
               <Users className='w-5 h-5 text-blue-500' />
-              <span>10K+ Active Players</span>
+              <span>{t.landing?.stats_active_players}</span>
             </div>
             <div className='flex items-center gap-2'>
               <MapPin className='w-5 h-5 text-purple-500' />
-              <span>500+ Cities</span>
+              <span>{t.landing?.stats_cities}</span>
             </div>
             <div className='flex items-center gap-2'>
               <Calendar className='w-5 h-5 text-pink-500' />
-              <span>Daily Games</span>
+              <span>{t.landing?.stats_daily_games}</span>
             </div>
           </motion.div>
 
@@ -161,9 +160,9 @@ const HeroSection = () => {
             <Link
               href='/auth/signup'
               className='inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-lg font-semibold shadow-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-400/50'
-              aria-label={t.landing?.cta || 'Get Started'}
+              aria-label={t.landing?.cta}
             >
-              {t.landing?.cta || 'Get Started'}
+              {t.landing?.cta}
               <Rocket className='w-6 h-6' />
             </Link>
             <Link
@@ -171,7 +170,7 @@ const HeroSection = () => {
               className='inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white text-lg font-semibold shadow-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-pink-400/50'
             >
               <ArrowRight className='w-6 h-6' />
-              Login
+              {t.landing?.login}
             </Link>
           </motion.div>
         </motion.div>
@@ -203,11 +202,11 @@ const HeroSection = () => {
               <div className='flex items-center gap-3'>
                 <div className='w-3 h-3 bg-green-500 rounded-full' />
                 <div className='text-sm font-semibold text-gray-800 dark:text-white'>
-                  Football Match
+                  {t.landing?.floating_card_football}
                 </div>
               </div>
               <div className='text-xs text-gray-600 dark:text-gray-300 mt-1'>
-                Central Park • 2 hours ago
+                {t.landing?.floating_card_location_central_park}
               </div>
             </motion.div>
 
@@ -220,11 +219,11 @@ const HeroSection = () => {
               <div className='flex items-center gap-3'>
                 <div className='w-3 h-3 bg-blue-500 rounded-full' />
                 <div className='text-sm font-semibold text-gray-800 dark:text-white'>
-                  Basketball
+                  {t.landing?.floating_card_basketball}
                 </div>
               </div>
               <div className='text-xs text-gray-600 dark:text-gray-300 mt-1'>
-                Downtown Gym • 1 hour ago
+                {t.landing?.floating_card_location_downtown_gym}
               </div>
             </motion.div>
           </div>

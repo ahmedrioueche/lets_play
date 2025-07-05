@@ -1,33 +1,38 @@
+import useTranslator from '@/hooks/useTranslator';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, CheckCircle, Play, Rocket, Star, Users } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useRef } from 'react';
 
-const steps = [
-  {
-    icon: Star,
-    title: 'Sign Up',
-    desc: 'Create your free account in seconds with just a few clicks.',
-    color: 'from-yellow-400 to-orange-500',
-    delay: 0,
-  },
-  {
-    icon: Users,
-    title: 'Connect',
-    desc: 'Find and connect with players nearby or worldwide.',
-    color: 'from-blue-400 to-purple-500',
-    delay: 0.3,
-  },
-  {
-    icon: Rocket,
-    title: 'Play',
-    desc: 'Join or organize games and start playing instantly.',
-    color: 'from-green-400 to-blue-500',
-    delay: 0.6,
-  },
-];
-
 const HowItWorksSection = () => {
+  const t = useTranslator();
+
+  const steps = [
+    {
+      icon: Star,
+      title: t.landing?.step_signup_title || 'Sign Up',
+      desc:
+        t.landing?.step_signup_desc ||
+        'Create your free account in seconds with just a few clicks.',
+      color: 'from-yellow-400 to-orange-500',
+      delay: 0,
+    },
+    {
+      icon: Users,
+      title: t.landing?.step_connect_title || 'Connect',
+      desc: t.landing?.step_connect_desc || 'Find and connect with players nearby or worldwide.',
+      color: 'from-blue-400 to-purple-500',
+      delay: 0.3,
+    },
+    {
+      icon: Rocket,
+      title: t.landing?.step_play_title || 'Play',
+      desc: t.landing?.step_play_desc || 'Join or organize games and start playing instantly.',
+      color: 'from-green-400 to-blue-500',
+      delay: 0.6,
+    },
+  ];
+
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -100,10 +105,10 @@ const HowItWorksSection = () => {
           className='text-center mb-20'
         >
           <h2 className='text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 bg-clip-text text-transparent'>
-            How It Works
+            {t.landing?.how_title}
           </h2>
           <p className='text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto'>
-            Get started in just three simple steps and join the gaming revolution
+            {t.landing?.how_subtitle}
           </p>
         </motion.div>
 
@@ -283,7 +288,7 @@ const HowItWorksSection = () => {
             whileTap={{ scale: 0.95 }}
           >
             <Play className='w-5 h-5' />
-            Start Your Journey
+            {t.landing?.start_your_journey}
           </motion.div>
         </motion.div>
       </div>

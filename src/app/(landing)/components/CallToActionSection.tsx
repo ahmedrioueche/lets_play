@@ -1,9 +1,12 @@
+import useTranslator from '@/hooks/useTranslator';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, Globe, Star, Users, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { useRef } from 'react';
 
 const CallToActionSection = () => {
+  const t = useTranslator();
+
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -108,7 +111,7 @@ const CallToActionSection = () => {
             transition={{ delay: 0.4, duration: 0.8 }}
             className='text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent leading-tight'
           >
-            Ready to get started?
+            {t.landing?.cta_title}
           </motion.h2>
 
           {/* Subtitle */}
@@ -119,8 +122,7 @@ const CallToActionSection = () => {
             transition={{ delay: 0.6, duration: 0.8 }}
             className='text-xl md:text-2xl text-gray-700 dark:text-gray-200 mb-12 max-w-3xl leading-relaxed'
           >
-            Join the most vibrant play community. Find games, meet friends, and have fun—anytime,
-            anywhere!
+            {t.landing?.cta_subtitle}
           </motion.p>
 
           {/* Features Grid */}
@@ -132,9 +134,21 @@ const CallToActionSection = () => {
             transition={{ delay: 0.8, duration: 0.8 }}
           >
             {[
-              { icon: Zap, text: 'Lightning Fast Setup', color: 'from-yellow-400 to-orange-500' },
-              { icon: Globe, text: 'Global Community', color: 'from-blue-400 to-purple-500' },
-              { icon: Star, text: 'Premium Experience', color: 'from-pink-400 to-purple-500' },
+              {
+                icon: Zap,
+                text: t.landing?.cta_feature_lightning_fast || 'Lightning Fast Setup',
+                color: 'from-yellow-400 to-orange-500',
+              },
+              {
+                icon: Globe,
+                text: t.landing?.cta_feature_global_community || 'Global Community',
+                color: 'from-blue-400 to-purple-500',
+              },
+              {
+                icon: Star,
+                text: t.landing?.cta_feature_premium_experience || 'Premium Experience',
+                color: 'from-pink-400 to-purple-500',
+              },
             ].map((feature, i) => (
               <motion.div
                 key={feature.text}
@@ -171,7 +185,7 @@ const CallToActionSection = () => {
                 className='inline-flex items-center justify-center gap-3 px-12 py-6 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-xl font-bold shadow-2xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-purple-400/50 w-full sm:w-auto animate-pulse'
                 aria-label='Get Started'
               >
-                Get Started Now
+                {t.landing?.cta_get_started_now}
                 <ArrowRight className='w-6 h-6' />
               </Link>
             </motion.div>
@@ -182,7 +196,7 @@ const CallToActionSection = () => {
                 className='inline-flex items-center justify-center gap-3 px-12 py-6 rounded-full bg-white/20 backdrop-blur-md hover:bg-white/30 text-gray-800 dark:text-white font-bold text-xl shadow-2xl transition-all duration-300 border-2 border-white/30 w-full sm:w-auto'
                 aria-label='Browse Games'
               >
-                Browse Games
+                {t.landing?.cta_browse_games}
                 <Globe className='w-6 h-6' />
               </Link>
             </motion.div>
@@ -198,15 +212,15 @@ const CallToActionSection = () => {
           >
             <div className='flex items-center gap-2'>
               <div className='w-2 h-2 bg-green-500 rounded-full'></div>
-              <span>10K+ Active Players</span>
+              <span>{t.landing?.cta_trust_active_players}</span>
             </div>
             <div className='flex items-center gap-2'>
               <div className='w-2 h-2 bg-blue-500 rounded-full'></div>
-              <span>500+ Cities</span>
+              <span>{t.landing?.cta_trust_cities}</span>
             </div>
             <div className='flex items-center gap-2'>
               <div className='w-2 h-2 bg-purple-500 rounded-full'></div>
-              <span>24/7 Support</span>
+              <span>{t.landing?.cta_trust_support}</span>
             </div>
           </motion.div>
 

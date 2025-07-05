@@ -4,6 +4,7 @@ import Button from '@/components/ui/Button';
 import Checkbox from '@/components/ui/Checkbox';
 import InputField from '@/components/ui/InputField';
 import { useAuth } from '@/context/AuthContext';
+import useTranslator from '@/hooks/useTranslator';
 import { gamesApi } from '@/lib/api/gamesApi';
 import { Game } from '@/types/game';
 import { useRouter } from 'next/navigation';
@@ -14,6 +15,7 @@ import { MapSection } from './components/MapSection';
 
 export default function CreateGamePage() {
   const router = useRouter();
+  const t = useTranslator();
   const [formData, setFormData] = useState<
     Omit<Game, 'id' | 'status' | 'organizer' | 'participants' | 'createdAt' | 'updatedAt'> & {
       ageMin?: number;
@@ -122,29 +124,29 @@ export default function CreateGamePage() {
   const validateForm = useCallback(() => {
     const newErrors: { [key: string]: string } = {};
     if (formData.coordinates.lat === 0 && formData.coordinates.lng === 0) {
-      newErrors.coordinates = 'Please select a location on the map.';
+      newErrors.coordinates = t.create.validation_coordinates_required;
     }
     if (!formData.date) {
-      newErrors.date = 'Date is required.';
+      newErrors.date = t.create.validation_date_required;
     }
     if (!formData.time) {
-      newErrors.time = 'Time is required.';
+      newErrors.time = t.create.validation_time_required;
     }
     if (formData.maxParticipants < 2) {
-      newErrors.maxParticipants = 'Minimum 2 participants required.';
+      newErrors.maxParticipants = t.create.validation_min_participants;
     }
     if (formData.ageMin && formData.ageMax && formData.ageMin > formData.ageMax) {
-      newErrors.ageRange = 'Minimum age cannot be greater than maximum age.';
+      newErrors.ageRange = t.create.validation_age_range;
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }, [formData]);
+  }, [formData, t.create]);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
       if (!validateForm()) {
-        toast.error('Please fill in all required fields correctly.');
+        toast.error(t.create.validation_fill_fields);
         return;
       }
       setIsLoading(true);
@@ -162,16 +164,16 @@ export default function CreateGamePage() {
         };
 
         await gamesApi.createGame(newGameData);
-        toast.success('Game created successfully!');
+        toast.success(t.create.success_game_created);
         router.push('/dashboard/explore');
       } catch (error) {
         console.error('Error creating game:', error);
-        toast.error('Failed to create game. Please try again.');
+        toast.error(t.create.error_failed_create);
       } finally {
         setIsLoading(false);
       }
     },
-    [formData, validateForm, router, autoTitle, user?._id]
+    [formData, validateForm, router, autoTitle, user?._id, t.create]
   );
 
   return (
@@ -196,8 +198,8 @@ export default function CreateGamePage() {
                   id='joinPermission'
                   checked={formData.joinPermission}
                   onChange={(checked) => handleCheckboxChange('joinPermission', checked)}
-                  label='Require organizer approval to join'
-                  description='Participants will need your approval before they can join the game'
+                  label={t.create.join_permission_label}
+                  description={t.create.join_permission_description}
                   accentColor='blue'
                   className='bg-light-background dark:bg-dark-accent'
                 />
@@ -215,11 +217,11 @@ export default function CreateGamePage() {
                 {/* Location Input */}
                 <div className='space-y-4'>
                   <InputField
-                    label='Location Name'
+                    label={t.create.location_name_label}
                     name='location'
                     value={formData.location}
                     onChange={handleInputChange}
-                    placeholder='e.g., Central Park Soccer Field'
+                    placeholder={t.create.location_name_placeholder}
                     error={errors.location}
                   />
                 </div>
@@ -234,7 +236,7 @@ export default function CreateGamePage() {
                 variant='primary'
                 className='w-full py-3 text-lg font-medium'
               >
-                Create Game
+                {t.create.create_game_button}
               </Button>
             </div>
           </form>

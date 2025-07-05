@@ -1,3 +1,4 @@
+import useTranslator from '@/hooks/useTranslator';
 import { motion } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import Image from 'next/image';
@@ -5,18 +6,19 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-const navLinks = [
-  { id: 'features', label: 'Features', href: '#features' },
-  { id: 'how', label: 'How It Works', href: '#how' },
-  { id: 'settings', label: 'Settings', href: '#settings' },
-  { id: 'community', label: 'Community', href: '#community' },
-  { id: 'faq', label: 'FAQ', href: '#faq' },
-  { id: 'contact', label: 'Contact', href: '#contact' },
-];
-
 const LandingNavbar = () => {
   const [open, setOpen] = useState(false);
   const router = useRouter();
+  const t = useTranslator();
+
+  const navLinks = [
+    { id: 'features', label: t.landing?.navbar_features || 'Features', href: '#features' },
+    { id: 'how', label: t.landing?.navbar_how_it_works || 'How It Works', href: '#how' },
+    { id: 'settings', label: t.landing?.navbar_settings || 'Settings', href: '#settings' },
+    { id: 'community', label: t.landing?.navbar_community || 'Community', href: '#community' },
+    { id: 'faq', label: t.landing?.navbar_faq || 'FAQ', href: '#faq' },
+    { id: 'contact', label: t.landing?.navbar_contact || 'Contact', href: '#contact' },
+  ];
 
   return (
     <motion.nav
@@ -29,7 +31,7 @@ const LandingNavbar = () => {
         <div onClick={() => router.push('/')} className='flex items-center gap-3 cursor-pointer'>
           <Image src='/images/logo.svg' alt='Logo' width={40} height={40} className='h-10 w-auto' />
           <span className='font-bold text-xl font-dancing bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'>
-            Let's Play
+            {t.app?.name}
           </span>
         </div>
         <div className='hidden lg:flex items-center gap-8'>
@@ -56,13 +58,13 @@ const LandingNavbar = () => {
             href='/auth/signup'
             className='px-6 py-2 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400'
           >
-            Get Started
+            {t.landing?.navbar_get_started}
           </Link>
           <Link
             href='/auth/login'
             className='px-6 py-2 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-semibold shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-pink-400'
           >
-            Login
+            {t.landing?.navbar_login}
           </Link>
         </div>
         <button
@@ -103,14 +105,14 @@ const LandingNavbar = () => {
             className='mt-2 px-6 py-2 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold shadow-lg transition-all duration-200 text-center'
             onClick={() => setOpen(false)}
           >
-            Get Started
+            {t.landing?.navbar_get_started}
           </Link>
           <Link
             href='/auth/login'
             className='mt-2 px-6 py-2 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-semibold shadow-lg transition-all duration-200 text-center'
             onClick={() => setOpen(false)}
           >
-            Login
+            {t.landing?.navbar_login}
           </Link>
         </motion.div>
       )}

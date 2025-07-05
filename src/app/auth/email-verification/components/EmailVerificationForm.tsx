@@ -1,4 +1,5 @@
 import Button from '@/components/ui/Button';
+import useTranslator from '@/hooks/useTranslator';
 import React, { useRef } from 'react';
 
 interface EmailVerificationFormProps {
@@ -18,6 +19,7 @@ const EmailVerificationForm: React.FC<EmailVerificationFormProps> = ({
   onResend,
   resendLoading,
 }) => {
+  const t = useTranslator();
   const [otp, setOtp] = React.useState(['', '', '', '', '', '']);
   const inputs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -58,11 +60,12 @@ const EmailVerificationForm: React.FC<EmailVerificationFormProps> = ({
   return (
     <form onSubmit={handleSubmit} className='p-8 flex flex-col items-center'>
       <h2 className='text-2xl font-bold mb-2 text-light-text-primary dark:text-dark-text-primary'>
-        Verify your email
+        {t.auth.email_verification_title}
       </h2>
       <p className='mb-6 text-light-text-secondary dark:text-dark-text-secondary text-center'>
-        We sent a 6-digit code to <span className='font-semibold'>{email}</span>.<br />
-        Enter it below to verify your account.
+        {t.auth.email_verification_description} <span className='font-semibold'>{email}</span>.
+        <br />
+        {t.auth.email_verification_instruction}
       </p>
       <div className='flex flex-wrap justify-center gap-1 md:gap-2 mb-4 w-full'>
         {otp.map((digit, i) => (
@@ -96,7 +99,7 @@ const EmailVerificationForm: React.FC<EmailVerificationFormProps> = ({
         className='w-full mb-2'
         disabled={isLoading || otp.some((d) => d === '')}
       >
-        {isLoading ? 'Verifying...' : 'Verify'}
+        {isLoading ? t.auth.email_verification_verifying : t.auth.email_verification_verify}
       </Button>
       <Button
         type='button'
@@ -105,7 +108,9 @@ const EmailVerificationForm: React.FC<EmailVerificationFormProps> = ({
         onClick={onResend}
         disabled={resendLoading || isLoading}
       >
-        {resendLoading ? 'Resending...' : 'Resend code'}
+        {resendLoading
+          ? t.auth.email_verification_resending
+          : t.auth.email_verification_resend_code}
       </Button>
     </form>
   );

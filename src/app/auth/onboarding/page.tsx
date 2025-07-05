@@ -1,6 +1,7 @@
 'use client';
 import LoadingPage from '@/components/ui/LoadingPage';
 import { useAuth } from '@/context/AuthContext';
+import useTranslator from '@/hooks/useTranslator';
 import { AnimatePresence, motion } from 'framer-motion';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -29,6 +30,7 @@ const OnboardingPage: React.FC = () => {
   const [authLoading, setAuthLoading] = useState(true);
   const router = useRouter();
   const { user } = useAuth();
+  const t = useTranslator();
 
   useEffect(() => {
     // Check authentication on mount
@@ -97,7 +99,7 @@ const OnboardingPage: React.FC = () => {
       setSuccess(true);
     } catch (err) {
       setIsLoading(false);
-      setError('Something went wrong. Please try again.');
+      setError(t.auth.onboarding_error_message);
     }
   };
 
@@ -175,13 +177,13 @@ const OnboardingPage: React.FC = () => {
                 className='mb-4 drop-shadow-lg'
               />
               <h2 className='text-3xl font-bold mb-2 text-light-text-primary dark:text-dark-text-primary'>
-                Welcome!
+                {t.auth.onboarding_welcome_title}
               </h2>
               <p className='text-light-text-secondary dark:text-dark-text-secondary mb-4 text-center'>
-                Your onboarding is complete. Enjoy the app!
+                {t.auth.onboarding_welcome_message}
               </p>
               <span className='text-xs text-light-text-secondary dark:text-dark-text-secondary'>
-                Redirecting...
+                {t.auth.onboarding_redirecting}
               </span>
             </motion.div>
           ) : (

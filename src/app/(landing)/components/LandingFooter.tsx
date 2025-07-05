@@ -1,25 +1,28 @@
 import { contacts } from '@/data/contact';
+import useTranslator from '@/hooks/useTranslator';
 import { motion } from 'framer-motion';
 import { Facebook, Github, Instagram, Linkedin, Mail } from 'lucide-react';
 
-const footerLinks = [
-  { label: 'Features', href: '#features' },
-  { label: 'How It Works', href: '#how' },
-  { label: 'Settings', href: '#settings' },
-  { label: 'Community', href: '#community' },
-  { label: 'FAQ', href: '#faq' },
-  { label: 'Contact', href: '#contact' },
-];
-
-const socialLinks = [
-  { icon: Github, href: contacts.github, label: 'GitHub' },
-  { icon: Linkedin, href: contacts.linkedin, label: 'LinkedIn' },
-  { icon: Facebook, href: contacts.facebook, label: 'Facebook' },
-  { icon: Instagram, href: contacts.instagram, label: 'Instagram' },
-  { icon: Mail, href: `mailto:${contacts.email}`, label: 'Email' },
-];
-
 const LandingFooter = () => {
+  const t = useTranslator();
+
+  const footerLinks = [
+    { label: t.landing?.footer_features || 'Features', href: '#features' },
+    { label: t.landing?.footer_how_it_works || 'How It Works', href: '#how' },
+    { label: t.landing?.footer_settings || 'Settings', href: '#settings' },
+    { label: t.landing?.footer_community || 'Community', href: '#community' },
+    { label: t.landing?.footer_faq || 'FAQ', href: '#faq' },
+    { label: t.landing?.footer_contact || 'Contact', href: '#contact' },
+  ];
+
+  const socialLinks = [
+    { icon: Github, href: contacts.github, label: 'GitHub' },
+    { icon: Linkedin, href: contacts.linkedin, label: 'LinkedIn' },
+    { icon: Facebook, href: contacts.facebook, label: 'Facebook' },
+    { icon: Instagram, href: contacts.instagram, label: 'Instagram' },
+    { icon: Mail, href: `mailto:${contacts.email}`, label: 'Email' },
+  ];
+
   return (
     <motion.footer
       initial={{ opacity: 0, y: 40 }}
@@ -40,7 +43,7 @@ const LandingFooter = () => {
           >
             <img src='/images/logo.svg' alt='Logo' className='h-10 w-auto' />
             <span className='font-bold text-xl font-dancing bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'>
-              Let's Play
+              {t.app?.name}
             </span>
           </motion.div>
 
@@ -119,7 +122,7 @@ const LandingFooter = () => {
           viewport={{ once: true }}
           transition={{ delay: 0.7, duration: 0.6 }}
         >
-          &copy; {new Date().getFullYear()} Let's Play. All rights reserved.
+          &copy; {new Date().getFullYear()} {t.app?.name}. {t.landing?.footer_copyright}
         </motion.div>
       </div>
     </motion.footer>

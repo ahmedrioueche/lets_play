@@ -98,7 +98,7 @@ export default function ExplorePage() {
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || 'Join request failed');
-        toast.success('Join request sent!');
+        toast.success(text.home.explore_join_request_sent);
         // Immediate reactivity: update selectedGame.joinRequests
         if (state.selectedGame) {
           setSelectedGame({
@@ -137,7 +137,7 @@ export default function ExplorePage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Cancellation failed');
-      toast.success('Registration cancelled!');
+      toast.success(text.home.explore_registration_cancelled);
       // Fetch updated game and update selectedGame
       const updatedRes = await fetch(`/api/games/${gameId}`);
       const updatedGame = await updatedRes.json();
@@ -195,13 +195,13 @@ export default function ExplorePage() {
             ) : (
               <div className='min-h-[50vh] flex items-center justify-center'>
                 <NotFound
-                  text='No games found'
+                  text={text.home.explore_no_games_found}
                   subtext={
                     state.searchQuery ||
                     state.filters.sports.length > 0 ||
                     state.filters.skillLevels.length > 0
-                      ? 'Try adjusting your search or filters to find more games.'
-                      : 'Be the first to create a game in your area!'
+                      ? text.home.explore_no_games_subtext_filters
+                      : text.home.explore_no_games_subtext_default
                   }
                 />
               </div>
@@ -263,8 +263,8 @@ export default function ExplorePage() {
         isOpen={gameToCancel.trim() !== ''}
         onConfirm={() => handleCancelRegistration(gameToCancel)}
         onCancel={() => setGameToCancel('')}
-        message='Canceling your registration will impact your credibility. Are you sure you want to proceed?'
-        warning='Warning'
+        message={text.home.explore_warning_cancel_message}
+        warning={text.home.explore_warning_cancel_title}
       />
     </div>
   );

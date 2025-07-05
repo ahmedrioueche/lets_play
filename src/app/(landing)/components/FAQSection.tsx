@@ -4,57 +4,6 @@ import { ChevronDown, HelpCircle, MapPin, Shield, Users, Zap } from 'lucide-reac
 import { useState } from 'react';
 import ContactSupportModal from './ContactSupportModal';
 
-const faqs = [
-  {
-    id: 1,
-    question: 'How do I find games near me?',
-    answer:
-      "Simply open the app and use our smart location feature. We'll show you all available games within your area, complete with details like skill level, number of players, and game type. You can also set up notifications for new games in your preferred sports.",
-    icon: MapPin,
-    category: 'Getting Started',
-  },
-  {
-    id: 2,
-    question: 'Is it safe to play with strangers?',
-    answer:
-      'Absolutely! We prioritize your safety with verified user profiles, community ratings, and secure messaging. All users go through a verification process, and you can read reviews from other players before joining any game.',
-    icon: Shield,
-    category: 'Safety',
-  },
-  {
-    id: 3,
-    question: 'Can I organize my own games?',
-    answer:
-      'Yes! Creating games is super easy. Just tap the "Create Game" button, choose your sport, set the location, time, and skill level. You can also set a maximum number of players and add special requirements if needed.',
-    icon: Users,
-    category: 'Organizing',
-  },
-  {
-    id: 4,
-    question: 'What sports are supported?',
-    answer:
-      'We support a wide range of sports including football, basketball, tennis, volleyball, badminton, and many more. New sports are added regularly based on community demand. You can also suggest new sports through our feedback system.',
-    icon: Zap,
-    category: 'Sports',
-  },
-  {
-    id: 5,
-    question: 'How do I communicate with other players?',
-    answer:
-      'Our built-in chat system allows you to message other players directly or in group chats for specific games. You can also share photos, locations, and coordinate meetups all within the app.',
-    icon: Users,
-    category: 'Communication',
-  },
-  {
-    id: 6,
-    question: 'What if I need to cancel a game?',
-    answer:
-      'No worries! You can cancel your participation up to 2 hours before the game starts. The organizer will be notified, and other players can take your spot. For organizers, you can cancel games with automatic notifications to all participants.',
-    icon: Shield,
-    category: 'Cancellations',
-  },
-];
-
 const FAQSection = () => {
   const [openId, setOpenId] = useState<number | null>(null);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
@@ -67,6 +16,63 @@ const FAQSection = () => {
   const handleContactSupport = () => {
     setIsContactModalOpen(true);
   };
+
+  const faqs = [
+    {
+      id: 1,
+      question: t.landing?.faq_question_find_games || 'How do I find games near me?',
+      answer:
+        t.landing?.faq_answer_find_games ||
+        "Simply open the app and use our smart location feature. We'll show you all available games within your area, complete with details like skill level, number of players, and game type. You can also set up notifications for new games in your preferred sports.",
+      icon: MapPin,
+      category: t.landing?.faq_category_getting_started || 'Getting Started',
+    },
+    {
+      id: 2,
+      question: t.landing?.faq_question_safety || 'Is it safe to play with strangers?',
+      answer:
+        t.landing?.faq_answer_safety ||
+        'Absolutely! We prioritize your safety with verified user profiles, community ratings, and secure messaging. All users go through a verification process, and you can read reviews from other players before joining any game.',
+      icon: Shield,
+      category: t.landing?.faq_category_safety || 'Safety',
+    },
+    {
+      id: 3,
+      question: t.landing?.faq_question_organize || 'Can I organize my own games?',
+      answer:
+        t.landing?.faq_answer_organize ||
+        'Yes! Creating games is super easy. Just tap the "Create Game" button, choose your sport, set the location, time, and skill level. You can also set a maximum number of players and add special requirements if needed.',
+      icon: Users,
+      category: t.landing?.faq_category_organizing || 'Organizing',
+    },
+    {
+      id: 4,
+      question: t.landing?.faq_question_sports || 'What sports are supported?',
+      answer:
+        t.landing?.faq_answer_sports ||
+        'We support a wide range of sports including football, basketball, tennis, volleyball, badminton, and many more. New sports are added regularly based on community demand. You can also suggest new sports through our feedback system.',
+      icon: Zap,
+      category: t.landing?.faq_category_sports || 'Sports',
+    },
+    {
+      id: 5,
+      question: t.landing?.faq_question_communication || 'How do I communicate with other players?',
+      answer:
+        t.landing?.faq_answer_communication ||
+        'Our built-in chat system allows you to message other players directly or in group chats for specific games. You can also share photos, locations, and coordinate meetups all within the app.',
+      icon: Users,
+      category: t.landing?.faq_category_communication || 'Communication',
+    },
+    {
+      id: 6,
+      question: t.landing?.faq_question_cancel || 'What if I need to cancel a game?',
+      answer:
+        t.landing?.faq_answer_cancel ||
+        'No worries! You can cancel your participation up to 2 hours before the game starts. The organizer will be notified, and other players can take your spot. For organizers, you can cancel games with automatic notifications to all participants.',
+      icon: Shield,
+      category: t.landing?.faq_category_cancellations || 'Cancellations',
+    },
+  ];
 
   return (
     <>

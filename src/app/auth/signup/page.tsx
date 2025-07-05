@@ -121,7 +121,7 @@ const SignupPage: React.FC = () => {
             name='name'
             value={formData.name}
             onChange={handleInputChange}
-            placeholder='Enter your full name'
+            placeholder={text.auth.name_placeholder}
             error={errors.name}
             icon={<User className='w-4 h-4' />}
           />
@@ -131,7 +131,7 @@ const SignupPage: React.FC = () => {
             type='email'
             value={formData.email}
             onChange={handleInputChange}
-            placeholder='Enter your email'
+            placeholder={text.auth.email_placeholder}
             error={errors.email}
             icon={<Mail className='w-4 h-4' />}
           />
@@ -141,7 +141,7 @@ const SignupPage: React.FC = () => {
             type={showPassword ? 'text' : 'password'}
             value={formData.password}
             onChange={handleInputChange}
-            placeholder='Enter your password'
+            placeholder={text.auth.password_placeholder}
             error={errors.password}
             icon={<Lock className='w-4 h-4' />}
             endAdornment={
@@ -160,7 +160,7 @@ const SignupPage: React.FC = () => {
             type={showConfirmPassword ? 'text' : 'password'}
             value={formData.confirmPassword}
             onChange={handleInputChange}
-            placeholder='Confirm your password'
+            placeholder={text.auth.confirm_password_placeholder}
             error={errors.confirmPassword}
             icon={<Lock className='w-4 h-4' />}
             endAdornment={

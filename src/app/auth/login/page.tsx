@@ -100,7 +100,7 @@ const LoginPage: React.FC = () => {
             type='email'
             value={formData.email}
             onChange={handleInputChange}
-            placeholder='Enter your email'
+            placeholder={text.auth.email_placeholder}
             error={errors.email}
             icon={<Mail className='w-4 h-4' />}
           />
@@ -110,7 +110,7 @@ const LoginPage: React.FC = () => {
             type={showPassword ? 'text' : 'password'}
             value={formData.password}
             onChange={handleInputChange}
-            placeholder='Enter your password'
+            placeholder={text.auth.password_placeholder}
             error={errors.password}
             icon={<Lock className='w-4 h-4' />}
             endAdornment={

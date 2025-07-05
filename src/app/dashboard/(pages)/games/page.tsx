@@ -1,6 +1,7 @@
 'use client';
 
 import GameDetailsModal from '@/app/dashboard/components/GameDetailsModal';
+import useTranslator from '@/hooks/useTranslator';
 import { Game } from '@/types/game';
 import { User } from '@/types/user';
 import { MapPin, Plus } from 'lucide-react';
@@ -17,6 +18,7 @@ import { useMyGames } from './hooks/useMyGames';
 
 export default function MyGamesPage() {
   const router = useRouter();
+  const t = useTranslator();
   const {
     createdGames,
     signedUpGames,
@@ -71,12 +73,12 @@ export default function MyGamesPage() {
       />
 
       <GamesSection
-        title='Games I Created'
+        title={t.my_games.created_section}
         games={createdGames}
         isLoading={isLoading}
         emptyStateComponent={<EmptyCreatedGames onCreateGame={handleCreateGame} />}
         actionButton={{
-          text: 'Create New Game',
+          text: t.my_games.create_new_game,
           icon: <Plus className='w-4 h-4' />,
           onClick: handleCreateGame,
         }}
@@ -85,12 +87,12 @@ export default function MyGamesPage() {
       />
 
       <GamesSection
-        title='Games I Joined'
+        title={t.my_games.joined_section}
         games={signedUpGames}
         isLoading={isLoading}
         emptyStateComponent={<EmptySignedUpGames onExploreGames={handleExploreGames} />}
         actionButton={{
-          text: 'Explore More Games',
+          text: t.my_games.explore_more_games,
           icon: <MapPin className='w-4 h-4' />,
           onClick: handleExploreGames,
         }}
@@ -123,7 +125,7 @@ export default function MyGamesPage() {
         onConfirm={confirmCancel}
         onCancel={() => setWarningOpen(false)}
         message={warningMessage}
-        warning='Warning: Canceling affects your credibility!'
+        warning={t.my_games.warning_credibility}
       />
     </div>
   );

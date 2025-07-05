@@ -1,5 +1,6 @@
 'use client';
 import LoadingPage from '@/components/ui/LoadingPage';
+import useTranslator from '@/hooks/useTranslator';
 import { User } from '@/types/user';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
@@ -13,6 +14,7 @@ const EmailVerificationPage: React.FC = () => {
   const [resendLoading, setResendLoading] = useState(false);
   const [sentOnLoad, setSentOnLoad] = useState(false);
   const router = useRouter();
+  const t = useTranslator();
 
   useEffect(() => {
     // Fetch user email
@@ -57,7 +59,7 @@ const EmailVerificationPage: React.FC = () => {
       if (user?.hasCompletedOnboarding) router.replace('/');
       else router.replace('/auth/onboarding');
     } catch (err) {
-      setError('Invalid or expired code.');
+      setError(t.auth.email_verification_invalid_code);
     } finally {
       setOtpLoading(false);
     }
@@ -70,7 +72,7 @@ const EmailVerificationPage: React.FC = () => {
       const res = await fetch('/api/auth/send-verification', { method: 'POST' });
       if (!res.ok) throw new Error('Failed to send code');
     } catch {
-      setError('Failed to send code.');
+      setError(t.auth.email_verification_failed_send);
     } finally {
       setResendLoading(false);
     }

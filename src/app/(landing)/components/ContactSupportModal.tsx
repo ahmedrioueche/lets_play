@@ -67,22 +67,23 @@ const ContactSupportModal: React.FC<ContactSupportModalProps> = ({ isOpen, onClo
   const contactMethods = [
     {
       icon: Mail,
-      title: 'Email Support',
-      description: 'Get a response within 24 hours',
+      title: t.landing?.contact_support_email_title || 'Email Support',
+      description: t.landing?.contact_support_email_description || 'Get a response within 24 hours',
       action: `mailto:${contacts.email}?subject=Support Request`,
       color: 'from-blue-500 to-blue-600',
     },
     {
       icon: MessageSquare,
-      title: 'Live Chat',
-      description: 'Available during business hours',
+      title: t.landing?.contact_support_live_chat_title || 'Live Chat',
+      description:
+        t.landing?.contact_support_live_chat_description || 'Available during business hours',
       action: '#',
       color: 'from-green-500 to-green-600',
     },
     {
       icon: Phone,
-      title: 'Phone Support',
-      description: 'Call us directly',
+      title: t.landing?.contact_support_phone_title || 'Phone Support',
+      description: t.landing?.contact_support_phone_description || 'Call us directly',
       action: 'tel:+1234567890',
       color: 'from-purple-500 to-purple-600',
     },
@@ -113,10 +114,10 @@ const ContactSupportModal: React.FC<ContactSupportModalProps> = ({ isOpen, onClo
                 </div>
                 <div>
                   <h2 className='text-xl font-bold text-gray-900 dark:text-white'>
-                    Contact Support
+                    {t.landing?.contact_support_title}
                   </h2>
                   <p className='text-sm text-gray-600 dark:text-gray-300'>
-                    We're here to help you!
+                    {t.landing?.contact_support_description}
                   </p>
                 </div>
               </div>
@@ -138,7 +139,7 @@ const ContactSupportModal: React.FC<ContactSupportModalProps> = ({ isOpen, onClo
                     : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
-                Send Message
+                {t.landing?.contact_support_send_message}
               </button>
               <button
                 onClick={() => setActiveTab('contact')}
@@ -148,7 +149,7 @@ const ContactSupportModal: React.FC<ContactSupportModalProps> = ({ isOpen, onClo
                     : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
-                Other Ways to Contact
+                {t.landing?.contact_support_other_ways}
               </button>
             </div>
 
@@ -185,10 +186,10 @@ const ContactSupportModal: React.FC<ContactSupportModalProps> = ({ isOpen, onClo
                           </svg>
                         </div>
                         <h3 className='text-xl font-semibold text-gray-900 dark:text-white mb-2'>
-                          Message Sent Successfully!
+                          {t.landing?.contact_support_success_title}
                         </h3>
                         <p className='text-gray-600 dark:text-gray-300'>
-                          Thank you for contacting us. We'll get back to you soon.
+                          {t.landing?.contact_support_success_message}
                         </p>
                       </motion.div>
                     ) : (
@@ -207,7 +208,7 @@ const ContactSupportModal: React.FC<ContactSupportModalProps> = ({ isOpen, onClo
                           {/* Name */}
                           <div>
                             <label className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2'>
-                              Name *
+                              {t.landing?.contact_support_name_label}
                             </label>
                             <input
                               type='text'
@@ -215,7 +216,7 @@ const ContactSupportModal: React.FC<ContactSupportModalProps> = ({ isOpen, onClo
                               value={formData.name}
                               onChange={(e) => handleInputChange('name', e.target.value)}
                               className='w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400'
-                              placeholder='Your full name'
+                              placeholder={t.landing?.contact_support_name_placeholder}
                               disabled={isSubmitting}
                             />
                           </div>
@@ -223,7 +224,7 @@ const ContactSupportModal: React.FC<ContactSupportModalProps> = ({ isOpen, onClo
                           {/* Email */}
                           <div>
                             <label className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2'>
-                              Email *
+                              {t.landing?.contact_support_email_label}
                             </label>
                             <input
                               type='email'
@@ -231,7 +232,7 @@ const ContactSupportModal: React.FC<ContactSupportModalProps> = ({ isOpen, onClo
                               value={formData.email}
                               onChange={(e) => handleInputChange('email', e.target.value)}
                               className='w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400'
-                              placeholder='your.email@example.com'
+                              placeholder={t.landing?.contact_support_email_placeholder}
                               disabled={isSubmitting}
                             />
                           </div>
@@ -240,7 +241,7 @@ const ContactSupportModal: React.FC<ContactSupportModalProps> = ({ isOpen, onClo
                         {/* Subject */}
                         <div>
                           <label className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2'>
-                            Subject *
+                            {t.landing?.contact_support_subject_label}
                           </label>
                           <input
                             type='text'
@@ -248,7 +249,7 @@ const ContactSupportModal: React.FC<ContactSupportModalProps> = ({ isOpen, onClo
                             value={formData.subject}
                             onChange={(e) => handleInputChange('subject', e.target.value)}
                             className='w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400'
-                            placeholder='Brief description of your issue'
+                            placeholder={t.landing?.contact_support_subject_placeholder}
                             disabled={isSubmitting}
                           />
                         </div>
@@ -256,7 +257,7 @@ const ContactSupportModal: React.FC<ContactSupportModalProps> = ({ isOpen, onClo
                         {/* Message */}
                         <div>
                           <label className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2'>
-                            Message *
+                            {t.landing?.contact_support_message_label}
                           </label>
                           <textarea
                             required
@@ -264,7 +265,7 @@ const ContactSupportModal: React.FC<ContactSupportModalProps> = ({ isOpen, onClo
                             value={formData.message}
                             onChange={(e) => handleInputChange('message', e.target.value)}
                             className='w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 resize-none'
-                            placeholder='Please describe your issue or question in detail...'
+                            placeholder={t.landing?.contact_support_message_placeholder}
                             disabled={isSubmitting}
                           />
                         </div>
@@ -280,12 +281,12 @@ const ContactSupportModal: React.FC<ContactSupportModalProps> = ({ isOpen, onClo
                           {isSubmitting ? (
                             <>
                               <div className='w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin' />
-                              Sending...
+                              {t.landing?.contact_support_sending}
                             </>
                           ) : (
                             <>
                               <Send className='w-5 h-5' />
-                              Send Message
+                              {t.landing?.contact_support_send_button}
                             </>
                           )}
                         </motion.button>
@@ -341,19 +342,19 @@ const ContactSupportModal: React.FC<ContactSupportModalProps> = ({ isOpen, onClo
                         </div>
                         <div>
                           <h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-2'>
-                            Response Time
+                            {t.landing?.contact_support_response_time_title}
                           </h3>
                           <p className='text-gray-600 dark:text-gray-300 mb-3'>
-                            We typically respond to support requests within 24 hours during business
-                            days.
+                            {t.landing?.contact_support_response_time_description}
                           </p>
                           <div className='text-sm text-gray-500 dark:text-gray-400'>
                             <p>
-                              <strong>Business Hours:</strong> Monday - Friday, 9:00 AM - 6:00 PM
-                              EST
+                              <strong>{t.landing?.contact_support_business_hours}</strong>{' '}
+                              {t.landing?.contact_support_business_hours_time}
                             </p>
                             <p>
-                              <strong>Emergency Support:</strong> Available 24/7 for critical issues
+                              <strong>{t.landing?.contact_support_emergency_support}</strong>{' '}
+                              {t.landing?.contact_support_emergency_description}
                             </p>
                           </div>
                         </div>

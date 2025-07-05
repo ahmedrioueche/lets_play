@@ -1,39 +1,50 @@
+import useTranslator from '@/hooks/useTranslator';
 import { AnimatePresence, motion, useScroll, useTransform } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Quote, Star, User } from 'lucide-react';
 import { useRef, useState } from 'react';
 
-const testimonials = [
-  {
-    name: 'Alex P.',
-    role: 'Football Player',
-    text: 'This platform made it so easy to find pickup games in my city! The real-time updates and chat feature are game-changers.',
-    color: 'from-blue-200 to-pink-100',
-    rating: 5,
-  },
-  {
-    name: 'Samira K.',
-    role: 'Tennis Coach',
-    text: 'I met so many new friends and teammates. The chat is seamless and the community is incredibly supportive.',
-    color: 'from-yellow-200 to-blue-100',
-    rating: 5,
-  },
-  {
-    name: 'Jordan L.',
-    role: 'Basketball Player',
-    text: 'The design is beautiful and everything just works. Love the intuitive interface and how easy it is to organize games.',
-    color: 'from-pink-200 to-yellow-100',
-    rating: 5,
-  },
-  {
-    name: 'Maria S.',
-    role: 'Volleyball Enthusiast',
-    text: 'Finally found a platform that connects sports lovers worldwide. The map feature helps me discover new courts and players.',
-    color: 'from-green-200 to-blue-100',
-    rating: 5,
-  },
-];
-
 const TestimonialsSection = () => {
+  const t = useTranslator();
+
+  const testimonials = [
+    {
+      name: t.landing?.testimonial_alex_name || 'Alex P.',
+      role: t.landing?.testimonial_alex_role || 'Football Player',
+      text:
+        t.landing?.testimonial_alex_text ||
+        'This platform made it so easy to find pickup games in my city! The real-time updates and chat feature are game-changers.',
+      color: 'from-blue-200 to-pink-100',
+      rating: 5,
+    },
+    {
+      name: t.landing?.testimonial_samira_name || 'Samira K.',
+      role: t.landing?.testimonial_samira_role || 'Tennis Coach',
+      text:
+        t.landing?.testimonial_samira_text ||
+        'I met so many new friends and teammates. The chat is seamless and the community is incredibly supportive.',
+      color: 'from-yellow-200 to-blue-100',
+      rating: 5,
+    },
+    {
+      name: t.landing?.testimonial_jordan_name || 'Jordan L.',
+      role: t.landing?.testimonial_jordan_role || 'Basketball Player',
+      text:
+        t.landing?.testimonial_jordan_text ||
+        'The design is beautiful and everything just works. Love the intuitive interface and how easy it is to organize games.',
+      color: 'from-pink-200 to-yellow-100',
+      rating: 5,
+    },
+    {
+      name: t.landing?.testimonial_maria_name || 'Maria S.',
+      role: t.landing?.testimonial_maria_role || 'Volleyball Enthusiast',
+      text:
+        t.landing?.testimonial_maria_text ||
+        'Finally found a platform that connects sports lovers worldwide. The map feature helps me discover new courts and players.',
+      color: 'from-green-200 to-blue-100',
+      rating: 5,
+    },
+  ];
+
   const [index, setIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -109,10 +120,10 @@ const TestimonialsSection = () => {
           className='text-center mb-20'
         >
           <h2 className='text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent'>
-            What Our Users Say
+            {t.landing?.testimonials_title}
           </h2>
           <p className='text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto'>
-            Join thousands of satisfied players who've transformed their gaming experience
+            {t.landing?.testimonials_subtitle}
           </p>
         </motion.div>
 
@@ -276,10 +287,10 @@ const TestimonialsSection = () => {
           transition={{ delay: 1, duration: 0.8 }}
         >
           {[
-            { label: 'Happy Players', value: '10K+' },
-            { label: 'Games Played', value: '50K+' },
-            { label: 'Cities Covered', value: '500+' },
-            { label: 'Rating', value: '4.9★' },
+            { label: t.landing?.stats_happy_players || 'Happy Players', value: '10K+' },
+            { label: t.landing?.stats_games_played || 'Games Played', value: '50K+' },
+            { label: t.landing?.stats_cities_covered || 'Cities Covered', value: '500+' },
+            { label: t.landing?.stats_rating || 'Rating', value: '4.9★' },
           ].map((stat, i) => (
             <motion.div
               key={stat.label}

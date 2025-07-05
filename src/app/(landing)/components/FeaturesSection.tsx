@@ -1,59 +1,74 @@
+import useTranslator from '@/hooks/useTranslator';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Globe, Heart, MessageCircle, Rocket, ShieldCheck, Users, Zap } from 'lucide-react';
 import { useRef } from 'react';
 
-const features = [
-  {
-    icon: Rocket,
-    title: 'Lightning Fast',
-    desc: 'Instantly find and join games near you with real-time updates.',
-    color: 'from-pink-400 to-yellow-300',
-    featured: true,
-    delay: 0,
-  },
-  {
-    icon: Users,
-    title: 'Vibrant Community',
-    desc: 'Meet, chat, and play with players from all over the world.',
-    color: 'from-blue-400 to-purple-400',
-    featured: false,
-    delay: 0.2,
-  },
-  {
-    icon: ShieldCheck,
-    title: 'Secure & Private',
-    desc: 'Your data and privacy are protected with industry-leading security.',
-    color: 'from-green-400 to-blue-300',
-    featured: false,
-    delay: 0.4,
-  },
-  {
-    icon: MessageCircle,
-    title: 'Seamless Chat',
-    desc: 'Message friends and new players with our integrated chat.',
-    color: 'from-yellow-400 to-pink-400',
-    featured: false,
-    delay: 0.6,
-  },
-  {
-    icon: Zap,
-    title: 'Real-time Updates',
-    desc: 'Get instant notifications about new games and player activities.',
-    color: 'from-purple-400 to-pink-300',
-    featured: false,
-    delay: 0.8,
-  },
-  {
-    icon: Globe,
-    title: 'Global Reach',
-    desc: 'Connect with players worldwide and discover new gaming communities.',
-    color: 'from-indigo-400 to-purple-300',
-    featured: false,
-    delay: 1.0,
-  },
-];
-
 const FeaturesSection = () => {
+  const t = useTranslator();
+
+  const features = [
+    {
+      icon: Rocket,
+      title: t.landing?.feature_lightning_fast_title || 'Lightning Fast',
+      desc:
+        t.landing?.feature_lightning_fast_desc ||
+        'Instantly find and join games near you with real-time updates.',
+      color: 'from-pink-400 to-yellow-300',
+      featured: true,
+      delay: 0,
+    },
+    {
+      icon: Users,
+      title: t.landing?.feature_vibrant_community_title || 'Vibrant Community',
+      desc:
+        t.landing?.feature_vibrant_community_desc ||
+        'Meet, chat, and play with players from all over the world.',
+      color: 'from-blue-400 to-purple-400',
+      featured: false,
+      delay: 0.2,
+    },
+    {
+      icon: ShieldCheck,
+      title: t.landing?.feature_secure_private_title || 'Secure & Private',
+      desc:
+        t.landing?.feature_secure_private_desc ||
+        'Your data and privacy are protected with industry-leading security.',
+      color: 'from-green-400 to-blue-300',
+      featured: false,
+      delay: 0.4,
+    },
+    {
+      icon: MessageCircle,
+      title: t.landing?.feature_seamless_chat_title || 'Seamless Chat',
+      desc:
+        t.landing?.feature_seamless_chat_desc ||
+        'Message friends and new players with our integrated chat.',
+      color: 'from-yellow-400 to-pink-400',
+      featured: false,
+      delay: 0.6,
+    },
+    {
+      icon: Zap,
+      title: t.landing?.feature_realtime_updates_title || 'Real-time Updates',
+      desc:
+        t.landing?.feature_realtime_updates_desc ||
+        'Get instant notifications about new games and player activities.',
+      color: 'from-purple-400 to-pink-300',
+      featured: false,
+      delay: 0.8,
+    },
+    {
+      icon: Globe,
+      title: t.landing?.feature_global_reach_title || 'Global Reach',
+      desc:
+        t.landing?.feature_global_reach_desc ||
+        'Connect with players worldwide and discover new gaming communities.',
+      color: 'from-indigo-400 to-purple-300',
+      featured: false,
+      delay: 1.0,
+    },
+  ];
+
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -105,11 +120,10 @@ const FeaturesSection = () => {
           className='text-center mb-20'
         >
           <h2 className='text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent'>
-            Why Choose Us?
+            {t.landing?.features_title}
           </h2>
           <p className='text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto'>
-            Experience the future of social gaming with cutting-edge features designed for modern
-            players.
+            {t.landing?.features_subtitle}
           </p>
         </motion.div>
 
@@ -185,7 +199,7 @@ const FeaturesSection = () => {
                           ease: 'easeInOut',
                         }}
                       >
-                        Featured
+                        {t.landing?.featured_badge}
                       </motion.span>
                     )}
 
@@ -246,7 +260,7 @@ const FeaturesSection = () => {
             whileTap={{ scale: 0.95 }}
           >
             <Zap className='w-5 h-5' />
-            Explore All Features
+            {t.landing?.explore_all_features}
           </motion.div>
         </motion.div>
       </div>

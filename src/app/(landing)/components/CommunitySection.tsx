@@ -1,4 +1,5 @@
 import GameCard from '@/components/games/GameCard';
+import useTranslator from '@/hooks/useTranslator';
 import { Game } from '@/types/game';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Calendar, MapPin, TrendingUp, Users } from 'lucide-react';
@@ -89,6 +90,8 @@ const mockGames: Game[] = [
 ];
 
 const CommunitySection = () => {
+  const t = useTranslator();
+
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -161,10 +164,10 @@ const CommunitySection = () => {
           className='text-center mb-16'
         >
           <h2 className='text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent'>
-            Join the Game, Join the Fun!
+            {t.landing?.community_title}
           </h2>
           <p className='text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-8'>
-            Explore live games happening near you. Click a card or pin to see more details!
+            {t.landing?.community_subtitle}
           </p>
 
           {/* Live Stats */}
@@ -178,25 +181,25 @@ const CommunitySection = () => {
             {[
               {
                 icon: MapPin,
-                label: 'Active Games',
+                label: t.landing?.stats_active_games || 'Active Games',
                 value: '247',
                 color: 'from-blue-500 to-purple-500',
               },
               {
                 icon: Users,
-                label: 'Online Players',
+                label: t.landing?.stats_online_players || 'Online Players',
                 value: '1.2K',
                 color: 'from-green-500 to-blue-500',
               },
               {
                 icon: Calendar,
-                label: "Today's Events",
+                label: t.landing?.stats_todays_events || "Today's Events",
                 value: '89',
                 color: 'from-pink-500 to-purple-500',
               },
               {
                 icon: TrendingUp,
-                label: 'Growth Rate',
+                label: t.landing?.stats_growth_rate || 'Growth Rate',
                 value: '+23%',
                 color: 'from-yellow-500 to-orange-500',
               },
@@ -377,7 +380,7 @@ const CommunitySection = () => {
               onClick={() => router.push('/auth/signup')}
             >
               <MapPin className='w-5 h-5' />
-              Explore More Games
+              {t.landing?.explore_more_games}
             </motion.button>
           </motion.div>
         </div>

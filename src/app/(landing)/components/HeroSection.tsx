@@ -151,7 +151,7 @@ const HeroSection = () => {
             />
 
             {/* Floating Game Cards */}
-            <div className='absolute top-10 right-10 bg-white/90 dark:bg-gray-800/90 rounded-2xl p-4 shadow-xl backdrop-blur-sm border border-white/20 animate-fade-in-scale delay-1000'>
+            <div className='absolute top-10 right-10 bg-white/90 dark:bg-gray-800/90 rounded-2xl p-4 shadow-xl backdrop-blur-sm border border-white/20 opacity-0 animate-fade-in-scale delay-1000'>
               <div className='flex items-center gap-3'>
                 <div className='w-3 h-3 bg-green-500 rounded-full' />
                 <div className='text-sm font-semibold text-gray-800 dark:text-white'>
@@ -163,7 +163,7 @@ const HeroSection = () => {
               </div>
             </div>
 
-            <div className='absolute bottom-10 left-10 bg-white/90 dark:bg-gray-800/90 rounded-2xl p-4 shadow-xl backdrop-blur-sm border border-white/20 animate-fade-in-scale delay-1500'>
+            <div className='absolute bottom-10 left-10 bg-white/90 dark:bg-gray-800/90 rounded-2xl p-4 shadow-xl backdrop-blur-sm border border-white/20 opacity-0 animate-fade-in-scale delay-1500'>
               <div className='flex items-center gap-3'>
                 <div className='w-3 h-3 bg-blue-500 rounded-full' />
                 <div className='text-sm font-semibold text-gray-800 dark:text-white'>
@@ -189,39 +189,6 @@ const HeroSection = () => {
       </div>
 
       <style jsx>{`
-        @keyframes fadeInLeft {
-          from {
-            opacity: 0;
-            transform: translateX(-50px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-
-        @keyframes fadeInRight {
-          from {
-            opacity: 0;
-            transform: translateX(50px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
         @keyframes fadeInScale {
           from {
             opacity: 0;
@@ -247,34 +214,6 @@ const HeroSection = () => {
 
         .animate-fade-in-scale {
           animation: fadeInScale 0.8s ease-out;
-        }
-
-        .delay-200 {
-          animation-delay: 0.2s;
-        }
-
-        .delay-300 {
-          animation-delay: 0.3s;
-        }
-
-        .delay-400 {
-          animation-delay: 0.4s;
-        }
-
-        .delay-600 {
-          animation-delay: 0.6s;
-        }
-
-        .delay-800 {
-          animation-delay: 0.8s;
-        }
-
-        .delay-1000 {
-          animation-delay: 1s;
-        }
-
-        .delay-1500 {
-          animation-delay: 1.5s;
         }
       `}</style>
     </section>

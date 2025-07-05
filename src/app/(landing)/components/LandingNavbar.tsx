@@ -24,7 +24,7 @@ const LandingNavbar = () => {
       <div className='max-w-7xl mx-auto flex items-center justify-between px-2 py-4'>
         <div onClick={() => router.push('/')} className='flex items-center gap-3 cursor-pointer'>
           <Image src='/images/logo.svg' alt='Logo' width={40} height={40} className='h-10 w-auto' />
-          <span className='font-bold text-xl font-dancing bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'>
+          <span className='font-bold md:text-2xl text-xl font-dancing bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'>
             {t.app?.name}
           </span>
         </div>
@@ -33,7 +33,7 @@ const LandingNavbar = () => {
             <a
               key={link.id}
               href={link.href}
-              className='relative text-lg font-medium text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200 hover:scale-105 focus:outline-none'
+              className='relative text-base font-medium text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200 hover:scale-105 focus:outline-none'
               tabIndex={0}
               aria-label={link.label}
               onKeyDown={(e) => {

@@ -92,9 +92,9 @@ const ContactSupportModal: React.FC<ContactSupportModalProps> = ({ isOpen, onClo
 
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in'>
-      <div className='relative w-full max-w-4xl bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden animate-modal-in'>
+      <div className='relative w-full max-w-4xl max-h-screen bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden animate-modal-in flex flex-col'>
         {/* Header */}
-        <div className='flex items-center justify-between px-8 py-6 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-gray-700 dark:to-gray-600'>
+        <div className='flex items-center justify-between px-8 py-6 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-gray-700 dark:to-gray-600 flex-shrink-0'>
           <div className='flex items-center gap-3'>
             <div className='w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center'>
               <HelpCircle className='w-6 h-6 text-white' />
@@ -117,7 +117,7 @@ const ContactSupportModal: React.FC<ContactSupportModalProps> = ({ isOpen, onClo
         </div>
 
         {/* Tab Navigation */}
-        <div className='flex border-b border-gray-200 dark:border-gray-700'>
+        <div className='flex border-b border-gray-200 dark:border-gray-700 flex-shrink-0'>
           <button
             onClick={() => setActiveTab('form')}
             className={`flex-1 py-4 px-6 text-sm font-medium transition-colors ${
@@ -141,7 +141,7 @@ const ContactSupportModal: React.FC<ContactSupportModalProps> = ({ isOpen, onClo
         </div>
 
         {/* Content */}
-        <div className='p-8'>
+        <div className='p-8 overflow-y-auto flex-1'>
           <div
             className={`transition-all duration-300 ${activeTab === 'form' ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4 absolute'}`}
           >

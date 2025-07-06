@@ -7,6 +7,7 @@ import NotFound from '@/components/ui/NotFound';
 import { useAuth } from '@/context/AuthContext';
 import { useExplore } from '@/hooks/useExplore';
 import useTranslator from '@/hooks/useTranslator';
+import { gamesApi } from '@/lib/api/gamesApi';
 import { Game } from '@/types/game';
 import { User } from '@/types/user';
 import { useEffect, useState } from 'react';
@@ -25,7 +26,11 @@ export default function ExplorePage() {
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
-  const [gameToCancel, setGameToCancel] = useState('');
+  const [warningModalOpen, setWarningModalOpen] = useState(false);
+  const [warningMessage, setWarningMessage] = useState('');
+  const [warningTitle, setWarningTitle] = useState('');
+  const [cancelType, setCancelType] = useState<'signup' | 'game' | null>(null);
+  const [gameToCancel, setGameToCancel] = useState<Game | null>(null);
 
   // Ensure we're on the client side before using geolocation
   useEffect(() => {
@@ -127,25 +132,61 @@ export default function ExplorePage() {
     }
   };
 
-  const handleCancelRegistration = async (gameId: string) => {
-    if (!user) return;
+  const handleCancelRegistration = (game: Game) => {
+    if (!game) return;
+
+    setWarningMessage(
+      'Are you sure you want to cancel your signup for this game? Canceling may affect your credibility.'
+    );
+    setWarningTitle('Cancel Registration');
+    setCancelType('signup');
+    setGameToCancel(game);
+    setWarningModalOpen(true);
+  };
+
+  const handleCancelGame = (game: Game) => {
+    if (!game) return;
+
+    setWarningMessage(
+      'Are you sure you want to cancel this game? This action cannot be undone. Canceling may affect your credibility.'
+    );
+    setWarningTitle('Cancel Game');
+    setCancelType('game');
+    setGameToCancel(game);
+    setWarningModalOpen(true);
+  };
+
+  const confirmCancel = async () => {
+    if (!gameToCancel || !user?._id) return;
+
     try {
-      const res = await fetch(`/api/games/${gameId}`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user._id }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Cancellation failed');
-      toast.success(text.home.explore_registration_cancelled);
-      // Fetch updated game and update selectedGame
-      const updatedRes = await fetch(`/api/games/${gameId}`);
-      const updatedGame = await updatedRes.json();
-      setSelectedGame(updatedGame);
-    } catch (err: any) {
-      toast.error(err.message || 'Cancellation failed');
+      if (cancelType === 'signup') {
+        // Cancel registration for the game
+        await gamesApi.cancelRegistration(gameToCancel._id, user._id);
+        toast.success(text.home.explore_registration_cancelled);
+
+        // Fetch updated game and update selectedGame
+        const updatedRes = await fetch(`/api/games/${gameToCancel._id}`);
+        const updatedGame = await updatedRes.json();
+        setSelectedGame(updatedGame);
+      } else if (cancelType === 'game') {
+        // Delete the entire game
+        await gamesApi.deleteGame(gameToCancel._id, user._id);
+        toast.success('Game cancelled successfully');
+
+        // Close the details modal since the game is deleted
+        setIsDetailsModalOpen(false);
+        setSelectedGame(null);
+      }
+    } catch (error: any) {
+      console.error('Error canceling:', error);
+      toast.error(error.message || 'Cancellation failed');
     } finally {
-      setGameToCancel('');
+      setWarningModalOpen(false);
+      setWarningMessage('');
+      setWarningTitle('');
+      setCancelType(null);
+      setGameToCancel(null);
     }
   };
 
@@ -185,7 +226,7 @@ export default function ExplorePage() {
               <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
                 {state.filteredGames.map((game: Game) => (
                   <GameCard
-                    key={game.id}
+                    key={game._id}
                     game={game}
                     onClick={() => handleGameClick(game)}
                     userLocation={state.userLocation}
@@ -246,7 +287,7 @@ export default function ExplorePage() {
             setSelectedGame(null);
           }}
           onRegister={(gameId, user) => handleRegister(gameId, user)}
-          onCancelRegistration={(gameId) => setGameToCancel(gameId)}
+          onCancelRegistration={() => handleCancelRegistration(state.selectedGame!)}
           isRegistered={
             user
               ? state.selectedGame.participants?.some(
@@ -255,16 +296,23 @@ export default function ExplorePage() {
               : false
           }
           mode='explore'
+          onCancelGame={() => handleCancelGame(state.selectedGame!)}
         />
       )}
       <div className='flex-1 relative mt-4'>{renderContentView()}</div>
 
       <WarningModal
-        isOpen={gameToCancel.trim() !== ''}
-        onConfirm={() => handleCancelRegistration(gameToCancel)}
-        onCancel={() => setGameToCancel('')}
-        message={text.home.explore_warning_cancel_message}
-        warning={text.home.explore_warning_cancel_title}
+        isOpen={warningModalOpen}
+        onConfirm={confirmCancel}
+        onCancel={() => {
+          setWarningModalOpen(false);
+          setWarningMessage('');
+          setWarningTitle('');
+          setCancelType(null);
+          setGameToCancel(null);
+        }}
+        message={warningMessage}
+        warning={warningTitle}
       />
     </div>
   );

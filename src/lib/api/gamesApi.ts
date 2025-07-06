@@ -23,9 +23,10 @@ export const gamesApi = {
     });
   },
 
-  deleteGame: async (id: string): Promise<any> => {
-    return fetcher<any>(`/api/games/${id}`, {
+  deleteGame: async (id: string, userId: string): Promise<any> => {
+    return fetcher<any>('/api/games', {
       method: 'DELETE',
+      body: { gameId: id, userId },
     });
   },
 

@@ -1,7 +1,6 @@
 import { useAuth } from '@/context/AuthContext';
 import { gamesApi } from '@/lib/api/gamesApi';
 import { Game } from '@/types/game';
-import { getDistanceFromLatLonInKm } from '@/utils/helper';
 import { useEffect, useState } from 'react';
 
 interface UseMyGamesReturn {
@@ -56,6 +55,9 @@ export const useMyGames = (): UseMyGamesReturn => {
     try {
       setIsLoading(true);
       const allGames = await gamesApi.getGames();
+      console.log('Fetched games:', allGames);
+      console.log('Current user:', user);
+      console.log('User location:', userLocation);
       // Filter games created by the current user
       let userCreatedGames = allGames.filter((g: Game) => {
         const organizerId =
@@ -68,40 +70,39 @@ export const useMyGames = (): UseMyGamesReturn => {
       let userSignedUpGames = allGames.filter(
         (g: Game) =>
           Array.isArray(g.participants) &&
-          g.participants.some(
-            (participant: any) =>
-              typeof participant === 'object' &&
-              participant !== null &&
-              '_id' in participant &&
-              participant._id === user?._id
-          ) &&
+          g.participants.some((participant: any) => {
+            if (typeof participant === 'object' && participant !== null && '_id' in participant) {
+              return participant._id === user?._id;
+            }
+            return participant === user?._id;
+          }) &&
           (typeof g.organizer === 'object' && g.organizer !== null && '_id' in g.organizer
             ? g.organizer._id
             : g.organizer) !== user?._id
       );
-      // Filter by location if available
-      if (userLocation) {
-        userCreatedGames = userCreatedGames.filter((g: Game) => {
-          if (!g.coordinates) return false;
-          const dist = getDistanceFromLatLonInKm(
-            userLocation.lat,
-            userLocation.lng,
-            g.coordinates.lat,
-            g.coordinates.lng
-          );
-          return dist <= 50;
-        });
-        userSignedUpGames = userSignedUpGames.filter((g: Game) => {
-          if (!g.coordinates) return false;
-          const dist = getDistanceFromLatLonInKm(
-            userLocation.lat,
-            userLocation.lng,
-            g.coordinates.lat,
-            g.coordinates.lng
-          );
-          return dist <= 50;
-        });
-      }
+      // TEMP: Disable location filtering for debugging
+      // if (userLocation) {
+      //   userCreatedGames = userCreatedGames.filter((g: Game) => {
+      //     if (!g.coordinates) return false;
+      //     const dist = getDistanceFromLatLonInKm(
+      //       userLocation.lat,
+      //       userLocation.lng,
+      //       g.coordinates.lat,
+      //       g.coordinates.lng
+      //     );
+      //     return dist <= 50;
+      //   });
+      //   userSignedUpGames = userSignedUpGames.filter((g: Game) => {
+      //     if (!g.coordinates) return false;
+      //     const dist = getDistanceFromLatLonInKm(
+      //       userLocation.lat,
+      //       userLocation.lng,
+      //       g.coordinates.lat,
+      //       g.coordinates.lng
+      //     );
+      //     return dist <= 50;
+      //   });
+      // }
       setCreatedGames(userCreatedGames);
       setSignedUpGames(userSignedUpGames);
     } catch (error) {
@@ -133,16 +134,27 @@ export const useMyGames = (): UseMyGamesReturn => {
     setWarningOpen(true);
   };
 
-  const confirmCancel = () => {
-    if (!selectedGame) return;
-    if (cancelType === 'signup') {
-      setSignedUpGames((games) => games.filter((g) => g.id !== selectedGame.id));
-    } else if (cancelType === 'game') {
-      setCreatedGames((games) => games.filter((g) => g.id !== selectedGame.id));
+  const confirmCancel = async () => {
+    if (!selectedGame || !user?._id) return;
+
+    try {
+      if (cancelType === 'signup') {
+        // Cancel registration for the game
+        await gamesApi.cancelRegistration(selectedGame._id, user._id);
+        setSignedUpGames((games) => games.filter((g) => g._id !== selectedGame._id));
+      } else if (cancelType === 'game') {
+        // Delete the entire game
+        await gamesApi.deleteGame(selectedGame._id, user._id);
+        setCreatedGames((games) => games.filter((g) => g._id !== selectedGame._id));
+      }
+    } catch (error) {
+      console.error('Error canceling:', error);
+      // You might want to show an error message to the user here
+    } finally {
+      setWarningOpen(false);
+      setModalOpen(false);
+      setCancelType(null);
     }
-    setWarningOpen(false);
-    setModalOpen(false);
-    setCancelType(null);
   };
 
   return {

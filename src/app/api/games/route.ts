@@ -4,6 +4,7 @@ import NotificationModel from '@/models/Notification';
 import UserModel from '@/models/User';
 import UserProfileModel from '@/models/UserProfile';
 import { getDistanceFromLatLonInKm } from '@/utils/helper';
+import { sendNotification } from '@/utils/notifications';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET() {
@@ -160,6 +161,67 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(newGame, { status: 201 });
   } catch (error: any) {
     console.error('Error creating game:', error);
+    return NextResponse.json({ message: error.message || 'Something went wrong' }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  await dbConnect();
+
+  try {
+    const { gameId, userId } = await req.json();
+
+    if (!gameId || !userId) {
+      return NextResponse.json({ message: 'Game ID and User ID are required' }, { status: 400 });
+    }
+
+    const game = await GameModel.findById(gameId)
+      .populate('organizer', 'name email avatar _id')
+      .populate('participants', 'name email avatar _id');
+
+    if (!game) {
+      return NextResponse.json({ message: 'Game not found' }, { status: 404 });
+    }
+
+    // Check if the user is the organizer of the game
+    const organizerId =
+      typeof game.organizer === 'object' && game.organizer !== null && '_id' in game.organizer
+        ? game.organizer._id.toString()
+        : game.organizer.toString();
+
+    if (organizerId !== userId) {
+      return NextResponse.json(
+        { message: 'Only the organizer can delete this game' },
+        { status: 403 }
+      );
+    }
+
+    // Notify all participants about the game deletion
+    const participants = Array.isArray(game.participants) ? game.participants : [];
+    const participantIds = participants.map((p: any) => {
+      if (typeof p === 'object' && p !== null && '_id' in p) {
+        return p._id.toString();
+      }
+      return p.toString();
+    });
+
+    // Send notifications to all participants
+    await sendNotification({
+      userIds: participantIds,
+      excludeUserIds: [userId],
+      type: 'game_reminder',
+      event: 'game_deletion',
+      title: 'Game cancelled',
+      message: `The game "${game.title}" has been cancelled by the organizer`,
+      data: { gameId: game._id, cancelledByUserId: userId },
+    });
+
+    // Delete the game
+    await GameModel.findByIdAndDelete(gameId);
+
+    return NextResponse.json({ message: 'Game deleted successfully' });
+  } catch (error: any) {
+    console.error('Error deleting game:', error);
     return NextResponse.json({ message: error.message || 'Something went wrong' }, { status: 500 });
   }
 }

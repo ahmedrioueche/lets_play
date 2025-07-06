@@ -92,7 +92,7 @@ const ContactSupportModal: React.FC<ContactSupportModalProps> = ({ isOpen, onClo
 
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in'>
-      <div className='relative w-full max-w-4xl max-h-screen bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden animate-modal-in flex flex-col'>
+      <div className='relative w-full max-w-4xl max-h-[95%] bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden animate-modal-in flex flex-col'>
         {/* Header */}
         <div className='flex items-center justify-between px-8 py-6 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-gray-700 dark:to-gray-600 flex-shrink-0'>
           <div className='flex items-center gap-3'>
@@ -188,7 +188,7 @@ const ContactSupportModal: React.FC<ContactSupportModalProps> = ({ isOpen, onClo
                       required
                       value={formData.name}
                       onChange={(e) => handleInputChange('name', e.target.value)}
-                      className='w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400'
+                      className='w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 outline-none'
                       placeholder={t.landing?.contact_support_name_placeholder}
                       disabled={isSubmitting}
                     />
@@ -204,7 +204,7 @@ const ContactSupportModal: React.FC<ContactSupportModalProps> = ({ isOpen, onClo
                       required
                       value={formData.email}
                       onChange={(e) => handleInputChange('email', e.target.value)}
-                      className='w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400'
+                      className='w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 outline-none'
                       placeholder={t.landing?.contact_support_email_placeholder}
                       disabled={isSubmitting}
                     />
@@ -221,7 +221,7 @@ const ContactSupportModal: React.FC<ContactSupportModalProps> = ({ isOpen, onClo
                     required
                     value={formData.subject}
                     onChange={(e) => handleInputChange('subject', e.target.value)}
-                    className='w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400'
+                    className='w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 outline-none'
                     placeholder={t.landing?.contact_support_subject_placeholder}
                     disabled={isSubmitting}
                   />
@@ -237,7 +237,7 @@ const ContactSupportModal: React.FC<ContactSupportModalProps> = ({ isOpen, onClo
                     rows={5}
                     value={formData.message}
                     onChange={(e) => handleInputChange('message', e.target.value)}
-                    className='w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 resize-none'
+                    className='w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 resize-none outline-none'
                     placeholder={t.landing?.contact_support_message_placeholder}
                     disabled={isSubmitting}
                   />

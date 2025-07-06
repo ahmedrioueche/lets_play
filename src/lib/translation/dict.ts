@@ -302,6 +302,7 @@ export const dict = {
     },
     settings: {
       title: 'Settings',
+      subtitle: 'Manage your preferences and account settings',
       account: 'Account',
       language: 'Language',
       theme: 'Theme',
@@ -879,6 +880,7 @@ export const dict = {
     },
     settings: {
       title: 'Paramètres',
+      subtitle: 'Gérez vos préférences et les paramètres de votre compte',
       account: 'Compte',
       language: 'Langue',
       theme: 'Thème',
@@ -1470,6 +1472,7 @@ export const dict = {
     },
     settings: {
       title: 'Configuración',
+      subtitle: 'Administra tus preferencias y la configuración de tu cuenta',
       account: 'Cuenta',
       language: 'Idioma',
       theme: 'Tema',
@@ -2059,6 +2062,7 @@ export const dict = {
     },
     settings: {
       title: 'Einstellungen',
+      subtitle: 'Verwalten Sie Ihre Präferenzen und Kontoeinstellungen',
       account: 'Konto',
       language: 'Sprache',
       theme: 'Design',
@@ -2612,6 +2616,7 @@ export const dict = {
     },
     settings: {
       title: 'Impostazioni',
+      subtitle: 'Gestisci le tue preferenze e le impostazioni del tuo account',
       account: 'Account',
       language: 'Lingua',
       theme: 'Tema',

@@ -62,7 +62,7 @@ const GameDetailsPage = () => {
   return (
     <div className='container mx-auto p-2'>
       {/* Page Header */}
-      <div className='mb-8 flex items-center justify-between'>
+      <div className='mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
         <div>
           <h1 className='text-3xl font-dancing font-bold text-light-text-primary dark:text-dark-text-primary mb-2 flex items-center gap-2'>
             <Calendar className='w-7 h-7 text-light-primary dark:text-dark-primary' />
@@ -80,7 +80,7 @@ const GameDetailsPage = () => {
             user._id && (
             <button
               onClick={() => router.push(`/dashboard/games/${game.id || game._id}/audit`)}
-              className='flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl px-4 py-2 font-medium transition-colors'
+              className='flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl px-4 py-2 font-medium transition-colors w-full sm:w-auto justify-center'
               title='Manage Game'
             >
               <Settings className='w-5 h-5' />
@@ -90,12 +90,12 @@ const GameDetailsPage = () => {
       </div>
 
       {/* Info Grid */}
-      <div className='bg-light-card dark:bg-dark-card rounded-2xl p-6 mb-6 border border-light-border dark:border-dark-border'>
+      <div className='bg-light-card dark:bg-dark-card rounded-2xl p-3 sm:p-6 mb-6 border border-light-border dark:border-dark-border'>
         <GameInfoSection game={game} />
       </div>
 
       {/* Organizer Section */}
-      <div className='bg-light-card dark:bg-dark-card rounded-2xl p-6 mb-6 border border-light-border dark:border-dark-border'>
+      <div className='bg-light-card dark:bg-dark-card rounded-2xl p-3 sm:p-6 mb-6 border border-light-border dark:border-dark-border'>
         <OrganizerSection
           game={game}
           organizer={typeof game.organizer === 'object' ? game.organizer : null}
@@ -103,7 +103,7 @@ const GameDetailsPage = () => {
       </div>
 
       {/* Description */}
-      <div className='bg-light-card dark:bg-dark-card rounded-2xl p-6 mb-6 border border-light-border dark:border-dark-border'>
+      <div className='bg-light-card dark:bg-dark-card rounded-2xl p-3 sm:p-6 mb-6 border border-light-border dark:border-dark-border'>
         <h2 className='text-lg font-semibold text-light-text-primary dark:text-dark-text-primary mb-2'>
           About
         </h2>
@@ -113,11 +113,11 @@ const GameDetailsPage = () => {
       </div>
 
       {/* Map Section */}
-      <div className='bg-light-card dark:bg-dark-card rounded-2xl p-6 mb-6 border border-light-border dark:border-dark-border'>
+      <div className='bg-light-card dark:bg-dark-card rounded-2xl p-3 sm:p-6 mb-6 border border-light-border dark:border-dark-border'>
         <MapSection game={game} userLocation={null} />
       </div>
 
-      <div className='bg-light-card dark:bg-dark-card rounded-2xl p-6 mb-6 border border-light-border dark:border-dark-border'>
+      <div className='bg-light-card dark:bg-dark-card rounded-2xl p-3 sm:p-6 mb-6 border border-light-border dark:border-dark-border'>
         <h3 className='text-lg font-semibold text-light-text-primary dark:text-dark-text-primary mb-4'>
           Participants
         </h3>
@@ -132,7 +132,7 @@ const GameDetailsPage = () => {
       </div>
 
       {/* Action Buttons */}
-      <div className='bg-light-card dark:bg-dark-card rounded-2xl p-6 border border-light-border dark:border-dark-border mb-4'>
+      <div className='bg-light-card dark:bg-dark-card rounded-2xl p-3 sm:p-6 border border-light-border dark:border-dark-border mb-4'>
         <ActionButtons
           game={game}
           mode='explore'

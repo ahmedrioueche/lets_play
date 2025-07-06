@@ -1,15 +1,7 @@
 import { useAuth } from '@/context/AuthContext';
+import useTranslator from '@/hooks/useTranslator';
 import { capitalize } from '@/utils/helper';
-import {
-  HelpCircle,
-  LogOut,
-  MessageSquare,
-  Monitor,
-  Moon,
-  Palette,
-  Settings,
-  Sun,
-} from 'lucide-react';
+import { LogOut, Monitor, Moon, Palette, Settings, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useRouter } from 'next/navigation';
 import Dropdown from './ui/BaseDropdown';
@@ -19,6 +11,7 @@ const ProfileDropdown = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
   const { theme, setTheme } = useTheme();
   const { user, logout } = useAuth();
   const router = useRouter();
+  const text = useTranslator();
 
   const handleLogout = async () => {
     await logout();
@@ -39,23 +32,11 @@ const ProfileDropdown = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
     {
       id: 'settings',
       icon: <Settings className='h-5 w-5' />,
-      label: 'Settings',
+      label: text.settings.title,
       onClick: () => {
         router.push('/dashboard/settings');
         onClose();
       },
-    },
-    {
-      id: 'help',
-      icon: <HelpCircle className='h-5 w-5' />,
-      label: 'Help',
-      onClick: onClose,
-    },
-    {
-      id: 'feedback',
-      icon: <MessageSquare className='h-5 w-5' />,
-      label: 'Feedback',
-      onClick: onClose,
     },
   ];
 

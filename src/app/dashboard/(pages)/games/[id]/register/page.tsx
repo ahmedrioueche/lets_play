@@ -146,7 +146,7 @@ const RegisterGamePage = () => {
         </p>
       </div>
       {/* Game Summary */}
-      <div className='p-4 bg-light-card dark:bg-dark-card rounded-xl mb-4'>
+      <div className='p-3 sm:p-4 bg-light-card dark:bg-dark-card rounded-xl mb-4'>
         <h3 className='font-medium text-light-text-primary dark:text-dark-text-primary mb-2'>
           {game.title}
         </h3>
@@ -156,7 +156,7 @@ const RegisterGamePage = () => {
         </div>
       </div>
       {/* User Info Summary */}
-      <div className='p-4 bg-light-card dark:bg-dark-card rounded-xl mb-4'>
+      <div className='p-3 sm:p-4 bg-light-card dark:bg-dark-card rounded-xl mb-4'>
         <h3 className='font-medium text-light-text-primary dark:text-dark-text-primary mb-3'>
           Your Information
         </h3>
@@ -181,11 +181,11 @@ const RegisterGamePage = () => {
         </div>
       </div>
       {/* Map Section (match game details page) */}
-      <div className='bg-light-card dark:bg-dark-card rounded-2xl p-6 mb-4 border border-light-border dark:border-dark-border'>
+      <div className='bg-light-card dark:bg-dark-card rounded-2xl p-3 sm:p-6 mb-4 border border-light-border dark:border-dark-border'>
         <MapSection game={game} userLocation={null} />
       </div>
       {/* Participants List */}
-      <div className='bg-light-card dark:bg-dark-card rounded-2xl p-6 mb-4 border border-light-border dark:border-dark-border'>
+      <div className='bg-light-card dark:bg-dark-card rounded-2xl p-3 sm:p-6 mb-4 border border-light-border dark:border-dark-border'>
         <h3 className='text-lg font-semibold text-light-text-primary dark:text-dark-text-primary mb-2'>
           Participants ({game.participants.length}/{game.maxParticipants})
         </h3>
@@ -200,7 +200,7 @@ const RegisterGamePage = () => {
       </div>
       {alreadyRegistered && !isLoading ? (
         <div className='mb-4'>
-          <div className='flex items-start gap-3 p-4 bg-light-danger/10 dark:bg-dark-danger/10 border border-light-danger/30 dark:border-dark-danger/30 rounded-lg'>
+          <div className='flex flex-col sm:flex-row items-start gap-3 p-3 sm:p-4 bg-light-danger/10 dark:bg-dark-danger/10 border border-light-danger/30 dark:border-dark-danger/30 rounded-lg'>
             <AlertTriangle className='w-5 h-5 mt-0.5 flex-shrink-0 text-light-danger dark:text-dark-danger' />
             <div>
               <h4 className='font-medium text-light-danger dark:text-dark-danger mb-1'>Alert</h4>
@@ -212,7 +212,7 @@ const RegisterGamePage = () => {
         </div>
       ) : (
         <div className='mb-4'>
-          <div className='flex items-start gap-3 p-4 bg-light-danger/10 dark:bg-dark-danger/10 border border-light-danger/30 dark:border-dark-danger/30 rounded-lg'>
+          <div className='flex flex-col sm:flex-row items-start gap-3 p-3 sm:p-4 bg-light-danger/10 dark:bg-dark-danger/10 border border-light-danger/30 dark:border-dark-danger/30 rounded-lg'>
             <AlertTriangle className='w-5 h-5 mt-0.5 flex-shrink-0 text-light-danger dark:text-dark-danger' />
             <div>
               <h4 className='font-medium text-light-danger dark:text-dark-danger mb-1'>

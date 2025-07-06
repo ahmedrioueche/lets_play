@@ -291,22 +291,22 @@ const AuditGamePage = () => {
       </div>
 
       {/* Info Grid */}
-      <div className='bg-light-card dark:bg-dark-card rounded-2xl p-6 mb-6 border border-light-border dark:border-dark-border'>
+      <div className='bg-light-card dark:bg-dark-card rounded-2xl p-6 sm:p-6 p-3 mb-6 border border-light-border dark:border-dark-border'>
         <GameInfoSection game={game} />
       </div>
 
       {/* Organizer Section */}
-      <div className='bg-light-card dark:bg-dark-card rounded-2xl p-6 mb-6 border border-light-border dark:border-dark-border'>
+      <div className='bg-light-card dark:bg-dark-card rounded-2xl p-6 sm:p-6 p-3 mb-6 border border-light-border dark:border-dark-border'>
         <OrganizerSection game={game} organizer={organizer} />
       </div>
 
       {/* Map Section */}
-      <div className='bg-light-card dark:bg-dark-card rounded-2xl p-6 mb-6 border border-light-border dark:border-dark-border'>
+      <div className='bg-light-card dark:bg-dark-card rounded-2xl p-6 sm:p-6 p-3 mb-6 border border-light-border dark:border-dark-border'>
         <MapSection game={game} userLocation={null} />
       </div>
 
       {/* Participants Presence Section */}
-      <div className='bg-light-card dark:bg-dark-card rounded-2xl p-6 mb-6 border border-light-border dark:border-dark-border'>
+      <div className='bg-light-card dark:bg-dark-card rounded-2xl p-6 sm:p-6 p-3 mb-6 border border-light-border dark:border-dark-border'>
         <h3 className='text-lg font-semibold text-light-text-primary dark:text-dark-text-primary mb-4'>
           Participants Presence
         </h3>
@@ -332,7 +332,7 @@ const AuditGamePage = () => {
                   </span>
                 )}
               </div>
-              <div className='flex items-center gap-3'>
+              <div className='flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto'>
                 {/* Show Present checkbox only if game has started */}
                 {hasGameStarted && (
                   <Checkbox
@@ -347,7 +347,7 @@ const AuditGamePage = () => {
                 {/* Kick button for non-organizer participants */}
                 {p._id !== organizerId && (
                   <Button
-                    className='ml-2 text-xs font-semibold'
+                    className='ml-0 sm:ml-2 text-xs font-semibold w-full sm:w-auto'
                     variant='danger'
                     size='default'
                     disabled={kicking === p._id}
@@ -365,7 +365,7 @@ const AuditGamePage = () => {
 
       {/* Join Requests Section */}
       {joinRequestUsers.length > 0 && (
-        <div className='bg-light-card dark:bg-dark-card rounded-2xl p-6 mb-6 border border-light-border dark:border-dark-border'>
+        <div className='bg-light-card dark:bg-dark-card rounded-2xl p-6 sm:p-6 p-3 mb-6 border border-light-border dark:border-dark-border'>
           <h3 className='text-lg font-semibold text-light-text-primary dark:text-dark-text-primary mb-4'>
             Join Requests
           </h3>
@@ -386,9 +386,9 @@ const AuditGamePage = () => {
                     {capitalize(u.name)}
                   </span>
                 </div>
-                <div className='flex items-center gap-3'>
+                <div className='flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto'>
                   <Button
-                    className='text-xs font-semibold'
+                    className='text-xs font-semibold w-full sm:w-auto'
                     variant='primary'
                     size='default'
                     onClick={() => handleAcceptRequest(u)}
@@ -396,7 +396,7 @@ const AuditGamePage = () => {
                     Accept
                   </Button>
                   <Button
-                    className='text-xs font-semibold'
+                    className='text-xs font-semibold w-full sm:w-auto'
                     variant='danger'
                     size='default'
                     onClick={() => handleRejectRequest(u)}
@@ -411,7 +411,7 @@ const AuditGamePage = () => {
       )}
 
       {/* Actions Section */}
-      <div className='bg-light-card dark:bg-dark-card rounded-2xl p-6 border border-light-border dark:border-dark-border mb-4'>
+      <div className='bg-light-card dark:bg-dark-card rounded-2xl p-6 sm:p-6 p-3 border border-light-border dark:border-dark-border mb-4'>
         <div className='flex flex-col sm:flex-row gap-4'>
           <Button
             onClick={handleSendReminders}

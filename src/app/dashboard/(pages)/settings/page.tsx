@@ -16,9 +16,7 @@ const SettingsPage: React.FC = () => {
             <h1 className='text-2xl sm:text-3xl font-bold font-dancing text-gray-900 dark:text-white'>
               {text.settings.title}
             </h1>
-            <p className='text-gray-600 dark:text-gray-300 mt-1'>
-              Manage your preferences and account settings
-            </p>
+            <p className='text-gray-600 dark:text-gray-300 mt-1'>{text.settings.subtitle}</p>
           </div>
         </div>
       </div>

@@ -77,7 +77,13 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-light-primary/10 to-light-secondary/10 dark:from-slate-800 dark:via-slate-700/20 dark:to-slate-900 flex items-center justify-center p-4'>
+    <div className='min-h-screen  flex items-center justify-center p-4'>
+      {/* Background Elements */}
+      <div className='absolute inset-0 opacity-30 animate-pulse pointer-events-none'>
+        <div className='absolute top-20 left-10 w-32 h-32 bg-blue-400/20 rounded-full blur-xl' />
+        <div className='absolute top-40 right-20 w-24 h-24 bg-purple-400/20 rounded-full blur-xl' />
+        <div className='absolute bottom-20 left-1/4 w-40 h-40 bg-pink-400/20 rounded-full blur-xl' />
+      </div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -85,11 +91,11 @@ const LoginPage: React.FC = () => {
       >
         {/* Header */}
         <div className='text-center p-6 border-b border-gray-200 dark:border-gray-700'>
-          <h1 className='text-2xl font-bold text-light-text-primary dark:text-dark-text-primary mb-1'>
-            {text.auth.welcome_back}
+          <h1 className='md:text-3xl text-2xl font-bold font-dancing text-light-primary dark:text-text-primary mb-1'>
+            {text.app.name}
           </h1>
           <p className='text-sm text-light-text-secondary dark:text-dark-text-secondary'>
-            {text.auth.sign_in_to_continue}
+            {text.app.slogan}
           </p>
         </div>
 

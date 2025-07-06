@@ -77,7 +77,7 @@ const Navbar = () => {
       icon: <UserAvatar avatar={user?.avatar} className='h-7 w-7' />,
       label: capitalize(user?.name || 'profile'),
       onClick: () => {
-        router.push(`/profile/${user?._id}`);
+        router.push(`/dashboard/profile/${user?._id}`);
         setMobileMenuOpen(false);
       },
       showNotification: false,
@@ -177,7 +177,7 @@ const Navbar = () => {
               )}
             </button>
             <div
-              onClick={() => router.push('/')}
+              onClick={() => router.push('/dashboard')}
               className='cursor-pointer flex items-center gap-2 min-w-0'
             >
               <Image

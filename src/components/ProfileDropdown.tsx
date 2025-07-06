@@ -32,7 +32,7 @@ const ProfileDropdown = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
       icon: <UserAvatar avatar={user?.avatar} className='h-7 w-7' />,
       label: capitalize(user?.name || 'profile'),
       onClick: () => {
-        router.push(`/profile/${user?._id}`);
+        router.push(`/dashboard/profile/${user?._id}`);
         onClose();
       },
     },

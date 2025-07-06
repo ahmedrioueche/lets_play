@@ -1,5 +1,6 @@
 import dbConnect from '@/config/db';
 import GameModel from '@/models/Game';
+import UserProfileModel from '@/models/UserProfile';
 import { getDistanceFromLatLonInKm } from '@/utils/helper';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -16,7 +17,8 @@ export async function GET(req: NextRequest) {
     const lat = parseFloat(searchParams.get('lat') || '0');
     const lng = parseFloat(searchParams.get('lng') || '0');
     const limit = parseInt(searchParams.get('limit') || '10');
-    const radius = parseFloat(searchParams.get('radius') || '50'); // 50km default
+    let radius = parseFloat(searchParams.get('radius') || '0'); // 0 means not set
+    const userId = searchParams.get('userId');
 
     // If no coordinates provided, return error
     if (!lat || !lng) {
@@ -24,6 +26,22 @@ export async function GET(req: NextRequest) {
         { error: 'Latitude and longitude parameters are required' },
         { status: 400 }
       );
+    }
+
+    // If userId is provided, try to get maxDistanceForVisibleGames from user profile
+    if (userId) {
+      const userProfile = await UserProfileModel.findOne({ userId }).lean();
+      if (
+        userProfile &&
+        userProfile.settings &&
+        typeof userProfile.settings.maxDistanceForVisibleGames === 'number'
+      ) {
+        radius = userProfile.settings.maxDistanceForVisibleGames;
+      }
+    }
+    // Fallback to 50km if radius is still not set
+    if (!radius || radius <= 0) {
+      radius = 300;
     }
 
     // Get all open games

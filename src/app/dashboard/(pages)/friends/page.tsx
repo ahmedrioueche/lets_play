@@ -220,14 +220,14 @@ export default function FriendsPage() {
 
   const handleMessage = useCallback(
     (id: string) => {
-      router.push(`/chat?friend=${id}`);
+      router.push(`/dashboard/chat?friend=${id}`);
     },
     [router]
   );
 
   const handleCardClick = useCallback(
     (id: string) => {
-      router.push(`/profile/${id}`);
+      router.push(`/dashboard/profile/${id}`);
     },
     [router]
   );

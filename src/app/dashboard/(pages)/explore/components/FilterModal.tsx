@@ -66,7 +66,7 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, filters, onF
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className='fixed inset-x-4 top-4 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:max-w-lg w-full bg-white dark:bg-dark-card rounded-2xl shadow-xl z-50 overflow-hidden'
+            className='fixed inset-x-4 top-4 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:max-w-lg w-full bg-white dark:bg-dark-card rounded-2xl shadow-xl z-50 overflow-hidden max-h-[95vh] overflow-y-auto'
           >
             <div className='p-6'>
               {/* Header */}
@@ -89,7 +89,7 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, filters, onF
                   <h3 className='text-sm font-medium text-light-text-secondary dark:text-dark-text-secondary mb-3'>
                     {t.games}
                   </h3>
-                  <div className='flex flex-wrap gap-2'>
+                  <div className='flex flex-wrap gap-2 max-h-40 overflow-y-auto scrollbar-thin pr-1'>
                     {availableGames.map((sport) => (
                       <button
                         key={sport.name}

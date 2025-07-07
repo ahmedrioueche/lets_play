@@ -10,11 +10,7 @@ interface NotificationsDropdownProps {
   onUnreadCountChange?: (count: number) => void;
 }
 
-const NotificationsDropdown = ({
-  isOpen,
-  onClose,
-  onUnreadCountChange,
-}: NotificationsDropdownProps) => {
+const NotificationsDropdown = ({ isOpen, onClose }: NotificationsDropdownProps) => {
   const { user } = useAuth();
   const text = useTranslator();
   const router = useRouter();
@@ -56,7 +52,16 @@ const NotificationsDropdown = ({
 
     // Use custom route if provided in notification data
     if (notification.data?.route) {
-      router.push(notification.data.route);
+      let route = notification.data.route;
+      // Ensure /dashboard is prefixed
+      if (!route.startsWith('/dashboard')) {
+        if (route.startsWith('/')) {
+          route = `/dashboard${route}`;
+        } else {
+          route = `/dashboard/${route}`;
+        }
+      }
+      router.push(route);
       return;
     }
 
@@ -65,18 +70,18 @@ const NotificationsDropdown = ({
       case 'friend_invitation':
         // Navigate to sender's profile to show accept/decline buttons
         if (notification.data?.fromUserId) {
-          router.push(`/profile/${notification.data.fromUserId}`);
+          router.push(`/dashboard/profile/${notification.data.fromUserId}`);
         }
         break;
       case 'friend_accepted':
         // Navigate to the friend's profile
         if (notification.data?.fromUserId) {
-          router.push(`/profile/${notification.data.fromUserId}`);
+          router.push(`/dashboard/profile/${notification.data.fromUserId}`);
         }
         break;
       case 'game_invitation':
         if (notification.data?.gameId) {
-          router.push(`/games/${notification.data?.gameId}`);
+          router.push(`/dashboard/games/${notification.data?.gameId}`);
         }
         break;
       case 'game_join_request':
@@ -85,7 +90,7 @@ const NotificationsDropdown = ({
           (notification.data?.type === 'join_request' ||
             notification.data?.type === 'join_request_cancel')
         ) {
-          router.push(`/games/${notification.data.gameId}/audit`);
+          router.push(`/dashboard/games/${notification.data.gameId}/audit`);
         }
         break;
       default:

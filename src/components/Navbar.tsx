@@ -57,10 +57,6 @@ const Navbar = () => {
     [updateBadge]
   );
 
-  //useEffect(() => {
-  //  usersApi.deleteCurrentUser(user?._id!);
-  //}, [user?._id]);
-
   const handleSettingsClick = () => {
     router.push('/dashboard/settings');
   };

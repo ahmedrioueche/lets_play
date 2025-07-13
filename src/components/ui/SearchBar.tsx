@@ -17,7 +17,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   placeholder,
 }) => {
   return (
-    <div className='flex-1 flex items-center gap-2 bg-light-card  dark:bg-dark-card rounded-xl px-4 py-3 focus-within:ring-2 focus-within:ring-light-primary dark:focus-within:ring-dark-primary transition-all'>
+    <div className='flex-1 flex items-center gap-2 bg-light-card border border-gray-300 dark:border-none dark:bg-dark-card rounded-xl px-4 py-3 focus-within:ring-2 focus-within:ring-light-primary dark:focus-within:ring-dark-primary transition-all'>
       <Search className='w-5 h-5 text-light-text-secondary dark:text-dark-text-secondary' />
       <input
         type='text'

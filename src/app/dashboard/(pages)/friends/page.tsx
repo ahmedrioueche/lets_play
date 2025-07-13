@@ -112,11 +112,11 @@ const FriendsStatsOverview: FC<{ friends: User[]; playedWith: User[]; suggestion
 const FriendsPageHeader: FC = () => {
   const text = useTranslator();
   return (
-    <div className='mb-8'>
+    <div className='md:mb-8 mb-4'>
       <h1 className='text-3xl font-dancing font-bold text-light-text-primary dark:text-dark-text-primary mb-2'>
         {text.friends.page_title}
       </h1>
-      <p className='text-light-text-secondary dark:text-dark-text-secondary'>
+      <p className='hidden md:flex text-light-text-secondary dark:text-dark-text-secondary'>
         {text.friends.page_subtitle}
       </p>
     </div>
@@ -357,11 +357,14 @@ export default function FriendsPage() {
         </div>
         {!searchActive && (
           <div className='flex-shrink-0 w-full sm:w-auto flex justify-end'>
-            <div className='inline-flex rounded-xl bg-light-card dark:bg-dark-card p-1 shadow border border-light-border dark:border-dark-border'>
+            <div className='inline-flex rounded-xl bg-light-card dark:bg-dark-card p-1 shadow border border-light-border dark:border-dark-border w-full sm:w-auto overflow-x-auto flex-nowrap'>
               {TABS.map((tab) => (
                 <button
+                  name={tab.label}
                   key={tab.key}
-                  className={`px-6 py-2 rounded-lg font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400
+                  aria-label={tab.label}
+                  title={tab.label}
+                  className={`px-3 sm:px-6 py-2 rounded-lg font-semibold text-xs sm:text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 max-w-[90px] sm:max-w-none overflow-hidden text-ellipsis whitespace-nowrap
                     ${activeTab === tab.key ? 'bg-light-primary dark:bg-dark-primary text-white shadow' : 'text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-background dark:hover:bg-dark-accent'}`}
                   onClick={() => setActiveTab(tab.key as any)}
                 >

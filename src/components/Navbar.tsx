@@ -7,7 +7,6 @@ import useTranslator from '@/hooks/useTranslator';
 import { capitalize } from '@/utils/helper';
 import {
   Bell,
-  HelpCircle,
   LogOut,
   Menu,
   MessageSquare,
@@ -107,20 +106,6 @@ const Navbar = () => {
         handleSettingsClick();
         setMobileMenuOpen(false);
       },
-      showNotification: false,
-    },
-    {
-      id: 'help',
-      icon: <HelpCircle className='h-5 w-5' />,
-      label: 'Help',
-      onClick: () => setMobileMenuOpen(false),
-      showNotification: false,
-    },
-    {
-      id: 'feedback',
-      icon: <MessageSquare className='h-5 w-5' />,
-      label: 'Feedback',
-      onClick: () => setMobileMenuOpen(false),
       showNotification: false,
     },
   ];

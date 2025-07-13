@@ -356,16 +356,19 @@ export default function FriendsPage() {
           <SearchBar value={search} onChange={handleSearchChange} onActionClick={handleSearch} />
         </div>
         {!searchActive && (
-          <div className='flex-shrink-0 w-full sm:w-auto flex justify-end'>
-            <div className='inline-flex rounded-xl bg-light-card dark:bg-dark-card p-1 shadow border border-light-border dark:border-dark-border w-full sm:w-auto overflow-x-auto flex-nowrap'>
+          <div className='flex-shrink-0 w-full flex justify-end'>
+            <div className='inline-flex rounded-xl bg-light-card dark:bg-dark-card p-1 sm:p-2 shadow border border-light-border dark:border-dark-border w-full sm:w-auto overflow-x-auto flex-nowrap'>
               {TABS.map((tab) => (
                 <button
                   name={tab.label}
                   key={tab.key}
                   aria-label={tab.label}
                   title={tab.label}
-                  className={`px-3 sm:px-6 py-2 rounded-lg font-semibold text-xs sm:text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 max-w-[90px] sm:max-w-none overflow-hidden text-ellipsis whitespace-nowrap
-                    ${activeTab === tab.key ? 'bg-light-primary dark:bg-dark-primary text-white shadow' : 'text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-background dark:hover:bg-dark-accent'}`}
+                  className={`px-3 sm:px-6 py-2 rounded-lg font-semibold text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 flex-shrink-0 whitespace-nowrap ${
+                    activeTab === tab.key
+                      ? 'bg-light-primary dark:bg-dark-primary text-white shadow'
+                      : 'text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-background dark:hover:bg-dark-accent'
+                  }`}
                   onClick={() => setActiveTab(tab.key as any)}
                 >
                   {tab.label}

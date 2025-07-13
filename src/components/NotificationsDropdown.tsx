@@ -134,7 +134,7 @@ const NotificationsDropdown = ({ isOpen, onClose }: NotificationsDropdownProps) 
   return (
     <div className='relative' ref={dropdownRef}>
       {isOpen && (
-        <div className='absolute right-0 mt-10 md:mt-2 w-80 bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border rounded-lg shadow-lg z-50 max-h-180 h-120 overflow-hidden'>
+        <div className='absolute right-0 mt-12 md:mt-2 mr-4 w-80 bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border rounded-lg shadow-lg z-50 max-h-180 h-120 overflow-hidden'>
           <div className='p-4 border-b border-light-border dark:border-dark-border'>
             <div className='flex items-center justify-between'>
               <h3 className='font-semibold text-light-text-primary dark:text-dark-text-primary'>

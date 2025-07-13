@@ -4,7 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import useTranslator from '@/hooks/useTranslator';
 import { Conversation } from '@/types/chat';
 import { formatDistanceToNow } from 'date-fns';
-import { MessageSquare, X } from 'lucide-react';
+import { MessageSquare } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Dropdown from './ui/BaseDropdown';
@@ -114,12 +114,6 @@ const MessagesDropdown: React.FC<MessagesDropdownProps> = ({
           <h3 className='text-lg font-semibold text-light-text dark:text-dark-text'>
             {text.general.messages || 'Messages'}
           </h3>
-          <button
-            onClick={onClose}
-            className='p-1 rounded-full hover:bg-light-background dark:hover:bg-dark-background'
-          >
-            <X className='h-4 w-4' />
-          </button>
         </div>
 
         {/* Content */}

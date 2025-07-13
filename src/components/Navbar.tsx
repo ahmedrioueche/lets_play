@@ -222,7 +222,10 @@ const Navbar = () => {
               </div>
 
               <button
-                onClick={() => setProfileOpen(!profileOpen)}
+                onClick={() => {
+                  setProfileOpen(!profileOpen);
+                  setMobileMessagesOpen(false);
+                }}
                 className='ml-2'
                 aria-label='Profile'
               >
@@ -235,6 +238,7 @@ const Navbar = () => {
               onClick={(e) => {
                 e.stopPropagation();
                 setMobileMenuOpen(!mobileMenuOpen);
+                setMobileMessagesOpen(false);
               }}
               className='md:hidden p-2 rounded-full hover:bg-light-card dark:hover:bg-dark-card flex-shrink-0'
             >
@@ -301,7 +305,7 @@ const Navbar = () => {
               {bottomMenuItems.map((item) => (
                 <button
                   key={item.id}
-                  className={`p-3 hover:bg-light-card dark:hover:bg-dark-card flex items-center gap-3 text-left ${item.className || ''}`}
+                  className={`p-3 hover:bg-light-background dark:hover:bg-dark-background flex items-center gap-3 text-left ${item.className || ''}`}
                   onClick={item.onClick}
                 >
                   {item.icon}

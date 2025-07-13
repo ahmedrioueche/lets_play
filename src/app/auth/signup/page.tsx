@@ -90,6 +90,7 @@ const SignupPage: React.FC = () => {
         scope: 'email profile',
         access_type: 'offline',
         prompt: 'consent',
+        state: 'signup',
       });
       window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
     } catch (error) {

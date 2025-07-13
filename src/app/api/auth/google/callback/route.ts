@@ -19,9 +19,12 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const code = searchParams.get('code');
+    const source = searchParams.get('source') || 'login';
 
     if (!code) {
-      return NextResponse.redirect(`${BASE_URL}/auth?error=no_code`);
+      // Redirect based on where the auth was initiated
+      const redirectPath = source === 'signup' ? '/auth/signup' : '/auth/login';
+      return NextResponse.redirect(`${BASE_URL}${redirectPath}?error=authentication_cancelled`);
     }
 
     // Exchange code for access token
@@ -41,7 +44,8 @@ export async function GET(request: NextRequest) {
 
     if (!tokenResponse.ok) {
       console.error('Token exchange failed:', await tokenResponse.text());
-      return NextResponse.redirect(`${BASE_URL}/auth?error=token_exchange_failed`);
+      const redirectPath = source === 'signup' ? '/auth/signup' : '/auth/login';
+      return NextResponse.redirect(`${BASE_URL}${redirectPath}?error=token_exchange_failed`);
     }
 
     const tokenData = await tokenResponse.json();
@@ -55,7 +59,8 @@ export async function GET(request: NextRequest) {
 
     if (!userResponse.ok) {
       console.error('User info fetch failed:', await userResponse.text());
-      return NextResponse.redirect(`${BASE_URL}/auth?error=user_info_failed`);
+      const redirectPath = source === 'signup' ? '/auth/signup' : '/auth/login';
+      return NextResponse.redirect(`${BASE_URL}${redirectPath}?error=user_info_failed`);
     }
 
     const googleUser = await userResponse.json();
@@ -69,10 +74,10 @@ export async function GET(request: NextRequest) {
     if (!user) {
       // Create new user
       const newUser = {
-        id: googleUser.id, // Use Google ID as the id field
+        id: googleUser.id,
         name: googleUser.name,
         email: googleUser.email,
-        phone: '', // Required field, set empty for Google users
+        phone: '',
         avatar: googleUser.picture,
         bio: '',
         location: {
@@ -81,7 +86,7 @@ export async function GET(request: NextRequest) {
         },
         registeredGames: [],
         isOnline: true,
-        isVerified: true, // Mark as verified for OAuth users
+        isVerified: true,
       };
 
       user = await UserModel.create(newUser);
@@ -158,6 +163,9 @@ export async function GET(request: NextRequest) {
     return response;
   } catch (error) {
     console.error('Google callback error:', error);
-    return NextResponse.redirect(`${BASE_URL}/auth?error=callback_failed`);
+    const { searchParams } = new URL(request.url);
+    const source = searchParams.get('source') || 'login';
+    const redirectPath = source === 'signup' ? '/auth/signup' : '/auth/login';
+    return NextResponse.redirect(`${BASE_URL}${redirectPath}?error=authentication_failed`);
   }
 }

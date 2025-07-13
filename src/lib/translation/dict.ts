@@ -1163,6 +1163,13 @@ export const dict = {
       intermediate: 'Intermédiaire',
       advanced: 'Avancé',
     },
+    not_found: {
+      title: 'Page non trouvée',
+      description: 'Oups ! La page que vous recherchez semble avoir pris une pause de jeu.',
+      subtext: 'La page a peut-être été déplacée, supprimée ou vous avez saisi une mauvaise URL.',
+      go_home: 'Accueil',
+      explore_games: 'Explorer les parties',
+    },
   },
 
   es: {
@@ -1753,6 +1760,13 @@ export const dict = {
       beginner: 'Principiante',
       intermediate: 'Intermedio',
       advanced: 'Avanzado',
+    },
+    not_found: {
+      title: 'Página no encontrada',
+      description: '¡Ups! La página que buscas parece haber tomado un descanso de juego.',
+      subtext: 'La página podría haber sido movida, eliminada o ingresaste una URL incorrecta.',
+      go_home: 'Ir al inicio',
+      explore_games: 'Explorar juegos',
     },
   },
   de: {
@@ -2345,6 +2359,14 @@ export const dict = {
       intermediate: 'Mittelstufe',
       advanced: 'Fortgeschritten',
     },
+    not_found: {
+      title: 'Seite nicht gefunden',
+      description: 'Hoppla! Die Seite, die du suchst, scheint eine Spielpause gemacht zu haben.',
+      subtext:
+        'Die Seite wurde möglicherweise verschoben, gelöscht oder du hast die falsche URL eingegeben.',
+      go_home: 'Zur Startseite',
+      explore_games: 'Spiele erkunden',
+    },
   },
   it: {
     app: {
@@ -2898,6 +2920,13 @@ export const dict = {
       beginner: 'Principiante',
       intermediate: 'Intermedio',
       advanced: 'Avanzato',
+    },
+    not_found: {
+      title: 'Pagina non trovata',
+      description: 'Ops! La pagina che stai cercando sembra aver fatto una pausa di gioco.',
+      subtext: 'La pagina potrebbe essere stata spostata, eliminata o hai inserito un URL errato.',
+      go_home: 'Torna alla home',
+      explore_games: 'Esplora partite',
     },
   },
 } as const;

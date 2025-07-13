@@ -392,7 +392,7 @@ export default function ProfilePage() {
           className='mb-8'
         >
           <div className='bg-white dark:bg-gray-800 rounded-2xl p-2 border border-gray-100 dark:border-gray-700'>
-            <div className='flex space-x-2'>
+            <div className='flex flex-wrap gap-2 sm:flex-nowrap sm:space-x-2'>
               {[
                 { id: 'overview', label: 'Overview', icon: User },
                 { id: 'stats', label: 'Stats', icon: TrendingUp },
@@ -404,7 +404,7 @@ export default function ProfilePage() {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id as any)}
-                    className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-medium transition-all ${
+                    className={`flex-1 min-w-[calc(50%-0.25rem)] sm:min-w-0 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-medium transition-all ${
                       activeTab === tab.id
                         ? 'bg-blue-500 text-white shadow-lg'
                         : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
